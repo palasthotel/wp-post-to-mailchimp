@@ -1,0 +1,20 @@
+#post_to_mailchimp-meta-box .campaign-list { margin: 0; }
+
+#post_to_mailchimp-meta-box .campaign-list li { position: relative; padding: 8px 0 8px 0; line-height: 1.6rem; border-bottom: 1px solid #e6e6e6; }
+
+#post_to_mailchimp-meta-box .post_to_mailchimp__error { border: 1px solid #efefef; border-left: 4px solid red; padding-left: 8px; box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1); }
+
+#post_to_mailchimp-meta-box .post_to_mailchimp__error .post_to_mailchimp__error--title { font-weight: bold; }
+
+#post_to_mailchimp-meta-box .post_to_mailchimp__error .post_to_mailchimp__error--details { line-height: 1rem; }
+
+#post_to_mailchimp-meta-box .campaign-controls--send { /*align-self: flex-end;*/ display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-pack: end; -webkit-justify-content: flex-end; -ms-flex-pack: end; justify-content: flex-end; }
+
+#post_to_mailchimp-meta-box button.send { background: #ffe01b; font-weight: bold; color: black; margin-top: 4px; text-align: right; }
+
+#post_to_mailchimp-meta-box .lists-list { margin-bottom: 8px; }
+
+#post_to_mailchimp-meta-box .timestamp-wrap input { padding: 1px; font-size: 12px; }
+
+#post_to_mailchimp-meta-box .timestamp-wrap select { height: 21px; line-height: 14px; padding: 0; vertical-align: top; font-size: 12px; }
+/*# sourceMappingURL=meta-box.css.map */

@@ -1,0 +1,60 @@
+
+
+#post_to_mailchimp-meta-box{
+
+	.campaign-list{
+		margin: 0;
+	}
+	.campaign-list li{
+		position: relative;
+		padding: 8px 0 8px 0;
+		line-height: 1.6rem;
+		border-bottom: 1px solid #e6e6e6;
+	}
+
+	.post_to_mailchimp__error{
+		border: 1px solid #efefef;
+		border-left: 4px solid red;
+		padding-left: 8px;
+		box-shadow: 0 1px 1px 0 rgba( 0, 0, 0, 0.1 );
+		.post_to_mailchimp__error--title{
+			font-weight: bold;
+		}
+		.post_to_mailchimp__error--details{
+			line-height: 1rem;
+		}
+	}
+	.campaign-controls--time{
+
+	}
+	.campaign-controls--send{
+		/*align-self: flex-end;*/
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	button.send{
+		background: #ffe01b;
+		font-weight: bold;
+		color:black;
+		margin-top: 4px;
+		text-align: right;
+	}
+	.lists-list{
+		margin-bottom: 8px;
+	}
+	.timestamp-wrap{
+		input{
+			padding: 1px;
+			font-size: 12px;
+		}
+		select{
+			height: 21px;
+			line-height: 14px;
+			padding: 0;
+			vertical-align: top;
+			font-size: 12px;
+		}
+
+	}
+}
