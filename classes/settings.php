@@ -23,9 +23,7 @@ class Settings {
 	 */
 	public function __construct($plugin) {
 		$this->plugin = $plugin;
-
-		// TODO: add settings link to plugin page
-
+		
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_filter('plugin_action_links_' . $plugin->basename, array($this, 'add_action_links'));
