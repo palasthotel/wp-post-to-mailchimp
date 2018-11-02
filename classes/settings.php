@@ -69,14 +69,6 @@ class Settings {
 			'ph_mailchimp_settings_section'
 		);
 
-//		add_settings_field(
-//			'ph_mailchimp_campaigns',
-//			__('Available campaigns', Plugin::DOMAIN),
-//			array( $this, 'render_campaigns' ),
-//			'ph_mailchimp_settings',
-//			'ph_mailchimp_settings_section'
-//		);
-
 	}
 
 	/**
@@ -85,8 +77,8 @@ class Settings {
 	function admin_menu(){
 		add_submenu_page(
 			'options-general.php',
-			'Mailchimp',
-			'Mailchimp',
+			__('Post to Mailchimp', Plugin::DOMAIN),
+			__('Post to Mailchimp', Plugin::DOMAIN),
 			'manage_options',
 			'ph_mailchimp_settings',
 			array( $this, 'render_settings_form' )
@@ -96,7 +88,7 @@ class Settings {
 	public function render_settings_form(){
 		?>
 		<div class="wrap">
-			<h2><?php _e('Mailchimp Settings', Plugin::DOMAIN); ?></h2>
+			<h2><?php _e('Post to Mailchimp Settings', Plugin::DOMAIN); ?></h2>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( 'ph_mailchimp_settings' );

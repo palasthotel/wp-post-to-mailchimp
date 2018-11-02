@@ -1,0 +1,128 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Post to Mailchimp\n"
+"POT-Creation-Date: 2018-11-02 17:05+0100\n"
+"PO-Revision-Date: 2018-11-02 17:04+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: plugin.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: classes/meta-box.php:44 classes/meta-box.php:140
+msgid "now"
+msgstr ""
+
+#: classes/meta-box.php:45
+msgid "Schedule for"
+msgstr ""
+
+#: classes/meta-box.php:46 classes/meta-box.php:141
+msgid "Edit"
+msgstr ""
+
+#: classes/meta-box.php:47
+msgid "Cancel"
+msgstr ""
+
+#: classes/meta-box.php:48
+msgid "Sorry, schedule needs to be in future"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+#: classes/meta-box.php:54 classes/settings.php:80 classes/settings.php:81
+msgid "Post to Mailchimp"
+msgstr ""
+
+#: classes/meta-box.php:67
+msgid "API is not ready yet."
+msgstr ""
+
+#: classes/meta-box.php:74
+msgid "You have to save the post first."
+msgstr ""
+
+#: classes/meta-box.php:113
+msgid "List"
+msgstr ""
+
+#: classes/meta-box.php:126
+msgid "Scheduled to be send"
+msgstr ""
+
+#: classes/meta-box.php:130
+msgid "Was send"
+msgstr ""
+
+#: classes/meta-box.php:139
+msgid "Send it"
+msgstr ""
+
+#: classes/meta-box.php:150
+msgid "Send"
+msgstr ""
+
+#: classes/meta-box.php:173
+msgid "Add campaign"
+msgstr ""
+
+#: classes/meta-box.php:180
+msgid ""
+"You can create the next campaign as soon as you send or delete the existing "
+"one."
+msgstr ""
+
+#: classes/meta-box.php:205
+msgid "List not found"
+msgstr ""
+
+#: classes/meta-box.php:267
+msgid "Invalid schedule date."
+msgstr ""
+
+#: classes/settings.php:41
+msgid "API"
+msgstr ""
+
+#: classes/settings.php:48
+msgid "API key"
+msgstr ""
+
+#: classes/settings.php:57
+msgid "Google Analytics ID"
+msgstr ""
+
+#: classes/settings.php:66
+msgid "Available lists"
+msgstr ""
+
+#: classes/settings.php:91
+msgid "Post to Mailchimp Settings"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/Palasthotel"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Provides a wrapper for MailChimp.com API"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Palasthotel ( Edward Bock <eb@palasthotel.de> )"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.palasthotel.de"
+msgstr ""

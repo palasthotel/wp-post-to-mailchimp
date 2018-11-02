@@ -2,6 +2,8 @@
 
 	$(function(){
 
+		const i18n = ptm.i18n;
+
 		// submit button
 		const $submit = $("#post_to_mailchimp_schedule");
 		// display for when to send the mails
@@ -48,16 +50,16 @@
 				const now = new Date();
 				setTimewrap(new Date(now.getTime()+ (1000*60*30)));
 				$timewrap.slideDown();
-				$a.text("Cancel");
-				$timedisplay.text("Schedule for");
+				$a.text(i18n.time_edit_cancel);
+				$timedisplay.text(i18n.time_display_schedule);
 			} else {
 				$timewrap.slideUp({
 					done: function(){
 						$timewrap.remove();
 					}
 				});
-				$a.text("Schedule");
-				$timedisplay.text("now");
+				$a.text(i18n.time_edit);
+				$timedisplay.text(i18n.time_display_schedule);
 			}
 
 		});
@@ -70,7 +72,7 @@
 				const today = new Date();
 				if(schedule <= today){
 					e.preventDefault();
-					alert("Sorry, schedule needs to be in future");
+					alert(i18n.warning_schedule_in_past);
 				}
 			}
 		});

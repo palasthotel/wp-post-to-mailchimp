@@ -40,6 +40,13 @@ class MetaBox {
 			wp_enqueue_script(Plugin::DOMAIN."-meta-box-script", $this->plugin->url."/js/meta-box.js", array("jquery"), 1, true);
 			wp_localize_script(Plugin::DOMAIN."-meta-box-script", "PostToMailchimp", array(
 				"schedule" => $this->getScheduleFromTransient($post->ID),
+				"i18n" => array(
+					"time_display_now" => __("now", Plugin::DOMAIN),
+					"time_display_schedule" => __("Schedule for", Plugin::DOMAIN),
+					"time_edit" => __("Edit", Plugin::DOMAIN),
+					"time_edit_cancel" => __("Cancel", Plugin::DOMAIN),
+					"warning_schedule_in_past" => __("Sorry, schedule needs to be in future", Plugin::DOMAIN),
+				)
 			));
 			$this->clearScheduleFromTransient($post->ID);
 			add_meta_box(
@@ -56,12 +63,16 @@ class MetaBox {
 	public function render($post){
 		$controller = $this->plugin->controller;
 		if(!$controller->isReady()){
-			echo "<p class='description'>API is not ready yet.</p>";
+			echo "<p class='description'>";
+			_e("API is not ready yet.", Plugin::DOMAIN);
+			echo "</p>";
 			return;
 		}
 
 		if( get_post_status($post->ID) == 'auto-draft' ){
-			echo "<p class='description'>You have to save the post first.</p>";
+			echo "<p class='description'>";
+			_e("You have to save the post first.",Plugin::DOMAIN);
+			echo "</p>";
 			return;
 		}
 
@@ -99,7 +110,8 @@ class MetaBox {
 
 			echo "<div class='content'>";
 			// list info
-			echo "List: ";
+			echo _e("List", Plugin::DOMAIN);
+			echo ": ";
 			$l = $this->plugin->controller->getListById($c["recipients"]["list_id"]);
 			if(false != $l){
 				render_list_link($l["name"], $l["web_id"]);
@@ -110,9 +122,13 @@ class MetaBox {
 			// send info or send button
 			if($c["send_time"] != ''){
 				if("schedule" === $c["status"]){
-					echo "<br>Scheduled to be send:<br>";
+					echo "<br>";
+					_e("Scheduled to be send", Plugin::DOMAIN);
+					echo ":<br>";
 				} else {
-					echo "<br>Was send:<br>";
+					echo "<br>";
+					_e("Was send", Plugin::DOMAIN);
+					echo ":<br>";
 				}
 				echo format_datetime(strtotime($c["send_time"]));
 			} else {
@@ -120,7 +136,10 @@ class MetaBox {
 				?>
 				<div class='campaign-controls'>
 					<div class="campaign-controls--time">
-						<span>Send: <strong class="time-display">now</strong> <a href="#mailchimp-schedule" class="hide-if-no-js">Schedule</a></span>
+						<span><?php _e("Send it", Plugin::DOMAIN); ?>:
+							<strong class="time-display"><?php _e("now", Plugin::DOMAIN); ?></strong>
+							<a href="#mailchimp-schedule" class="hide-if-no-js"><?php _e("Edit", Plugin::DOMAIN); ?></a>
+						</span>
 					</div>
 					<div class="campaign-controls--send">
 						 <button
@@ -128,7 +147,7 @@ class MetaBox {
 				name='<?php echo self::POST_SCHEDULE_NAME; ?>'
 				class='button send'
 				value='<?php echo $c["id"] ?>'>
-							 Send
+							 <?php _e('Send', Plugin::DOMAIN); ?>
 						 </button>
 					</div>
 				</div>
@@ -141,7 +160,7 @@ class MetaBox {
 
 		if(!$hasOpenCampaign){
 			?>
-			<label for="<?php echo self::POST_LIST_ID; ?>">Choose a list:</label><br>
+			<label for="<?php echo self::POST_LIST_ID; ?>"><?php _e("Choose a list", Plugin::DOMAIN); ?>:</label><br>
 			<select class="post_to_mailchimp__lists-list" id="<?php echo self::POST_LIST_ID; ?>" name="<?php echo self::POST_LIST_ID; ?>">
 				<?php
 				foreach ($lists as $item){
@@ -151,13 +170,15 @@ class MetaBox {
 			</select>
 			<div>
 				<?php
-				submit_button("Create campaign", "primary", self::POST_CREATE_NAME, false);
+				submit_button(__("Add campaign", Plugin::DOMAIN), "primary", self::POST_CREATE_NAME, false);
 				?>
 			</div>
 			<?php
 		} else {
 			?>
-			<p class="description">You can create the next campaign as soon as you send or delete the existing one.</p>
+			<p class="description">
+				<?php _e("You can create the next campaign as soon as you send or delete the existing one.", Plugin::DOMAIN); ?>
+			</p>
 			<?php
 		}
 
@@ -180,7 +201,9 @@ class MetaBox {
 
 			$list_id = sanitize_text_field($_POST[self::POST_LIST_ID]);
 			$list = $this->plugin->controller->getListById($list_id);
-			if($list == false) die("list not found");
+			if($list == false){
+				wp_die(new \WP_Error(__("List not found", Plugin::DOMAIN)));
+			}
 
 			$campaign = $this->plugin->controller->addCampaign(
 				get_the_title($post_id),
@@ -241,7 +264,7 @@ class MetaBox {
 				$timestring = sprintf( "%04d-%02d-%02d %02d:%02d:%02d", $aa, $mm, $jj, $hh, $mn, $ss );
 				$valid_date = wp_checkdate( $mm, $jj, $aa, $timestring );
 				if ( !$valid_date ) {
-					$this->setError($campaign_id, "Invalid schedule date.");
+					$this->setError($campaign_id, __("Invalid schedule date.", Plugin::DOMAIN));
 					return;
 				}
 				$date = get_gmt_from_date( $timestring );

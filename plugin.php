@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Post to Mailchimp
  * Plugin URI: https://github.com/Palasthotel
- * Description: Provides a wrapper for MailChimp.com API
+ * Description: Use your contents with Mailchimp.com API
  * Version: 1.0
  * Author: Palasthotel ( Edward Bock <eb@palasthotel.de> )
  * Author URI: http://www.palasthotel.de
@@ -34,7 +34,8 @@ class Plugin {
 	 */
 	const DOMAIN = "post_to_mailchimp";
 	const THEME_FOLDER = "plugin-parts";
-	const TEMPLATE = "post-to-mailchimp.php";
+	const TEMPLATE_HTML = "post-to-mailchimp.php";
+	const TEMPLATE_PLAINTEXT = "post-plaintext-to-mailchimp.php";
 
 	/**
 	 * post metas
@@ -87,7 +88,7 @@ class Plugin {
 		load_plugin_textdomain(
 			Plugin::DOMAIN,
 			FALSE,
-			$this->dir . '/languages'
+			dirname( plugin_basename( __FILE__ ) ) . '/languages'
 		);
 
 		require_once dirname(__FILE__)."/vendor/autoload.php";

@@ -21,6 +21,7 @@ class Render {
 		$this->sub_dirs = null;
 
 		add_action(Plugin::ACTION_NEWSLETTER_THE_CONTENT, array($this, "the_content"));
+		add_action(Plugin::ACTION_NEWSLETTER_THE_CONTENT_PLAINTEXT, array($this, "the_content_plaintext"));
 	}
 
 	/**
@@ -29,7 +30,21 @@ class Render {
 	 *
 	 */
 	public function the_content($post_id){
-		$template = $this->get_template_path(Plugin::TEMPLATE);
+		$template = $this->get_template_path(Plugin::TEMPLATE_HTML);
+		if($template === false) return;
+		$post = get_post($post_id);
+		setup_postdata($post);
+		include $template;
+		wp_reset_postdata();
+	}
+
+	/**
+	 * render content plaintext
+	 * @param $post_id
+	 *
+	 */
+	public function the_content_plaintext($post_id){
+		$template = $this->get_template_path(Plugin::TEMPLATE_PLAINTEXT);
 		if($template === false) return;
 		$post = get_post($post_id);
 		setup_postdata($post);
