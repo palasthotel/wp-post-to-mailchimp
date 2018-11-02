@@ -81,6 +81,7 @@ class Plugin {
 
 		$this->dir = plugin_dir_path(__FILE__);
 		$this->url = plugin_dir_url(__FILE__);
+		$this->basename = plugin_basename(__FILE__);
 		
 		/**
 		 * load translations

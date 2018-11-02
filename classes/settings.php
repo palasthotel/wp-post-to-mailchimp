@@ -28,6 +28,7 @@ class Settings {
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_filter('plugin_action_links_' . $plugin->basename, array($this, 'add_action_links'));
 		add_filter(Plugin::FILTER_ADD_CAMPAIGN_ARGS, array($this, 'add_to_campaign_args'));
 	}
 
@@ -85,6 +86,18 @@ class Settings {
 		);
 	}
 
+	/**
+	 * action link to settings on plugins list page
+	 * @param $links
+	 *
+	 * @return array
+	 */
+	public function add_action_links($links){
+		return array_merge($links, array(
+			'<a href="'.admin_url('options-general.php?page=ph_mailchimp_settings').'">'.__("Settings", Plugin::DOMAIN).'</a>'
+		));
+	}
+
 	public function render_settings_form(){
 		?>
 		<div class="wrap">
@@ -103,9 +116,9 @@ class Settings {
 	public function render_section(){
 		$controller = $this->plugin->controller;
 		if($controller->isReady()){
-			echo "<p>✅ Yep, this is working!</p>";
+			echo "<p>✅ ".__("Yep, this is working!", Plugin::DOMAIN)."</p>";
 		} else {
-			echo "<p>🚨 Nope, this is not working. Is your API key valid?</p>";
+			echo "<p>🚨 ".__("Nope, this is not working. Is your API key valid?", Plugin::DOMAIN)."</p>";
 		}
 	}
 
@@ -147,43 +160,12 @@ class Settings {
 
 				echo "<span class='description'>";
 				echo "ID: $list_id";
-				echo "</a><br>";
-				echo "Members: $count <br>";
-				echo "Defaults: $default_from_name &lt;$default_from_email&gt; $default_subject<br>";
-				echo "</span>";
-
-				echo "</li>";
-			}
-			echo "</ul>";
-		} else {
-			echo "---";
-		}
-
-	}
-
-	public function render_campaigns(){
-		$camps = $this->plugin->controller->getCampaigns();
-		$i = 1;
-		if($camps){
-			echo "<ul>";
-			foreach ($camps as $item){
-				$web_id = $item["web_id"];
-				$campaign_id = $item["id"];
-				$name = $item["settings"]["title"];
-				$create_time = format_string_datetime( $item["create_time"] );
-				$send_time = ($item["send_time"] != '')? format_string_datetime($item["send_time"]) : "not yet";
-
-				echo "<li>";
-				render_campaign_link($name, $web_id);
 				echo "<br>";
-				echo "<span class='description'>";
-				echo "ID: $campaign_id<br>";
-				echo "Created: $create_time<br>";
-				echo "Send: $send_time";
+				echo __("Members", Plugin::DOMAIN).": $count <br>";
+				echo __("Defaults", Plugin::DOMAIN).": $default_from_name &lt;$default_from_email&gt; – $default_subject<br>";
 				echo "</span>";
 
 				echo "</li>";
-				$i++;
 			}
 			echo "</ul>";
 		} else {
