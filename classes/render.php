@@ -32,6 +32,7 @@ class Render {
 	public function the_content($post_id){
 		$template = $this->get_template_path(Plugin::TEMPLATE_HTML);
 		if($template === false) return;
+		global $post;
 		$post = get_post($post_id);
 		setup_postdata($post);
 		include $template;
@@ -46,6 +47,7 @@ class Render {
 	public function the_content_plaintext($post_id){
 		$template = $this->get_template_path(Plugin::TEMPLATE_PLAINTEXT);
 		if($template === false) return;
+		global $post;
 		$post = get_post($post_id);
 		setup_postdata($post);
 		include $template;
