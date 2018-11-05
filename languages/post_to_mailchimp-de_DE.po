@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Post to Mailchimp\n"
-"POT-Creation-Date: 2018-11-02 17:27+0100\n"
-"PO-Revision-Date: 2018-11-02 17:27+0100\n"
+"POT-Creation-Date: 2018-11-05 17:56+0100\n"
+"PO-Revision-Date: 2018-11-05 17:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -20,68 +20,84 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: classes/meta-box.php:44 classes/meta-box.php:140
+#: classes/meta-box.php:87 classes/meta-box.php:96
 msgid "now"
 msgstr "Sofort"
 
-#: classes/meta-box.php:45
+#: classes/meta-box.php:88
 msgid "Schedule for"
 msgstr "Planen für"
 
-#: classes/meta-box.php:46 classes/meta-box.php:141
+#: classes/meta-box.php:89 classes/meta-box.php:97
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: classes/meta-box.php:47
+#: classes/meta-box.php:90
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: classes/meta-box.php:48
+#: classes/meta-box.php:91
 msgid "Sorry, schedule needs to be in future"
 msgstr "Sorry, der Planzeitpunkt muss in der Zukunft liegen."
 
-#. Plugin Name of the plugin/theme
-#: classes/meta-box.php:54 classes/settings.php:81 classes/settings.php:82
-msgid "Post to Mailchimp"
-msgstr ""
-
-#: classes/meta-box.php:67
-msgid "API is not ready yet."
-msgstr "API ist noch nicht bereit."
-
-#: classes/meta-box.php:74
-msgid "You have to save the post first."
-msgstr "Der Post muss zunächst gespeichert werden."
-
-#: classes/meta-box.php:113
+#: classes/meta-box.php:92
 msgid "List"
 msgstr "Liste"
 
-#: classes/meta-box.php:126
+#: classes/meta-box.php:93
 msgid "Scheduled to be send"
 msgstr "Versand geplant"
 
-#: classes/meta-box.php:130
+#: classes/meta-box.php:94
 msgid "Was send"
 msgstr "Wurde versendet"
 
-#: classes/meta-box.php:139
+#: classes/meta-box.php:95
 msgid "Send it"
 msgstr "Versenden"
 
-#: classes/meta-box.php:150
+#: classes/meta-box.php:98
 msgid "Send"
 msgstr "Versenden"
 
-#: classes/meta-box.php:163
+#: classes/meta-box.php:99
+msgid "Please wait..."
+msgstr "Bitte warten..."
+
+#: classes/meta-box.php:100
+msgid "Creating campaign, please wait..."
+msgstr "Erstelle Kampagne, bitte warten..."
+
+#: classes/meta-box.php:101
+msgid "Error 🚨"
+msgstr "Fehler 🚨"
+
+#: classes/meta-box.php:102
+msgid "Scheduling campaign, please wait..."
+msgstr "Plane den Versand, bitte warten..."
+
+#. Plugin Name of the plugin/theme
+#: classes/meta-box.php:108 classes/settings.php:79 classes/settings.php:80
+msgid "Post to Mailchimp"
+msgstr ""
+
+#: classes/meta-box.php:121
+msgid "API is not ready yet."
+msgstr "API ist noch nicht bereit."
+
+#: classes/meta-box.php:129
+msgid "You have to save the post first."
+msgstr "Der Post muss zunächst gespeichert werden."
+
+#: classes/meta-box.php:142
 msgid "Choose a list"
 msgstr "Wähle eine Liste"
 
-#: classes/meta-box.php:173
+#: classes/meta-box.php:155
 msgid "Add campaign"
 msgstr "Kampagne hinzufügen"
 
-#: classes/meta-box.php:180
+#: classes/meta-box.php:162
 msgid ""
 "You can create the next campaign as soon as you send or delete the existing "
 "one."
@@ -89,51 +105,47 @@ msgstr ""
 "Die nächste Kampagne kann erst erstellt werden, wenn die aktuelle versendet "
 "oder gelöscht wurde."
 
-#: classes/meta-box.php:205
+#: classes/meta-box.php:187
 msgid "List not found"
 msgstr "Keine Liste gefunden"
 
-#: classes/meta-box.php:267
-msgid "Invalid schedule date."
-msgstr "Plandatum ist nicht valide."
-
-#: classes/settings.php:42
+#: classes/settings.php:40
 msgid "API"
 msgstr ""
 
-#: classes/settings.php:49
+#: classes/settings.php:47
 msgid "API key"
 msgstr ""
 
-#: classes/settings.php:58
+#: classes/settings.php:56
 msgid "Google Analytics ID"
 msgstr ""
 
-#: classes/settings.php:67
+#: classes/settings.php:65
 msgid "Available lists"
 msgstr "Verfügbare Listen"
 
-#: classes/settings.php:97
+#: classes/settings.php:95
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: classes/settings.php:104
+#: classes/settings.php:102
 msgid "Post to Mailchimp Settings"
 msgstr "Post to Mailchimp Einstellungen"
 
-#: classes/settings.php:119
+#: classes/settings.php:117
 msgid "Yep, this is working!"
 msgstr "Jep, funktioniert!"
 
-#: classes/settings.php:121
+#: classes/settings.php:119
 msgid "Nope, this is not working. Is your API key valid?"
 msgstr "Nein, das funktioniert noch nicht. Ist der API key gültig?"
 
-#: classes/settings.php:164
+#: classes/settings.php:162
 msgid "Members"
 msgstr "Mitglieder"
 
-#: classes/settings.php:165
+#: classes/settings.php:163
 msgid "Defaults"
 msgstr "Voreinstellungen"
 
@@ -152,6 +164,9 @@ msgstr ""
 #. Author URI of the plugin/theme
 msgid "http://www.palasthotel.de"
 msgstr ""
+
+#~ msgid "Invalid schedule date."
+#~ msgstr "Plandatum ist nicht valide."
 
 #~ msgid "Provides a wrapper for MailChimp.com API"
 #~ msgstr "Mailchimp.com API für WordPress Posts."
