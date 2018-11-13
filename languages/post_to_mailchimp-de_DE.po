@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Post to Mailchimp\n"
-"POT-Creation-Date: 2018-11-05 17:56+0100\n"
-"PO-Revision-Date: 2018-11-05 17:57+0100\n"
+"POT-Creation-Date: 2018-11-13 08:47+0100\n"
+"PO-Revision-Date: 2018-11-13 08:49+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -141,11 +141,16 @@ msgstr "Jep, funktioniert!"
 msgid "Nope, this is not working. Is your API key valid?"
 msgstr "Nein, das funktioniert noch nicht. Ist der API key gültig?"
 
-#: classes/settings.php:162
+#: classes/settings.php:131
+#, php-format
+msgid "You can get one in your %sMailchimp Account Settings%s."
+msgstr "Bekommst du in den %sMailchimp Account Einstellungen%s."
+
+#: classes/settings.php:169
 msgid "Members"
 msgstr "Mitglieder"
 
-#: classes/settings.php:163
+#: classes/settings.php:170
 msgid "Defaults"
 msgstr "Voreinstellungen"
 

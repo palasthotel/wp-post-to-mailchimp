@@ -126,6 +126,13 @@ class Settings {
 
 	public function render_api_key(){
 		$this->renderInput("ph_mailchimp_api_key", $this->getApiKey());
+		echo "<br><span class='description'>";
+		printf(
+				__( "You can get one in your %sMailchimp Account Settings%s.", Plugin::DOMAIN),
+				"<a href='https://us19.admin.mailchimp.com/account/api/' target='_blank'>",
+				"</a>"
+		);
+		echo "</span>";
 	}
 
 	public function getGoogleAnalyticsId(){

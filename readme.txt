@@ -4,7 +4,7 @@ Donate link: http://palasthotel.de/
 Tags: mailchimp, newsletter
 Requires at least: 4.0
 Tested up to: 4.9.8
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl
 
@@ -33,6 +33,9 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 
 == Changelog ==
+
+= 1.0.1 =
+* Readme update
 
 = 1.0 =
 * First release
