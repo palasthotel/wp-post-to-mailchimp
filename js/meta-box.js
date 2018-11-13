@@ -297,7 +297,7 @@
 
 			api.schedule(id, schedule, function(error, data){
 				if(error){
-					console.log(data);
+					console.error(data);
 					setError($button);
 				} else {
 					setTimeout(function(){
