@@ -19,8 +19,14 @@ Use post content for mailchimp campaigns.
 1. Upload `post-to-mailchimp.zip` to the `/wp-content/plugins/` directory
 1. Extract the Plugin to a `post-to-mailchimp` Folder
 1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Goto settings and setup your mailchimp credentials
+1. You now have a meta box on every post edit page to schedule newletters with the content of the post
 
 == Frequently Asked Questions ==
+
+= How can I customize the visualization of my newsletter? =
+
+You can copy one or both templates out of the `wp-content/plugins/post-to-mailchimp/templates` directory into your theme folder in a directory called `plugin-parts` and customize the templates there.
 
 
 == Screenshots ==
