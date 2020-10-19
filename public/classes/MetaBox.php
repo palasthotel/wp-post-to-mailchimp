@@ -9,7 +9,7 @@
 namespace Palasthotel\PostToMailchimp;
 
 
-class MetaBox {
+class MetaBox extends _Component {
 
 	const AJAX_ACTION_CREATE = "post_to_mailchimp__create";
 
@@ -21,13 +21,8 @@ class MetaBox {
 
 	const ROOT_ID = "post_to_mailchimp__app";
 
-	/**
-	 * MetaBox constructor.
-	 *
-	 * @param Plugin $plugin
-	 */
-	public function __construct( $plugin ) {
-		$this->plugin = $plugin;
+
+	public function onCreate() {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10, 2 );
 		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
 		add_action( 'wp_ajax_' . self::AJAX_ACTION_CREATE, array(

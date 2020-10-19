@@ -9,15 +9,9 @@
 namespace Palasthotel\PostToMailchimp;
 
 
-class Render {
+class Render extends _Component {
 
-	/**
-	 * Render constructor
-	 *
-	 * @param Plugin $plugin
-	 */
-	function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
+	function onCreate() {
 		$this->sub_dirs = null;
 
 		add_action(Plugin::ACTION_NEWSLETTER_THE_CONTENT, array($this, "the_content"));
@@ -75,7 +69,7 @@ class Render {
 		// other plugins
 		$paths = apply_filters(Plugin::FILTER_ADD_TEMPLATE_PATHS, array());
 		// add default templates at last position
-		$paths[] = $this->plugin->dir . 'templates';
+		$paths[] = $this->plugin->path . 'templates';
 		// find templates
 		foreach ($paths as $path){
 			if(is_file("$path/$template")){

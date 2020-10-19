@@ -10,21 +10,7 @@ namespace Palasthotel\PostToMailchimp;
 
 use DrewM\MailChimp\MailChimp;
 
-class Controller {
-
-	/**
-	 * @var Plugin
-	 */
-	private $plugin;
-
-	/**
-	 * Controller constructor.
-	 *
-	 * @param Plugin $plugin
-	 */
-	public function __construct( $plugin ) {
-		$this->plugin = $plugin;
-	}
+class Controller extends _Component {
 
 	/**
 	 * @var \DrewM\MailChimp\MailChimp|null
