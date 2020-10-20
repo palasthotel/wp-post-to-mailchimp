@@ -3,7 +3,7 @@
  * Plugin Name: Post to Mailchimp
  * Plugin URI: https://github.com/Palasthotel
  * Description: Use your contents with Mailchimp.com API
- * Version: 1.1.0
+ * Version: 2.0.0
  * Author: Palasthotel ( Edward Bock <eb@palasthotel.de> )
  * Author URI: http://www.palasthotel.de
  * Text Domain: post_to_mailchimp
@@ -22,14 +22,30 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+if ( ! defined( 'POST_TO_MAILCHIMP_API_KEY' ) ) {
+	define( 'POST_TO_MAILCHIMP_API_KEY', false );
+}
+if ( ! defined( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY' ) ) {
+	define( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY', false );
+}
+
 /**
  * Class Plugin
  * @property string $path
  * @property string url
  * @property string basename
+ * @property Settings settings
+ * @property MetaBox metaBox
+ * @property Templates templates
+ * @property Assets assets
+ * @property Gutenberg gutenberg
+ * @property Repository repository
+ * @property Controller controller
+ * @property WP_REST rest
+ * @property Database database
  */
 class Plugin {
-	
+
 	/**
 	 * ---------------------------------------------
 	 * plugin constants
@@ -39,6 +55,11 @@ class Plugin {
 	const THEME_FOLDER = "plugin-parts";
 	const TEMPLATE_HTML = "post-to-mailchimp.php";
 	const TEMPLATE_PLAINTEXT = "post-plaintext-to-mailchimp.php";
+
+	/**
+	 * script and style handles
+	 */
+	const HANDLE_JS_GUTENBERG = "post-to-mailchimp-gutenberg-js";
 
 	/**
 	 * post metas
@@ -61,35 +82,75 @@ class Plugin {
 	const FILTER_SCHEDULE_CAMPAIGN_ARGS = "post_to_mailchimp_schedule_campaign_args";
 	const FILTER_POST_TYPES = "post_to_mailchimp_post_types";
 	const FILTER_ADD_TEMPLATE_PATHS = "post_to_mailchimp_add_template_paths";
-	
+
+	/**
+	 * options
+	 */
+	const OPTION_MAILCHIMP_API_KEY = "ph_mailchimp_api_key";
+	const OPTION_GA_API_KEY = "ph_mailchimp_ga";
+
+	/**
+	 * transients
+	 */
+	const TRANSIENT_LISTS = "post-to-mailchimp__lists";
+	const TRANSIENT_SEGMENTS = "post-to-mailchimp__list_%s_segments";
+	const TRANSIENT_DELETE_SEGMENTS_LIKE = "%post-to-mailchimp__list_%_segments";
+
 	/**
 	 * Plugin constructor.
 	 */
 	private function __construct() {
 
-		$this->path     = plugin_dir_path(__FILE__);
-		$this->url      = plugin_dir_url(__FILE__);
-		$this->basename = plugin_basename(__FILE__);
-		
+		$this->path     = plugin_dir_path( __FILE__ );
+		$this->url      = plugin_dir_url( __FILE__ );
+		$this->basename = plugin_basename( __FILE__ );
+
 		/**
 		 * load translations
 		 */
 		load_plugin_textdomain(
 			Plugin::DOMAIN,
-			FALSE,
+			false,
 			dirname( plugin_basename( __FILE__ ) ) . '/languages'
 		);
 
-		require_once dirname(__FILE__)."/vendor/autoload.php";
+		require_once dirname( __FILE__ ) . "/vendor/autoload.php";
 
-		$this->controller = new Controller($this);
-		$this->settings = new Settings($this);
-		$this->meta_box = new MetaBox($this);
-		$this->render = new Render($this);
+		$this->assets     = new Assets( $this );
+		$this->gutenberg  = new Gutenberg( $this );
+		$this->database   = new Database( $this );
+		$this->controller = new Controller( $this );
+		$this->repository = new Repository( $this );
+		$this->settings   = new Settings( $this );
+		$this->metaBox    = new MetaBox( $this );
+		$this->templates  = new Templates( $this );
+		$this->rest       = new WP_REST( $this );
 
-		require_once dirname(__FILE__)."/inc/utils.php";
+		require_once dirname( __FILE__ ) . "/inc/utils.php";
+
+		/**
+		 * on activate or deactivate plugin
+		 */
+		register_activation_hook( __FILE__, array( $this, "activation" ) );
+		register_deactivation_hook( __FILE__, array( $this, "deactivation" ) );
+
+		$this->database->createTables();
 
 	}
+
+	/**
+	 * on plugin activation
+	 */
+	function activation() {
+		$this->database->createTables();
+	}
+
+	/**
+	 * on plugin deactivation
+	 */
+	function deactivation() {
+	}
+
 
 	/**
 	 * @var Plugin
@@ -99,10 +160,11 @@ class Plugin {
 	/**
 	 * @return Plugin
 	 */
-	public static function instance(){
-		if(static::$instance == null){
+	public static function instance() {
+		if ( static::$instance == null ) {
 			static::$instance = new Plugin();
 		}
+
 		return static::$instance;
 	}
 

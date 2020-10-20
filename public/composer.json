@@ -1,5 +1,12 @@
 {
-
+    "autoload": {
+        "classmap": [
+            "classes"
+        ],
+        "psr-4": {
+            "Palasthotel\\PostToMailchimp\\": "classes"
+        }
+    },
     "require": {
         "drewm/mailchimp-api": "^2.5"
     }

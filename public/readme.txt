@@ -2,9 +2,9 @@
 Contributors: palasthotel, edwardbock
 Donate link: http://palasthotel.de/
 Tags: mailchimp, newsletter
-Requires at least: 4.0
-Tested up to: 4.9.8
-Stable tag: 1.0.1
+Requires at least: 5.0
+Tested up to: 5.5.1
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl
 
@@ -34,6 +34,10 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 == Changelog ==
 
+= 2.0.0 =
+* Gutenberg support!
+* dropped classic editor support
+
 = 1.0.1 =
 * Readme update
 
@@ -42,6 +46,7 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 == Upgrade Notice ==
 
+With version 2.x we dropped the support for the classic Editor and focus on gutenberg only.
 
 == Arbitrary section ==
 

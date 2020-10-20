@@ -9,7 +9,7 @@
 namespace Palasthotel\PostToMailchimp;
 
 
-class Render extends _Component {
+class Templates extends _Component {
 
 	function onCreate() {
 		$this->sub_dirs = null;

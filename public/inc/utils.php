@@ -1,16 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: edward
- * Date: 29.10.18
- * Time: 17:51
- */
+
 namespace Palasthotel\PostToMailchimp;
+
+use Exception;
 
 /**
  * @param $string_date
  *
  * @return string
+ * @throws Exception
  */
 function format_string_datetime($string_date){
 	$datetime = new \DateTime($string_date);

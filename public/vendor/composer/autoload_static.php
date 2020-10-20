@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInitfe98777d43565134f1643d8f5712d151
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'Palasthotel\\PostToMailchimp\\' => 28,
+        ),
         'D' => 
         array (
             'DrewM\\MailChimp\\' => 16,
@@ -14,10 +18,31 @@ class ComposerStaticInitfe98777d43565134f1643d8f5712d151
     );
 
     public static $prefixDirsPsr4 = array (
+        'Palasthotel\\PostToMailchimp\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/classes',
+        ),
         'DrewM\\MailChimp\\' => 
         array (
             0 => __DIR__ . '/..' . '/drewm/mailchimp-api/src',
         ),
+    );
+
+    public static $classMap = array (
+        'Palasthotel\\PostToMailchimp\\Assets' => __DIR__ . '/../..' . '/classes/Assets.php',
+        'Palasthotel\\PostToMailchimp\\Audience' => __DIR__ . '/../..' . '/classes/Model/Audience.php',
+        'Palasthotel\\PostToMailchimp\\Campaign' => __DIR__ . '/../..' . '/classes/Model/Campaign.php',
+        'Palasthotel\\PostToMailchimp\\Controller' => __DIR__ . '/../..' . '/classes/Controller.php',
+        'Palasthotel\\PostToMailchimp\\Database' => __DIR__ . '/../..' . '/classes/Database.php',
+        'Palasthotel\\PostToMailchimp\\Gutenberg' => __DIR__ . '/../..' . '/classes/Gutenberg.php',
+        'Palasthotel\\PostToMailchimp\\MetaBox' => __DIR__ . '/../..' . '/classes/MetaBox.php',
+        'Palasthotel\\PostToMailchimp\\REST\\CampaignsController' => __DIR__ . '/../..' . '/classes/REST/CampaignsController.php',
+        'Palasthotel\\PostToMailchimp\\Repository' => __DIR__ . '/../..' . '/classes/Repository.php',
+        'Palasthotel\\PostToMailchimp\\Segment' => __DIR__ . '/../..' . '/classes/Model/Segment.php',
+        'Palasthotel\\PostToMailchimp\\Settings' => __DIR__ . '/../..' . '/classes/Settings.php',
+        'Palasthotel\\PostToMailchimp\\Templates' => __DIR__ . '/../..' . '/classes/Templates.php',
+        'Palasthotel\\PostToMailchimp\\WP_REST' => __DIR__ . '/../..' . '/classes/WP_REST.php',
+        'Palasthotel\\PostToMailchimp\\_Component' => __DIR__ . '/../..' . '/classes/_Component.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -25,6 +50,7 @@ class ComposerStaticInitfe98777d43565134f1643d8f5712d151
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitfe98777d43565134f1643d8f5712d151::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitfe98777d43565134f1643d8f5712d151::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitfe98777d43565134f1643d8f5712d151::$classMap;
 
         }, null, ClassLoader::class);
     }

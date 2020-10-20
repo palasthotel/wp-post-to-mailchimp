@@ -16,6 +16,7 @@ class Settings extends _Component {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_filter('plugin_action_links_' . $this->plugin->basename, array($this, 'add_action_links'));
 		add_filter(Plugin::FILTER_ADD_CAMPAIGN_ARGS, array($this, 'add_to_campaign_args'));
+		add_filter('pre_update_option_'.Plugin::OPTION_MAILCHIMP_API_KEY, [$this, 'before_update']);
 	}
 
 	/**
@@ -37,7 +38,7 @@ class Settings extends _Component {
 			'ph_mailchimp_settings',
 			'ph_mailchimp_settings_section'
 		);
-		register_setting( 'ph_mailchimp_settings', 'ph_mailchimp_api_key' );
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_MAILCHIMP_API_KEY );
 
 		add_settings_field(
 			'ph_mailchimp_ga',
@@ -46,7 +47,7 @@ class Settings extends _Component {
 			'ph_mailchimp_settings',
 			'ph_mailchimp_settings_section'
 		);
-		register_setting( 'ph_mailchimp_settings', 'ph_mailchimp_ga' );
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_GA_API_KEY);
 
 		add_settings_field(
 			'ph_mailchimp_lists',
@@ -93,7 +94,7 @@ class Settings extends _Component {
 				settings_fields( 'ph_mailchimp_settings' );
 				do_settings_sections( 'ph_mailchimp_settings' );
 				?>
-				<?php submit_button(); ?>
+				<?php submit_button(__("Save and update lists", Plugin::DOMAIN)); ?>
 			</form>
 		</div>
 		<?php
@@ -108,13 +109,25 @@ class Settings extends _Component {
 		}
 	}
 
+	public function isApiKeyInConstant(){
+	    return false !== POST_TO_MAILCHIMP_API_KEY;
+	}
+
 	public function getApiKey(){
-		return get_option('ph_mailchimp_api_key', '');
+		return $this->isApiKeyInConstant() ? POST_TO_MAILCHIMP_API_KEY: get_option(Plugin::OPTION_MAILCHIMP_API_KEY, '');
 	}
 
 	public function render_api_key(){
-		$this->renderInput("ph_mailchimp_api_key", $this->getApiKey());
-		echo "<br><span class='description'>";
+	    $isConstantOption = $this->isApiKeyInConstant();
+	    $apiKey = $this->getApiKey();
+		$this->renderInput("ph_mailchimp_api_key", $apiKey, $isConstantOption);
+		echo "<br/>";
+		if($isConstantOption){
+			echo "<span class='description'>";
+			_e('Included in wp-config.php.', Plugin::DOMAIN);
+			echo "</span> ";
+		}
+		echo "<span class='description'>";
 		printf(
 				__( "You can get one in your %sMailchimp Account Settings%s.", Plugin::DOMAIN),
 				"<a href='https://us19.admin.mailchimp.com/account/api/' target='_blank'>",
@@ -123,32 +136,36 @@ class Settings extends _Component {
 		echo "</span>";
 	}
 
+	public function isGoogleAnalyticsIdInConstant(){
+	    return false !== POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY;
+	}
 	public function getGoogleAnalyticsId(){
-		return get_option('ph_mailchimp_ga', '');
+		return $this->isGoogleAnalyticsIdInConstant() ? POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY: get_option(Plugin::OPTION_GA_API_KEY, '');
 	}
 	public function render_ga(){
-		$this->renderInput("ph_mailchimp_ga", $this->getGoogleAnalyticsId());
+		$this->renderInput("ph_mailchimp_ga", $this->getGoogleAnalyticsId(), $this->isGoogleAnalyticsIdInConstant());
 	}
 
-	private function renderInput($name, $value, $type = "text"){
-		echo "<input id='$name' name='$name' value='$value' type='$type' class='regular-text' />";
+	private function renderInput($name, $value, $isReadonly = false){
+	    $readonly = $isReadonly ? "readonly": "";
+	    echo "<input id='$name' name='$name' value='$value' type='text' $readonly class='regular-text' />";
 	}
 
 	public function render_lists(){
-		$lists = $this->plugin->controller->getLists();
+		$lists = $this->plugin->repository->getAudiencesList();
 		$list_id = null;
 		if($lists){
 			echo "<ul>";
 			foreach ($lists as $list){
-				$count = $list["stats"]["member_count"];
-				$web_id = $list["web_id"];
-				$list_id = $list["id"];
-				$default_from_name = $list["campaign_defaults"]["from_name"];
-				$default_from_email = $list["campaign_defaults"]["from_email"];
-				$default_subject = $list["campaign_defaults"]["subject"];
+				$count = $list->memberCount;
+				$web_id = $list->webId;
+				$list_id = $list->listId;
+				$default_from_name = $list->campaignDefaults["from_name"];
+				$default_from_email = $list->campaignDefaults["from_email"];
+				$default_subject = $list->campaignDefaults["subject"];
 
-				echo "<li>";
-				echo render_list_link($list["name"], $web_id);
+				echo "<li style='border-bottom: 1px solid #cecece;padding: 10px 0;'>";
+				echo render_list_link($list->name, $web_id);
 				echo "<br>";
 
 				echo "<span class='description'>";
@@ -157,6 +174,17 @@ class Settings extends _Component {
 				echo __("Members", Plugin::DOMAIN).": $count <br>";
 				echo __("Defaults", Plugin::DOMAIN).": $default_from_name &lt;$default_from_email&gt; – $default_subject<br>";
 				echo "</span>";
+
+				$segments = $this->plugin->repository->getSegments($list_id);
+
+				if(count($segments)){
+					echo "<strong>Segments</strong>";
+					echo "<ul style='padding-left: 20px;'>";
+					foreach ($this->plugin->repository->getSegments($list_id) as $segment){
+						echo "<li>$segment->name</li>";
+					}
+					echo "</ul>";
+				}
 
 				echo "</li>";
 			}
@@ -178,6 +206,10 @@ class Settings extends _Component {
 				"google_analytics" => $this->getGoogleAnalyticsId()
 			)
 		));
+	}
+
+	public function before_update(){
+	    $this->plugin->repository->cacheClear();
 	}
 
 

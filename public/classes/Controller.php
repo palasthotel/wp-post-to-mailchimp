@@ -13,16 +13,16 @@ use DrewM\MailChimp\MailChimp;
 class Controller extends _Component {
 
 	/**
-	 * @var \DrewM\MailChimp\MailChimp|null
+	 * @var MailChimp|null
 	 */
-	private $api = NULL;
+	private $api = null;
 
 	/**
-	 * @return bool|\DrewM\MailChimp\MailChimp|null
+	 * @return bool|MailChimp|null
 	 */
 	private function getApi() {
 		try {
-			if ( $this->api === NULL ) {
+			if ( $this->api === null ) {
 				$this->api = new MailChimp( $this->plugin->settings->getApiKey() );
 			}
 		} catch ( \Exception $e ) {
@@ -38,13 +38,13 @@ class Controller extends _Component {
 	 *
 	 * @return bool
 	 */
-	private $isReady = NULL;
+	private $isReady = null;
 
 	/**
 	 * @return bool
 	 */
 	public function isReady() {
-		if ( $this->isReady == NULL ) {
+		if ( $this->isReady == null ) {
 			$this->isReady = false;
 			if ( $this->getApi() ) {
 				$this->isReady = $this->api->get( "/ping" );
@@ -57,20 +57,51 @@ class Controller extends _Component {
 	/**
 	 * @param array $args
 	 *
-	 * @return array|false
+	 * @return Audience[]
 	 */
-	private $lists = NULL;
-
 	public function getLists( $args = array() ) {
 		if ( ! $this->isReady() ) {
-			return false;
-		}
-		if ( $this->lists == NULL ) {
-			$this->lists = $this->getApi()
-			                    ->get( '/lists', apply_filters( Plugin::FILTER_GET_LISTS_ARGS, $args ) );
+			error_log("Mailchimp api was not ready on Controller->getLists call.");
+			return [];
 		}
 
-		return ( $this->lists !== false ) ? $this->lists["lists"] : false;
+		$result = $this->getApi()->get( '/lists', apply_filters( Plugin::FILTER_GET_LISTS_ARGS, $args ) );
+
+		if ( !is_array( $result ) || !is_array( $result["lists"] ) ) return [];
+
+		return array_map( function ( $item ) {
+			return Audience::parse( $item );
+		}, $result["lists"] );
+	}
+
+	/**
+	 * @param string $id
+	 * @return Audience|false
+	 */
+	public function getAudience(string $id){
+		if ( ! $this->isReady() ) {
+			error_log("Mailchimp api was not ready on Controller->getLists call.");
+			return false;
+		}
+
+		$result = $this->getApi()->get("/lists/$id");
+		return Audience::parse($result);
+	}
+
+	/**
+	 * @param int|string $listId
+	 *
+	 * @return array|bool
+	 */
+	public function getSegments( $listId ) {
+		$result = $this->getApi()->get( "/lists/$listId/segments" );
+		if ( is_array( $result ) && is_array( $result["segments"] ) ) {
+			return array_map(function($item){
+				return new Segment($item["id"], $item["name"], $item["list_id"], $item["created_at"], $item["updated_at"]);
+			},$result["segments"]);
+		}
+
+		return false;
 	}
 
 	/**
@@ -129,7 +160,8 @@ class Controller extends _Component {
 	 *
 	 * @return array|false
 	 */
-	public function addCampaign( $title, $list_id, $args = array() ) {
+	public function addCampaign( string $title, string $list_id, $args = array() ) {
+
 		if ( ! $this->isReady() ) {
 			return false;
 		}
@@ -160,6 +192,11 @@ class Controller extends _Component {
 	 * @return bool
 	 */
 	public function addContent( $campaignId, $html, $plain_text, $url = "" ) {
+
+		if ( WP_DEBUG ) {
+			return false;
+		}
+
 		if ( ! $this->isReady() ) {
 			return false;
 		}
@@ -177,6 +214,11 @@ class Controller extends _Component {
 	 * @return array|bool|false
 	 */
 	public function send( $campaignId ) {
+
+		if ( WP_DEBUG ) {
+			return false;
+		}
+
 		if ( ! $this->isReady() ) {
 			return false;
 		}
@@ -192,6 +234,11 @@ class Controller extends _Component {
 	 * @return array|bool|false
 	 */
 	public function schedule( $campaignId, $utc_datetime ) {
+
+		if ( WP_DEBUG ) {
+			return false;
+		}
+
 		if ( ! $this->isReady() ) {
 			return false;
 		}

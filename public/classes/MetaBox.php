@@ -8,7 +8,11 @@
 
 namespace Palasthotel\PostToMailchimp;
 
-
+/**
+ * Class MetaBox
+ * @package Palasthotel\PostToMailchimp
+ * @deprecated will be replaced by gutenberg
+ */
 class MetaBox extends _Component {
 
 	const AJAX_ACTION_CREATE = "post_to_mailchimp__create";
@@ -23,16 +27,16 @@ class MetaBox extends _Component {
 
 
 	public function onCreate() {
-		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10, 2 );
-		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
-		add_action( 'wp_ajax_' . self::AJAX_ACTION_CREATE, array(
-			$this,
-			'ajax_create',
-		) );
-		add_action( 'wp_ajax_' . self::AJAX_ACTION_SEND, array(
-			$this,
-			'ajax_send',
-		) );
+//		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10, 2 );
+//		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
+//		add_action( 'wp_ajax_' . self::AJAX_ACTION_CREATE, array(
+//			$this,
+//			'ajax_create',
+//		) );
+//		add_action( 'wp_ajax_' . self::AJAX_ACTION_SEND, array(
+//			$this,
+//			'ajax_send',
+//		) );
 	}
 
 	/**
