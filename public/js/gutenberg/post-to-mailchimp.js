@@ -343,10 +343,10 @@ module.exports = _unsupportedIterableToArray;
 
 /***/ }),
 
-/***/ "./src/script/components/AudiencesListControl.js":
-/*!*******************************************************!*\
-  !*** ./src/script/components/AudiencesListControl.js ***!
-  \*******************************************************/
+/***/ "./src/script/components/AudiencesControl.js":
+/*!***************************************************!*\
+  !*** ./src/script/components/AudiencesControl.js ***!
+  \***************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -369,13 +369,29 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var AudiencesListControl = function AudiencesListControl() {
+
+var AudiencesControl = function AudiencesControl() {
   var _useAudience = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useAudience"])(),
       _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default()(_useAudience, 2),
       state = _useAudience2[0],
       setState = _useAudience2[1];
 
   var audiences = Object(_hooks_use_config__WEBPACK_IMPORTED_MODULE_4__["useAudiencesLists"])();
+  Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["useEffect"])(function () {
+    if (audiences.length === 1) {
+      var id = audiences[0].listId;
+      if (state != id) setState(id);
+    }
+  }, [audiences.length]);
+
+  if (audiences.length === 1) {
+    return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["TextControl"], {
+      label: "Audience",
+      value: audiences[0].name,
+      readOnly: true
+    });
+  }
+
   var options = [{
     value: "",
     label: '- Choose audience -'
@@ -395,94 +411,25 @@ var AudiencesListControl = function AudiencesListControl() {
   });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (AudiencesListControl);
+/* harmony default export */ __webpack_exports__["default"] = (AudiencesControl);
 
 /***/ }),
 
-/***/ "./src/script/components/PluginComponent.js":
-/*!**************************************************!*\
-  !*** ./src/script/components/PluginComponent.js ***!
-  \**************************************************/
-/*! exports provided: default */
+/***/ "./src/script/components/Buttons.js":
+/*!******************************************!*\
+  !*** ./src/script/components/Buttons.js ***!
+  \******************************************/
+/*! exports provided: CreateButton, UpdateButton, DeleteButton, SendButton */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
-/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _AudiencesListControl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AudiencesListControl */ "./src/script/components/AudiencesListControl.js");
-/* harmony import */ var _SegmentsListControl__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SegmentsListControl */ "./src/script/components/SegmentsListControl.js");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_6__);
-
-
-
-
-
-
-
-
-var PluginComponent = function PluginComponent() {
-  var Post = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_6__["useSelect"])(function (select) {
-    return select('core/editor').getCurrentPost();
-  });
-  console.log(Post);
-
-  var _useAudience = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useAudience"])(),
-      _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useAudience, 2),
-      audience = _useAudience2[0],
-      setAudience = _useAudience2[1];
-
-  var _useSegment = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useSegment"])(),
-      _useSegment2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useSegment, 2),
-      segment = _useSegment2[0],
-      setSegment = _useSegment2[1];
-
-  var _useCampaigns = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useCampaigns"])(Post.id),
-      _useCampaigns2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useCampaigns, 3),
-      campaigns = _useCampaigns2[0],
-      updateCampaign = _useCampaigns2[1],
-      addCampaign = _useCampaigns2[2];
-
-  console.log("campaigns", campaigns);
-
-  var handleCreateCampaign = function handleCreateCampaign() {
-    console.log("create campaign with", audience, segment);
-    addCampaign({
-      post_id: Post.id,
-      audience_id: audience,
-      segment_id: segment
-    });
-  };
-
-  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["PanelBody"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])("p", null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])("a", {
-    href: "#preview"
-  }, "Preview")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_AudiencesListControl__WEBPACK_IMPORTED_MODULE_2__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_SegmentsListControl__WEBPACK_IMPORTED_MODULE_3__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
-    isSecondary: true,
-    onClick: handleCreateCampaign
-  }, "Create Campaign"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])("p", null, "Send Campaign"));
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (PluginComponent);
-
-/***/ }),
-
-/***/ "./src/script/components/SegmentsListControl.js":
-/*!******************************************************!*\
-  !*** ./src/script/components/SegmentsListControl.js ***!
-  \******************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/toConsumableArray */ "./node_modules/@babel/runtime/helpers/toConsumableArray.js");
-/* harmony import */ var _babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateButton", function() { return CreateButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UpdateButton", function() { return UpdateButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeleteButton", function() { return DeleteButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SendButton", function() { return SendButton; });
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
 /* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
@@ -491,52 +438,258 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _hooks_use_config__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-config */ "./src/script/hooks/use-config.js");
-/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
 
 
 
 
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
 
-var SegmentsListControl = function SegmentsListControl() {
-  var _useAudience = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_6__["useAudience"])(),
+var CreateButton = function CreateButton() {
+  var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
+
+  var _useAudience = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useAudience"])(),
       _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useAudience, 1),
       audience = _useAudience2[0];
 
-  var segments = Object(_hooks_use_config__WEBPACK_IMPORTED_MODULE_5__["useSegments"])(audience);
+  var _useSegment = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useSegment"])(),
+      _useSegment2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useSegment, 1),
+      segment = _useSegment2[0];
 
-  var _useSegment = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_6__["useSegment"])(),
-      _useSegment2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useSegment, 2),
-      state = _useSegment2[0],
-      setState = _useSegment2[1];
+  var _useRecentCampaign = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaign"])(),
+      _useRecentCampaign2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign, 3),
+      campaign = _useRecentCampaign2[0],
+      _ = _useRecentCampaign2[1],
+      addCampaign = _useRecentCampaign2[2];
 
-  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(segments) !== _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()([]) || segments.length === 0) {
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) !== ( true ? "undefined" : undefined)) {
     return null;
   }
 
-  var options = [{
-    value: "",
-    label: '- Choose segment (optional) -'
-  }].concat(_babel_runtime_helpers_toConsumableArray__WEBPACK_IMPORTED_MODULE_0___default()(segments.map(function (_ref) {
-    var id = _ref.id,
-        name = _ref.name;
-    return {
-      value: id,
-      label: name
-    };
-  })));
-  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["SelectControl"], {
-    label: "Segments",
-    value: state,
-    onChange: setState,
-    options: options
-  });
+  var handleCreateCampaign = function handleCreateCampaign() {
+    return addCampaign({
+      audience_id: audience,
+      segment_id: segment
+    });
+  };
+
+  var disabled = isRequesting;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    disabled: disabled,
+    isSecondary: true,
+    onClick: handleCreateCampaign
+  }, "Create Campaign");
+};
+var UpdateButton = function UpdateButton() {
+  var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
+
+  var _useAudience3 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useAudience"])(),
+      _useAudience4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useAudience3, 1),
+      audience = _useAudience4[0];
+
+  var _useSegment3 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useSegment"])(),
+      _useSegment4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useSegment3, 1),
+      segment = _useSegment4[0];
+
+  var _useRecentCampaign3 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaign"])(),
+      _useRecentCampaign4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign3, 2),
+      campaign = _useRecentCampaign4[0],
+      updateCampaign = _useRecentCampaign4[1];
+
+  var hasChange = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaignHasChanges"])();
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) {
+    return null;
+  }
+
+  var disabled = isRequesting || !hasChange;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    disabled: disabled,
+    isSecondary: true,
+    onClick: function onClick() {
+      return updateCampaign(_objectSpread(_objectSpread({}, campaign), {}, {
+        audience_id: audience,
+        segment_id: segment
+      }));
+    }
+  }, "Save");
+};
+var DeleteButton = function DeleteButton() {
+  var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
+
+  var _useRecentCampaign5 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaign"])(),
+      _useRecentCampaign6 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign5, 4),
+      campaign = _useRecentCampaign6[0],
+      _1 = _useRecentCampaign6[1],
+      _2 = _useRecentCampaign6[2],
+      deleteCampaign = _useRecentCampaign6[3];
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return null;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    disabled: isRequesting,
+    isDestructive: true,
+    onClick: function onClick() {
+      return deleteCampaign();
+    }
+  }, "Delete");
+};
+var SendButton = function SendButton() {
+  var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
+  var hasChanges = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaignHasChanges"])();
+
+  var _useRecentCampaign7 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaign"])(),
+      _useRecentCampaign8 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign7, 1),
+      campaign = _useRecentCampaign8[0];
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return null;
+  var disabled = isRequesting || hasChanges;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    disabled: disabled,
+    isPrimary: true,
+    onClick: function onClick() {
+      return console.log("send");
+    }
+  }, "Send!");
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (SegmentsListControl);
+/***/ }),
+
+/***/ "./src/script/components/Plugin.js":
+/*!*****************************************!*\
+  !*** ./src/script/components/Plugin.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AudiencesControl_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AudiencesControl.js */ "./src/script/components/AudiencesControl.js");
+/* harmony import */ var _SegmentsControl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SegmentsControl.js */ "./src/script/components/SegmentsControl.js");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _hooks_use_config_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../hooks/use-config.js */ "./src/script/hooks/use-config.js");
+/* harmony import */ var _Buttons_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Buttons.js */ "./src/script/components/Buttons.js");
+
+
+
+
+
+
+
+
+
+var Plugin = function Plugin() {
+  var audiences = Object(_hooks_use_config_js__WEBPACK_IMPORTED_MODULE_6__["useAudiencesLists"])();
+
+  if (audiences.length < 1) {
+    return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], null, "Please make sure there is at least one Mailchimp.com audience available.");
+  }
+
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_AudiencesControl_js__WEBPACK_IMPORTED_MODULE_1__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_SegmentsControl_js__WEBPACK_IMPORTED_MODULE_2__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["CreateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["UpdateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["DeleteButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["SendButton"], null));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Plugin);
+
+/***/ }),
+
+/***/ "./src/script/components/SegmentsControl.js":
+/*!**************************************************!*\
+  !*** ./src/script/components/SegmentsControl.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _hooks_use_config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../hooks/use-config */ "./src/script/hooks/use-config.js");
+/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+
+
+
+
+
+
+
+var SegmentsControl = function SegmentsControl() {
+  var _useAudience = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useAudience"])(),
+      _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default()(_useAudience, 1),
+      audience = _useAudience2[0];
+
+  var segments = Object(_hooks_use_config__WEBPACK_IMPORTED_MODULE_4__["useSegments"])(audience);
+
+  var _useSegment = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useSegment"])(),
+      _useSegment2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default()(_useSegment, 2),
+      state = _useSegment2[0],
+      setState = _useSegment2[1];
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(segments) !== _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()([]) || segments.length === 0) {
+    return null;
+  }
+
+  var _segments = segments.filter(function (_ref) {
+    var type = _ref.type;
+    return type !== "static";
+  });
+
+  var _tags = segments.filter(function (_ref2) {
+    var type = _ref2.type;
+    return type === "static";
+  });
+
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["BaseControl"], {
+    id: "mailchimp-segment",
+    label: "Segment or tag"
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("select", {
+    id: "mailchimp-segment",
+    style: {
+      width: '100%'
+    },
+    value: state,
+    onChange: function onChange(e) {
+      return setState(e.target.value);
+    }
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("option", {
+    value: ""
+  }, "-"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("optgroup", {
+    label: "Segments"
+  }, _segments.map(function (_ref3) {
+    var id = _ref3.id,
+        name = _ref3.name;
+    return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("option", {
+      key: id,
+      value: id
+    }, name);
+  })), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("optgroup", {
+    label: "Tags"
+  }, _tags.map(function (_ref4) {
+    var id = _ref4.id,
+        name = _ref4.name;
+    return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])("option", {
+      key: id,
+      value: id
+    }, name);
+  }))));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (SegmentsControl);
 
 /***/ }),
 
@@ -577,12 +730,20 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 // ---------------------------------------------
 
 var DEFAULT_STATE = {
+  isRequesting: false,
   audience: localStorage.getItem("gutenberg-post-to-mailchimp__audience") || "",
   segment: localStorage.getItem("gutenberg-post-to-mailchimp__segment") || "",
   campaigns: []
 }; // ---------------------------------------------
 // api actions
 // ---------------------------------------------
+
+var CAMPAIGN_FETCH = function CAMPAIGN_FETCH(post_id) {
+  return {
+    type: 'CAMPAIGNS_FETCH',
+    path: "/post-to-mailchimp/v1/campaigns/".concat(post_id, "?recent=true")
+  };
+};
 
 var CAMPAIGNS_FETCH = function CAMPAIGNS_FETCH(post_id) {
   return {
@@ -594,7 +755,7 @@ var CAMPAIGNS_FETCH = function CAMPAIGNS_FETCH(post_id) {
 var CAMPAIGN_ADD = function CAMPAIGN_ADD(campaign) {
   return {
     type: 'CAMPAIGN_ADD',
-    path: "/post-to-mailchimp/v1/campaigns",
+    path: "/post-to-mailchimp/v1/campaigns/".concat(campaign.post_id, "/campaign"),
     data: campaign
   };
 };
@@ -602,15 +763,69 @@ var CAMPAIGN_ADD = function CAMPAIGN_ADD(campaign) {
 var CAMPAIGN_UPDATE = function CAMPAIGN_UPDATE(campaign) {
   return {
     type: 'CAMPAIGN_UPDATE',
-    path: "/post-to-mailchimp/v1/campaigns",
+    path: "/post-to-mailchimp/v1/campaigns/".concat(campaign.post_id, "/campaign"),
     data: campaign
   };
+};
+
+var CAMPAIGN_DELETE = function CAMPAIGN_DELETE(campaign) {
+  return {
+    type: 'CAMPAIGN_DELETE',
+    path: "/post-to-mailchimp/v1/campaigns/".concat(campaign.post_id, "/campaign/").concat(campaign.id)
+  };
+};
+
+var CAMPAIGN_TEST = function CAMPAIGN_TEST(post_id, campaign_id, email_addresses) {
+  return {
+    type: 'CAMPAIGN_UPDATE',
+    path: "/post-to-mailchimp/v1/campaigns/".concat(post_id, "/campaign/").concat(campaign_id, "/test"),
+    data: {
+      email_addresses: email_addresses
+    }
+  };
+};
+
+var CAMPAIGN_SEND = function CAMPAIGN_SEND(post_id, campaign_id) {
+  return {
+    type: 'CAMPAIGN_UPDATE',
+    path: "/post-to-mailchimp/v1/campaigns/".concat(post_id, "/campaign/").concat(campaign_id, "/send"),
+    data: {
+      email_addresses: email_addresses
+    }
+  };
 }; // ---------------------------------------------
-// local actions
+// action generators
+// ---------------------------------------------
+
+
+var actionNone = function actionNone() {
+  return {
+    type: 'none'
+  };
+};
+
+var actionIsRequesting = function actionIsRequesting(isRequesting) {
+  return {
+    type: 'SET_IS_REQUESTING',
+    isRequesting: isRequesting
+  };
+};
+
+var actionSetRecentCampaign = function actionSetRecentCampaign(campaign) {
+  return {
+    type: 'SET_RECENT_CAMPAIGN',
+    campaign: campaign
+  };
+}; // ---------------------------------------------
+// public actions that can be used with dispatch
 // ---------------------------------------------
 
 
 var actions = {
+  // ---------------------------------------------
+  // local state
+  // ---------------------------------------------
+  setIsRequesting: actionIsRequesting,
   setAudience: function setAudience(id) {
     return {
       type: 'SET_AUDIENCE',
@@ -629,6 +844,10 @@ var actions = {
       campaigns: campaigns
     };
   },
+  setRecentCampaign: actionSetRecentCampaign,
+  // ---------------------------------------------
+  // ajax state
+  // ---------------------------------------------
   addCampaign: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function addCampaign(campaign) {
     var result;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function addCampaign$(_context) {
@@ -636,17 +855,28 @@ var actions = {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return CAMPAIGN_ADD(campaign);
+            return actionIsRequesting(true);
 
           case 2:
+            _context.next = 4;
+            return CAMPAIGN_ADD(campaign);
+
+          case 4:
             result = _context.sent;
-            console.log(result);
-            return _context.abrupt("return", {
+            _context.next = 7;
+            return {
               type: 'ADD_CAMPAIGN',
               campaign: result
-            });
+            };
 
-          case 5:
+          case 7:
+            _context.next = 9;
+            return actionSetRecentCampaign(result);
+
+          case 9:
+            return _context.abrupt("return", actionIsRequesting(false));
+
+          case 10:
           case "end":
             return _context.stop();
         }
@@ -660,45 +890,145 @@ var actions = {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
-            return CAMPAIGN_UPDATE(campaign);
+            return actionIsRequesting(true);
 
           case 2:
+            _context2.next = 4;
+            return CAMPAIGN_UPDATE(campaign);
+
+          case 4:
             result = _context2.sent;
-            console.log(result);
-            return _context2.abrupt("return", {
+            _context2.next = 7;
+            return {
               type: 'UPDATE_CAMPAIGN',
               campaign: result
-            });
+            };
 
-          case 5:
+          case 7:
+            _context2.next = 9;
+            return actionIsRequesting(false);
+
+          case 9:
+            return _context2.abrupt("return", _context2.sent);
+
+          case 10:
           case "end":
             return _context2.stop();
         }
       }
     }, updateCampaign);
   }),
-  reloadCampaigns: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function reloadCampaigns(post_id) {
-    var campaigns;
-    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function reloadCampaigns$(_context3) {
+  deleteCampaign: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function deleteCampaign(campaign) {
+    var success;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function deleteCampaign$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return CAMPAIGNS_FETCH(post_id);
+            return actionIsRequesting(true);
 
           case 2:
-            campaigns = _context3.sent;
-            return _context3.abrupt("return", {
-              type: 'SET_CAMPAIGNS',
-              campaigns: campaigns
-            });
+            _context3.next = 4;
+            return CAMPAIGN_DELETE(campaign);
 
           case 4:
+            success = _context3.sent;
+
+            if (!success) {
+              _context3.next = 8;
+              break;
+            }
+
+            _context3.next = 8;
+            return actionSetRecentCampaign(undefined);
+
+          case 8:
+            return _context3.abrupt("return", actionIsRequesting(false));
+
+          case 9:
           case "end":
             return _context3.stop();
         }
       }
-    }, reloadCampaigns);
+    }, deleteCampaign);
+  }),
+  fetchCampaigns: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function fetchCampaigns(post_id) {
+    var campaigns;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function fetchCampaigns$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _context4.next = 2;
+            return actionIsRequesting(true);
+
+          case 2:
+            _context4.next = 4;
+            return CAMPAIGNS_FETCH(post_id);
+
+          case 4:
+            campaigns = _context4.sent;
+            _context4.next = 7;
+            return {
+              type: 'SET_CAMPAIGNS',
+              campaigns: campaigns
+            };
+
+          case 7:
+            return _context4.abrupt("return", actionIsRequesting(false));
+
+          case 8:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, fetchCampaigns);
+  }),
+  fetchRecentCampaign: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function fetchRecentCampaign(post_id) {
+    var campaign;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function fetchRecentCampaign$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.next = 2;
+            return actionIsRequesting(true);
+
+          case 2:
+            _context5.next = 4;
+            return CAMPAIGN_FETCH(post_id);
+
+          case 4:
+            campaign = _context5.sent;
+            _context5.next = 7;
+            return actionSetRecentCampaign(campaign);
+
+          case 7:
+            return _context5.abrupt("return", actionIsRequesting(true));
+
+          case 8:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, fetchRecentCampaign);
+  }),
+  sendTestMail: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function sendTestMail() {
+    var result;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function sendTestMail$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
+            return CAMPAIGN_TEST();
+
+          case 2:
+            result = _context6.sent;
+
+          case 3:
+          case "end":
+            return _context6.stop();
+        }
+      }
+    }, sendTestMail);
   })
 }; // ------------------------------------------------------
 // register our custom store
@@ -714,6 +1044,11 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
     var action = arguments.length > 1 ? arguments[1] : undefined;
 
     switch (action.type) {
+      case 'SET_IS_REQUESTING':
+        return _objectSpread(_objectSpread({}, state), {}, {
+          isRequesting: action.isRequesting
+        });
+
       case 'SET_AUDIENCE':
         localStorage.setItem("gutenberg-post-to-mailchimp__audience", action.id);
         return _objectSpread(_objectSpread({}, state), {}, {
@@ -742,6 +1077,11 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
             return c.campaign_id === action.campaign.campaign_id ? action.campaign : c;
           })
         });
+
+      case 'SET_RECENT_CAMPAIGN':
+        return _objectSpread(_objectSpread({}, state), {}, {
+          recentCampaign: action.campaign
+        });
     }
 
     return state;
@@ -754,6 +1094,9 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
   // selectors that can be used with select
   // ------------------------------------------------------
   selectors: {
+    isRequesting: function isRequesting(state) {
+      return state.isRequesting;
+    },
     getAudience: function getAudience(state) {
       return state.audience;
     },
@@ -762,6 +1105,9 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
     },
     getCampaigns: function getCampaigns(state, post_id) {
       return state.campaigns;
+    },
+    getRecentCampaign: function getRecentCampaign(state, post_id) {
+      return state.recentCampaign;
     }
   },
   // ----------------------------------------------------------------
@@ -770,39 +1116,95 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
   resolvers: {
     getCampaigns: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function getCampaigns(post_id) {
       var campaigns;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function getCampaigns$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function getCampaigns$(_context7) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
               if (!(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(post_id) === ( true ? "undefined" : undefined))) {
-                _context4.next = 2;
+                _context7.next = 2;
                 break;
               }
 
-              return _context4.abrupt("return", {
-                type: "none"
-              });
+              return _context7.abrupt("return", actionNone());
 
             case 2:
-              _context4.next = 4;
-              return CAMPAIGNS_FETCH(post_id);
+              _context7.next = 4;
+              return actionIsRequesting(true);
 
             case 4:
-              campaigns = _context4.sent;
-              return _context4.abrupt("return", actions.setCampaigns(campaigns));
+              _context7.next = 6;
+              return CAMPAIGNS_FETCH(post_id);
 
             case 6:
+              campaigns = _context7.sent;
+              _context7.next = 9;
+              return actionIsRequesting(false);
+
+            case 9:
+              return _context7.abrupt("return", actions.setCampaigns(campaigns));
+
+            case 10:
             case "end":
-              return _context4.stop();
+              return _context7.stop();
           }
         }
       }, getCampaigns);
+    }),
+    getRecentCampaign: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function getRecentCampaign(post_id) {
+      var campaign;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function getRecentCampaign$(_context8) {
+        while (1) {
+          switch (_context8.prev = _context8.next) {
+            case 0:
+              if (!(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(post_id) === ( true ? "undefined" : undefined))) {
+                _context8.next = 2;
+                break;
+              }
+
+              return _context8.abrupt("return", actionNone());
+
+            case 2:
+              _context8.next = 4;
+              return actionIsRequesting(true);
+
+            case 4:
+              _context8.next = 6;
+              return CAMPAIGN_FETCH(post_id);
+
+            case 6:
+              campaign = _context8.sent;
+              _context8.next = 9;
+              return actionIsRequesting(false);
+
+            case 9:
+              if (!(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(campaign.id) !== _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(1))) {
+                _context8.next = 11;
+                break;
+              }
+
+              return _context8.abrupt("return", actionNone());
+
+            case 11:
+              return _context8.abrupt("return", actions.setRecentCampaign(campaign));
+
+            case 12:
+            case "end":
+              return _context8.stop();
+          }
+        }
+      }, getRecentCampaign);
     })
   },
   // ----------------------------------------------------------------
   //  controls will be executed as side effects of generator actions
   // ----------------------------------------------------------------
   controls: {
+    CAMPAIGN_FETCH: function CAMPAIGN_FETCH(action) {
+      console.log("action fetch recent", action);
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+        path: action.path
+      });
+    },
     CAMPAIGNS_FETCH: function CAMPAIGNS_FETCH(action) {
       console.log("action fetch", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
@@ -823,6 +1225,21 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
         path: action.path,
         data: action.data,
         method: "PUT"
+      });
+    },
+    CAMPAIGN_DELETE: function CAMPAIGN_DELETE(action) {
+      console.log("action delete", action);
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+        path: action.path,
+        method: "DELETE"
+      });
+    },
+    CAMPAIGN_TEST: function CAMPAIGN_TEST(action) {
+      console.log("action test", action);
+      return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
+        path: action.path,
+        data: action.data,
+        method: "POST"
       });
     }
   }
@@ -849,7 +1266,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _components_PluginComponent__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/PluginComponent */ "./src/script/components/PluginComponent.js");
+/* harmony import */ var _components_Plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Plugin */ "./src/script/components/Plugin.js");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__);
+
 
 
 
@@ -870,7 +1290,16 @@ __webpack_require__.r(__webpack_exports__);
         name: PLUGIN_NAME,
         icon: "email",
         title: "Post to Mailchimp"
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_components_PluginComponent__WEBPACK_IMPORTED_MODULE_5__["default"], null)));
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
+        title: "Step 1: Create campaign",
+        initialOpen: true
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "Create Campaign")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
+        title: "Step 2: Test contents",
+        initialOpen: false
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "update and preview contents and send test mails")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
+        title: "Step 3: Schedule",
+        initialOpen: false
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "send right now or schedule")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_components_Plugin__WEBPACK_IMPORTED_MODULE_5__["default"], null)));
     }
   });
 })();
@@ -897,52 +1326,95 @@ var useSegments = function useSegments(listId) {
 
 /***/ }),
 
-/***/ "./src/script/hooks/use-store.js":
-/*!***************************************!*\
-  !*** ./src/script/hooks/use-store.js ***!
-  \***************************************/
-/*! exports provided: useAudience, useSegment, useCampaigns */
+/***/ "./src/script/hooks/use-post.js":
+/*!**************************************!*\
+  !*** ./src/script/hooks/use-post.js ***!
+  \**************************************/
+/*! exports provided: usePost */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "usePost", function() { return usePost; });
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__);
+
+var usePost = function usePost() {
+  return Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_0__["useSelect"])(function (select) {
+    return select('core/editor').getCurrentPost();
+  });
+};
+
+/***/ }),
+
+/***/ "./src/script/hooks/use-store.js":
+/*!***************************************!*\
+  !*** ./src/script/hooks/use-store.js ***!
+  \***************************************/
+/*! exports provided: useIsRequesting, useAudience, useSegment, useRecentCampaign, useRecentCampaignHasChanges, useCampaigns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useIsRequesting", function() { return useIsRequesting; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useAudience", function() { return useAudience; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useSegment", function() { return useSegment; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useRecentCampaign", function() { return useRecentCampaign; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useRecentCampaignHasChanges", function() { return useRecentCampaignHasChanges; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useCampaigns", function() { return useCampaigns; });
-/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
-/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _data_store_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/store.js */ "./src/script/data/store.js");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _use_config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./use-config */ "./src/script/hooks/use-config.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _data_store_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../data/store.js */ "./src/script/data/store.js");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _use_config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-config */ "./src/script/hooks/use-config.js");
+/* harmony import */ var _use_post_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./use-post.js */ "./src/script/hooks/use-post.js");
+
+
+
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
 
 
 
 
-var useAudience = function useAudience() {
-  var state = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useSelect"])(function (select) {
-    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]).getAudience();
+
+var useIsRequesting = function useIsRequesting() {
+  var state = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).isRequesting();
   }, []);
-  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]);
+  return state;
+};
+var useAudience = function useAudience() {
+  var state = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getAudience();
+  }, []);
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
   return [state, function (id) {
     dispatch.setAudience(id);
   }];
 };
 var useSegment = function useSegment() {
   var _useAudience = useAudience(),
-      _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useAudience, 1),
+      _useAudience2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useAudience, 1),
       audienceListId = _useAudience2[0];
 
-  var segments = Object(_use_config__WEBPACK_IMPORTED_MODULE_4__["useSegments"])(audienceListId);
-  var state = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useSelect"])(function (select) {
-    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]).getSegment();
+  var segments = Object(_use_config__WEBPACK_IMPORTED_MODULE_6__["useSegments"])(audienceListId);
+  var state = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getSegment();
   }, []);
-  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]);
-  Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["useEffect"])(function () {
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
+  Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_5__["useEffect"])(function () {
     if (segments.find(function (s) {
       return s.id + "" === state + "";
     })) return;
@@ -957,11 +1429,63 @@ var useSegment = function useSegment() {
     dispatch.setSegment(id);
   }];
 };
-var useCampaigns = function useCampaigns(postId) {
-  var campaigns = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useSelect"])(function (select) {
-    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]).getCampaigns(postId);
+var useRecentCampaign = function useRecentCampaign() {
+  var _usePost = Object(_use_post_js__WEBPACK_IMPORTED_MODULE_7__["usePost"])(),
+      id = _usePost.id;
+
+  var campaign = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getRecentCampaign(id);
   });
-  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_1__["STORE_NAME"]);
+  var isRequesting = useIsRequesting();
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
+  return [campaign, function (campaign) {
+    console.log("update campaign", campaign);
+    dispatch.updateCampaign(campaign);
+  }, function (new_campaign) {
+    if (isRequesting) {
+      console.error("Wait for running requst to be finished");
+      return;
+    }
+
+    if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) !== ( true ? "undefined" : undefined)) {
+      console.error("Can only add new campaign if there is no recent one for this post.", campaign);
+      return;
+    }
+
+    dispatch.addCampaign(_objectSpread({
+      post_id: id
+    }, new_campaign));
+  }, function () {
+    dispatch.deleteCampaign(campaign);
+  }];
+};
+var useRecentCampaignHasChanges = function useRecentCampaignHasChanges() {
+  var Post = Object(_use_post_js__WEBPACK_IMPORTED_MODULE_7__["usePost"])();
+
+  var _useRecentCampaign = useRecentCampaign(Post.id),
+      _useRecentCampaign2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign, 1),
+      campaign = _useRecentCampaign2[0];
+
+  var _useAudience3 = useAudience(),
+      _useAudience4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useAudience3, 1),
+      audience = _useAudience4[0];
+
+  var _useSegment = useSegment(),
+      _useSegment2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useSegment, 1),
+      segment = _useSegment2[0];
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return false;
+  console.log("has changes", campaign, audience, segment, campaign.audience_id !== audience, campaign.segment_id !== parseInt(segment));
+  return _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) !== ( true ? "undefined" : undefined) && (campaign.audience_id !== audience || campaign.segment_id !== parseInt(segment));
+};
+var useCampaigns = function useCampaigns() {
+  var _usePost2 = Object(_use_post_js__WEBPACK_IMPORTED_MODULE_7__["usePost"])(),
+      id = _usePost2.id;
+
+  var campaigns = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getCampaigns(id);
+  });
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
   return [campaigns, function (campaign) {
     console.log("update campaign", campaign);
     dispatch.updateCampaign(campaign);

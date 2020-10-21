@@ -84,7 +84,7 @@ add_filter('post_to_mailchimp_change_content_plaintext', function($content, $pos
 add_filter('post_to_mailchimp_add_campaign_args', function($args, $controller){
 	/**
 	* @var array $args
-	* @var \Palasthotel\PostToMailchimp\Controller $controller
+	* @var \Palasthotel\PostToMailchimp\API $controller
 	*/
 	return $args;
 }, 10, 2);
@@ -96,7 +96,7 @@ add_filter('post_to_mailchimp_add_campaign_args', function($args, $controller){
 function('post_to_mailchimp_schedule_campaign_args', $args, $controller){
 	/**
 	* @var array $args
-	* @var \Palasthotel\PostToMailchimp\Controller $controller
+	* @var \Palasthotel\PostToMailchimp\API $controller
 	*/
 	return $args;
 }, 10, 2);

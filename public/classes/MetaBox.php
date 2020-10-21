@@ -60,13 +60,13 @@ class MetaBox extends _Component {
 			wp_enqueue_style( Plugin::DOMAIN . "-meta-box-style", $this->plugin->url . "/css/meta-box.css" );
 			wp_enqueue_script( Plugin::DOMAIN . "-meta-box-script", $this->plugin->url . "/js/meta-box.js", array( Plugin::DOMAIN."-api" ), 1, true );
 
-			$controller      = $this->plugin->controller;
+			$controller      = $this->plugin->api;
 			$campaignIdsList = get_post_meta( $post->ID, Plugin::POST_META_CAMPAIGNS );
 
 			$mailchimp = false;
 			if ( $controller->isReady() ) {
 				$mailchimp = array(
-					"lists"        => $controller->getLists(),
+					"lists"        => $controller->getAudiences(),
 					"campaign_ids" => $campaignIdsList,
 					"campaigns"    => array_map( function ( $campaignIds ) use ( $controller ) {
 						$c                     = $controller->getCampaign( $campaignIds["id"] );
@@ -114,7 +114,7 @@ class MetaBox extends _Component {
 	}
 
 	public function render( $post ) {
-		$controller = $this->plugin->controller;
+		$controller = $this->plugin->api;
 		if ( ! $controller->isReady() ) {
 			echo "<p class='description'>";
 			_e( "API is not ready yet.", Plugin::DOMAIN );
@@ -133,7 +133,7 @@ class MetaBox extends _Component {
 
 		echo "<div id='" . self::ROOT_ID . "'></div>";
 
-		$lists = $controller->getLists();
+		$lists = $controller->getAudiences();
 
 		?>
 		<div id="post_to_mailchimp__next-campaign_create"
@@ -181,14 +181,15 @@ class MetaBox extends _Component {
 		) {
 
 			$list_id = sanitize_text_field( $_POST[ self::POST_LIST_ID ] );
-			$list    = $this->plugin->controller->getListById( $list_id );
+			$list    = $this->plugin->api->getListById( $list_id );
 			if ( $list == false ) {
 				wp_die( new \WP_Error( __( "List not found", Plugin::DOMAIN ) ) );
 			}
 
-			$campaign = $this->plugin->controller->addCampaign(
+			$campaign = $this->plugin->api->addCampaign(
 				get_the_title( $post_id ),
 				$list_id,
+				null,
 				array(
 					"settings" => array(
 						"from_name"    => $list["campaign_defaults"]["from_name"],
@@ -211,7 +212,7 @@ class MetaBox extends _Component {
 				$content_plaintext = ob_get_contents();
 				ob_end_clean();
 
-				$this->plugin->controller->addContent(
+				$this->plugin->api->addContent(
 					$campaign["id"],
 					apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT, $content, $post_id ),
 					apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT, $content_plaintext, $post_id ),
@@ -248,14 +249,15 @@ class MetaBox extends _Component {
 
 		$list_id = sanitize_text_field( $_POST["list_id"] );
 
-		$list = $this->plugin->controller->getListById( $list_id );
+		$list = $this->plugin->api->getListById( $list_id );
 		if ( $list == false ) {
 			die( 'List not found' );
 		}
 
-		$campaign = $this->plugin->controller->addCampaign(
+		$campaign = $this->plugin->api->addCampaign(
 			get_the_title( $post_id ),
 			$list_id,
+			null,
 			array(
 				"settings" => array(
 					"from_name"    => $list["campaign_defaults"]["from_name"],
@@ -280,7 +282,7 @@ class MetaBox extends _Component {
 		$content_plaintext = ob_get_contents();
 		ob_end_clean();
 
-		$this->plugin->controller->addContent(
+		$this->plugin->api->addContent(
 			$campaign["id"],
 			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT, $content, $post_id ),
 			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT, $content_plaintext, $post_id ),
@@ -315,13 +317,13 @@ class MetaBox extends _Component {
 		$schedule    = NULL;
 		if ( isset( $_POST["schedule"] ) && "" != $_POST["schedule"] ) {
 			$schedule = get_gmt_from_date( sanitize_text_field( $_POST["schedule"] ) );
-			$result   = $this->plugin->controller->schedule( $campaign_id, $schedule );
+			$result   = $this->plugin->api->schedule( $campaign_id, $schedule );
 			wp_send_json( $result );
 			exit;
 
 		}
 
-		$result = $this->plugin->controller->send( $campaign_id );
+		$result = $this->plugin->api->send( $campaign_id );
 		wp_send_json( $result );
 		exit;
 	}

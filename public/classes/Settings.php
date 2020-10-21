@@ -24,6 +24,14 @@ class Settings extends _Component {
 	 */
 	function admin_init() {
 
+	    if(
+	            is_array($_POST) && isset($_POST["post-to-mailchimp-settings-form"]) && $_POST["post-to-mailchimp-settings-form"] === "it-is"
+            &&
+	            isset($_POST["clear_cache"]) && !empty($_POST["clear_cache"])
+        ){
+            $this->plugin->repository->cacheClear();
+        }
+
 		add_settings_section(
 			'ph_mailchimp_settings_section',
 			__('API', Plugin::DOMAIN),
@@ -56,6 +64,7 @@ class Settings extends _Component {
 			'ph_mailchimp_settings',
 			'ph_mailchimp_settings_section'
 		);
+		register_setting('ph_mailchimp_settings', Plugin::OPTION_AUDIENCE_WHITELIST);
 
 	}
 
@@ -94,14 +103,17 @@ class Settings extends _Component {
 				settings_fields( 'ph_mailchimp_settings' );
 				do_settings_sections( 'ph_mailchimp_settings' );
 				?>
-				<?php submit_button(__("Save and update lists", Plugin::DOMAIN)); ?>
+				<?php submit_button(null, 'primary', 'submit', false); ?>
+				<?php submit_button(__("Clear cache", Plugin::DOMAIN), 'secondary', 'clear_cache', false); ?>
+                <input type="hidden" name="post-to-mailchimp-settings-form" value="it-is" />
+
 			</form>
 		</div>
 		<?php
 	}
 
 	public function render_section(){
-		$controller = $this->plugin->controller;
+		$controller = $this->plugin->api;
 		if($controller->isReady()){
 			echo "<p>✅ ".__("Yep, this is working!", Plugin::DOMAIN)."</p>";
 		} else {
@@ -151,8 +163,16 @@ class Settings extends _Component {
 	    echo "<input id='$name' name='$name' value='$value' type='text' $readonly class='regular-text' />";
 	}
 
+	public function getAudiencesWhitelist(){
+		$whitelist = get_option(Plugin::OPTION_AUDIENCE_WHITELIST);
+		return is_array($whitelist) ? $whitelist : [];
+	}
+	public function isAudienceWhitelisted($id){
+	    return in_array($id, $this->getAudiencesWhitelist());
+	}
+
 	public function render_lists(){
-		$lists = $this->plugin->repository->getAudiencesList();
+		$lists = $this->plugin->repository->getAudiences();
 		$list_id = null;
 		if($lists){
 			echo "<ul>";
@@ -165,6 +185,8 @@ class Settings extends _Component {
 				$default_subject = $list->campaignDefaults["subject"];
 
 				echo "<li style='border-bottom: 1px solid #cecece;padding: 10px 0;'>";
+				$checked = $this->isAudienceWhitelisted($list->listId) ? "checked": "";
+				echo "<input type='checkbox' value='$list->listId' name='".Plugin::OPTION_AUDIENCE_WHITELIST."[]' $checked />";
 				echo render_list_link($list->name, $web_id);
 				echo "<br>";
 
@@ -177,13 +199,41 @@ class Settings extends _Component {
 
 				$segments = $this->plugin->repository->getSegments($list_id);
 
-				if(count($segments)){
+				// static type segments are tags
+                // https://mailchimp.com/developer/api/marketing/list-segments/list-segments/
+				$tags = array_filter($segments, function($item){return $item->type === "static";});
+				$noTags = array_filter($segments, function ($item){return $item->type !== "static";});
+				if(count($noTags)){
 					echo "<strong>Segments</strong>";
 					echo "<ul style='padding-left: 20px;'>";
-					foreach ($this->plugin->repository->getSegments($list_id) as $segment){
+					foreach ($noTags as $segment){
 						echo "<li>$segment->name</li>";
 					}
 					echo "</ul>";
+				}
+				if(count($tags)){
+					echo "<strong>Tags</strong>";
+					echo "<ul style='padding-left: 20px;'>";
+					foreach ($tags as $segment){
+						echo "<li>$segment->name</li>";
+					}
+					echo "</ul>";
+				}
+
+				$groups = $this->plugin->repository->getGroups($list_id);
+				if(count($groups)){
+				    echo "<strong>Groups</strong>";
+					echo "<ul style='padding-left: 20px;'>";
+				    foreach ($groups as $group){
+				        echo "<li><em>Category: $group->title</em>";
+				        echo "<ul style='padding-left: 20px;'>";
+				        foreach ($group->interests as $item){
+				            echo "<li>$item->name</li>";
+				        }
+				        echo "</ul>";
+				        echo "</li>";
+				    }
+				    echo "</ul>";
 				}
 
 				echo "</li>";

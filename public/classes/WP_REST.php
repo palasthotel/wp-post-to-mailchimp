@@ -24,9 +24,13 @@ class WP_REST extends _Component {
 	 */
 	const ARG_POST_ID = "post_id";
 
+	const ARG_CAMPAIGN_ID = "campaign_id";
+
 	const ARG_AUDIENCE_ID = "audience_id";
 
 	const ARG_SEGMENT_ID = "segment_id";
+
+	const ARG_RECENT = "recent";
 
 	/**
 	 * start component

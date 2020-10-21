@@ -29,14 +29,18 @@ class ComposerStaticInitfe98777d43565134f1643d8f5712d151
     );
 
     public static $classMap = array (
+        'Palasthotel\\PostToMailchimp\\API' => __DIR__ . '/../..' . '/classes/API.php',
         'Palasthotel\\PostToMailchimp\\Assets' => __DIR__ . '/../..' . '/classes/Assets.php',
         'Palasthotel\\PostToMailchimp\\Audience' => __DIR__ . '/../..' . '/classes/Model/Audience.php',
         'Palasthotel\\PostToMailchimp\\Campaign' => __DIR__ . '/../..' . '/classes/Model/Campaign.php',
-        'Palasthotel\\PostToMailchimp\\Controller' => __DIR__ . '/../..' . '/classes/Controller.php',
         'Palasthotel\\PostToMailchimp\\Database' => __DIR__ . '/../..' . '/classes/Database.php',
+        'Palasthotel\\PostToMailchimp\\GroupCategory' => __DIR__ . '/../..' . '/classes/Model/GroupCategory.php',
+        'Palasthotel\\PostToMailchimp\\GroupInterest' => __DIR__ . '/../..' . '/classes/Model/GroupInterest.php',
         'Palasthotel\\PostToMailchimp\\Gutenberg' => __DIR__ . '/../..' . '/classes/Gutenberg.php',
+        'Palasthotel\\PostToMailchimp\\MailchimpCampaignArgs' => __DIR__ . '/../..' . '/classes/Model/MailchimpCampaignArgs.php',
         'Palasthotel\\PostToMailchimp\\MetaBox' => __DIR__ . '/../..' . '/classes/MetaBox.php',
         'Palasthotel\\PostToMailchimp\\REST\\CampaignsController' => __DIR__ . '/../..' . '/classes/REST/CampaignsController.php',
+        'Palasthotel\\PostToMailchimp\\REST\\_BaseController' => __DIR__ . '/../..' . '/classes/REST/_BaseController.php',
         'Palasthotel\\PostToMailchimp\\Repository' => __DIR__ . '/../..' . '/classes/Repository.php',
         'Palasthotel\\PostToMailchimp\\Segment' => __DIR__ . '/../..' . '/classes/Model/Segment.php',
         'Palasthotel\\PostToMailchimp\\Settings' => __DIR__ . '/../..' . '/classes/Settings.php',

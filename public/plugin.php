@@ -28,6 +28,9 @@ if ( ! defined( 'POST_TO_MAILCHIMP_API_KEY' ) ) {
 if ( ! defined( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY' ) ) {
 	define( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY', false );
 }
+if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
+	define( 'POST_TO_MAILCHIMP_DEBUG_OFF', false );
+}
 
 /**
  * Class Plugin
@@ -40,7 +43,7 @@ if ( ! defined( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY' ) ) {
  * @property Assets assets
  * @property Gutenberg gutenberg
  * @property Repository repository
- * @property Controller controller
+ * @property API $api
  * @property WP_REST rest
  * @property Database database
  */
@@ -60,6 +63,7 @@ class Plugin {
 	 * script and style handles
 	 */
 	const HANDLE_JS_GUTENBERG = "post-to-mailchimp-gutenberg-js";
+	const HANDLE_CSS_GUTENBERG = "post-to-mailchimp-gutenberg-css";
 
 	/**
 	 * post metas
@@ -88,6 +92,7 @@ class Plugin {
 	 */
 	const OPTION_MAILCHIMP_API_KEY = "ph_mailchimp_api_key";
 	const OPTION_GA_API_KEY = "ph_mailchimp_ga";
+	const OPTION_AUDIENCE_WHITELIST = "ph_mailchimp_audience_whitelist";
 
 	/**
 	 * transients
@@ -95,6 +100,8 @@ class Plugin {
 	const TRANSIENT_LISTS = "post-to-mailchimp__lists";
 	const TRANSIENT_SEGMENTS = "post-to-mailchimp__list_%s_segments";
 	const TRANSIENT_DELETE_SEGMENTS_LIKE = "%post-to-mailchimp__list_%_segments";
+	const TRANSIENT_GROUPS = "post-to-mailchimp__list_%s_groups";
+	const TRANSIENT_DELETE_GROUPS_LIKE = "%post-to-mailchimp__list_%_groups";
 
 	/**
 	 * Plugin constructor.
@@ -119,7 +126,7 @@ class Plugin {
 		$this->assets     = new Assets( $this );
 		$this->gutenberg  = new Gutenberg( $this );
 		$this->database   = new Database( $this );
-		$this->controller = new Controller( $this );
+		$this->api        = new API( $this );
 		$this->repository = new Repository( $this );
 		$this->settings   = new Settings( $this );
 		$this->metaBox    = new MetaBox( $this );

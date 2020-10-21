@@ -5,20 +5,97 @@ namespace Palasthotel\PostToMailchimp;
 
 
 /**
- * @property int post_id
- * @property int campaign_id
- * @property string state
+ * @property int $id
+ * @property int $post_id
+ * @property null|string $audience_id
+ * @property null|int $segment_id
+ * @property null|string $campaign_id
+ * @property null|array $attributes
+ * @property string $state
  */
 class Campaign {
 
-	const STATE_CREATED = "created";
-	const STATE_SCHEDULED = "scheduled";
+	const STATE_NEW = "new";
+	const STATE_SAVED = "draft";
+	const STATE_READY = "ready";
 	const STATE_SENT = "sent";
 
-	public function __construct(int $post_id, int $campaign_id, string $state = "created") {
-		$this->post_id = $post_id;
-		$this->campaign_id = $campaign_id;
-		$this->state = $state;
+	/**
+	 * Campaign constructor.
+	 *
+	 * @param int $id
+	 * @param int $post_id
+	 * @param null|string $state
+	 */
+	public function __construct( int $id, int $post_id, ?string $state = null ) {
+
+		$this->id          = $id;
+		$this->post_id     = $post_id;
+		$this->state       = null === $state ? static::STATE_NEW : $state;
+
+		$this->campaign_id = null;
+
+		$this->audience_id = null;
+		$this->segment_id  = null;
+
+		$this->attributes  = null;
+
 	}
+
+	/**
+	 * @param int $id
+	 * @param int $post_id
+	 *
+	 * @param null|string $state
+	 *
+	 * @return static
+	 */
+	public static function build( int $id, int $post_id, ?string $state = null ) {
+		return new static( $id, $post_id, $state );
+	}
+
+	/**
+	 * @param string|null $campaignId
+	 *
+	 * @return $this
+	 */
+	public function setCampaignId( ?string $campaignId ) {
+		$this->campaign_id = $campaignId;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $state
+	 *
+	 * @return $this
+	 */
+	public function setState(string $state){
+		$this->state = $state;
+		return $this;
+	}
+
+	/**
+	 * @param array|null $attributes
+	 *
+	 * @return $this
+	 */
+	public function setAttributes( ?array $attributes ) {
+		$this->attributes = $attributes;
+
+		if(
+			isset($attributes["recipients"])
+			&&
+			is_array($attributes["recipients"])
+		){
+			if(isset($attributes["recipients"]["list_id"])) $this->audience_id = $attributes["recipients"]["list_id"];
+			if(isset($attributes["recipients"]["segment_opts"]) && isset($attributes["recipients"]["segment_opts"]["saved_segment_id"])){
+				$this->segment_id = $attributes["recipients"]["segment_opts"]["saved_segment_id"];
+			}
+		}
+
+		return $this;
+	}
+
 
 }
