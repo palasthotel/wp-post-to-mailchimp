@@ -1,5 +1,6 @@
 import { Button } from "@wordpress/components";
-import { useAudience, useIsRequesting, useRecentCampaign, useRecentCampaignHasChanges, useSegment } from "../hooks/use-store";
+import { useAudience, useIsRequesting, useRecentCampaign, useRecentCampaignHasChanges, useSegment, useSendTestEmails, useTestEmailAddresses } from "../hooks/use-store";
+import { validateEmail } from "../utils/email";
 
 export const CreateButton = ()=>{
 
@@ -41,7 +42,7 @@ export const UpdateButton = ()=>{
         return null;
     }
 
-    const disabled = isRequesting || ! hasChange;
+    const disabled = typeof campaign === typeof undefined || isRequesting || ! hasChange;
 
     return <Button disabled={disabled} isSecondary onClick={()=>updateCampaign({
         ...campaign,
@@ -55,9 +56,32 @@ export const DeleteButton = ()=>{
     const isRequesting = useIsRequesting();
     const [campaign, _1, _2, deleteCampaign] = useRecentCampaign();
 
-    if(typeof campaign === typeof undefined) return null;
+    if(typeof campaign === typeof undefined){
+        return null;
+    }
 
-    return <Button disabled={isRequesting} isDestructive onClick={()=>deleteCampaign()}>Delete</Button>
+    const disabled = typeof campaign === typeof undefined || isRequesting;
+
+    return <Button disabled={disabled} isDestructive onClick={()=>deleteCampaign()}>Delete</Button>
+}
+
+export const SendTestButton = ()=>{
+
+    const isRequesting = useIsRequesting();
+    const hasChanges = useRecentCampaignHasChanges();
+    const [campaign] = useRecentCampaign();
+    const [emails] = useTestEmailAddresses();
+    const sendTest = useSendTestEmails();
+
+    if(typeof campaign === typeof undefined){
+        return null;
+    }
+
+    const validEmails = emails.filter(validateEmail)
+
+    const disabled = isRequesting || hasChanges || validEmails.length == 0;
+
+    return <Button disabled={disabled} isSecondary onClick={sendTest}>Send test</Button>
 }
 
 export const SendButton = ()=>{
@@ -66,9 +90,11 @@ export const SendButton = ()=>{
     const hasChanges = useRecentCampaignHasChanges();
     const [campaign] = useRecentCampaign();
 
-    if(typeof campaign === typeof undefined) return null;
+    if(typeof campaign === typeof undefined){
+        return null;
+    }
 
-    const disabled = isRequesting || hasChanges;
+    const disabled = typeof campaign === typeof undefined || isRequesting || hasChanges;
 
     return <Button disabled={disabled} isPrimary onClick={()=>console.log("send")}>Send!</Button>
 }

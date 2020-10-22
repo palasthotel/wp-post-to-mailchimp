@@ -32,6 +32,10 @@ class Assets extends _Component {
 			Plugin::HANDLE_JS_GUTENBERG,
 			"PostToMailchimp",
 			[
+				"preview" => [
+					"html" => $this->plugin->preview->getHTMLUrl(get_the_ID()),
+					"plaintext" => $this->plugin->preview->getPlaintextUrl(get_the_ID()),
+				],
 				"lists" => $lists,
 				"segments" => $segments,
 				"groups" => $groups,

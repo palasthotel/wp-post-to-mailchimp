@@ -4,6 +4,9 @@
 namespace Palasthotel\PostToMailchimp\REST;
 
 
+use Palasthotel\PostToMailchimp\Campaign;
+use Palasthotel\PostToMailchimp\MailchimpTestMail;
+use Palasthotel\PostToMailchimp\Plugin;
 use Palasthotel\PostToMailchimp\WP_REST;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -26,7 +29,8 @@ class CampaignsController extends _BaseController {
 				'args'                => [
 					WP_REST::ARG_POST_ID => $this->arg_int_required,
 					WP_REST::ARG_RECENT  => [
-						"type" => "boolean",
+						"type"    => "boolean",
+						"default" => false,
 					]
 				]
 			)
@@ -39,7 +43,7 @@ class CampaignsController extends _BaseController {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create_item' ),
 				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param(WP_REST::ARG_POST_ID) );
+					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
 				},
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
@@ -93,10 +97,24 @@ class CampaignsController extends _BaseController {
 					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
 				},
 				'args'                => [
-					WP_REST::ARG_POST_ID     => $this->arg_int_required,
-					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
-					"emails" => [
+					WP_REST::ARG_POST_ID         => $this->arg_int_required,
+					WP_REST::ARG_CAMPAIGN_ID     => $this->arg_int_required,
+					WP_REST::ARG_EMAIL_ADDRESSES => [
+						"required" => true,
+						"type"     => "array",
+						'items'    => array(
+							'type'   => 'string',
+							'format' => 'email',
+						),
 
+					],
+					WP_REST::ARG_EMAIL_TYPE      => [
+						'type'    => 'string',
+						'enum'    => array(
+							MailchimpTestMail::TYPE_HTML,
+							MailchimpTestMail::TYPE_PLAINTEXT,
+						),
+						'default' => MailchimpTestMail::TYPE_HTML,
 					]
 				]
 			)
@@ -153,22 +171,34 @@ class CampaignsController extends _BaseController {
 	}
 
 	public function delete_item( $request ) {
-		$post_id = $request->get_param(WP_REST::ARG_POST_ID);
-		$id = $request->get_param(WP_REST::ARG_CAMPAIGN_ID);
-		return  $this->plugin->repository->deleteCampaign($id);
+		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
+		$id      = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
+
+		return $this->plugin->repository->deleteCampaign( $id );
 	}
 
-	public function test(WP_REST_Request $request){
-		$post_id = $request->get_param(WP_REST::ARG_POST_ID);
-		$id = $request->get_param(WP_REST::ARG_CAMPAIGN_ID);
+	public function test( WP_REST_Request $request ) {
+		$post_id         = $request->get_param( WP_REST::ARG_POST_ID );
+		$id              = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
+		$email_addresses = $request->get_param( WP_REST::ARG_EMAIL_ADDRESSES );
+		$type            = $request->get_param( WP_REST::ARG_EMAIL_TYPE );
 
-		// TODO: send test messages
-		return true;
+		$campaign = $this->plugin->repository->getRecentCampaign( $post_id );
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return false;
+		}
+
+		$this->plugin->repository->updateCampaignContent($id);
+
+		return $this->plugin->api->sendTestMail( $campaign->campaign_id, new MailchimpTestMail(
+			$email_addresses,
+			$type
+		) );
 	}
 
-	public function send(WP_REST_Request $request){
-		$post_id = $request->get_param(WP_REST::ARG_POST_ID);
-		$id = $request->get_param(WP_REST::ARG_CAMPAIGN_ID);
+	public function send( WP_REST_Request $request ) {
+		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
+		$id      = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
 
 		// TODO: send message
 		return true;

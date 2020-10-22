@@ -256,5 +256,29 @@ class Repository extends _Component {
 		return true;
 	}
 
+	public function updateCampaignContent(int $id){
+		$campaign = $this->plugin->database->getCampaign($id);
+
+		if (!( $campaign instanceof Campaign)) return false;
+
+		ob_start();
+		do_action( Plugin::ACTION_NEWSLETTER_THE_CONTENT, $campaign->post_id );
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		ob_start();
+		do_action( Plugin::ACTION_NEWSLETTER_THE_CONTENT_PLAINTEXT, $campaign->post_id );
+		$content_plaintext = ob_get_contents();
+		ob_end_clean();
+
+		return $this->plugin->api->addContent(
+			$campaign->campaign_id,
+			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT, $content, $campaign->post_id ),
+			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT, $content_plaintext, $campaign->post_id ),
+			get_permalink( $campaign->post_id )
+		);
+
+	}
+
 
 }

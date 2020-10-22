@@ -1,14 +1,18 @@
 import apiFetch from "@wordpress/api-fetch";
 import { registerStore } from "@wordpress/data";
+import { validateEmail } from "../utils/email";
 
 // ---------------------------------------------
 // default store state
 // ---------------------------------------------
+// TODO: collect default from settings?
+const testEmailAddressesCache = localStorage.getItem("gutenberg-post-to-mailchimp__test_email_addresses") || "[]"
 const DEFAULT_STATE = {
     isRequesting: false,
     audience: localStorage.getItem("gutenberg-post-to-mailchimp__audience") || "",
     segment: localStorage.getItem("gutenberg-post-to-mailchimp__segment") || "",
     campaigns: [],
+    testEmailAddresses: JSON.parse(testEmailAddressesCache).filter(validateEmail), 
 };
 
 // ---------------------------------------------
@@ -36,9 +40,9 @@ const CAMPAIGN_DELETE = (campaign)=>({
     type: 'CAMPAIGN_DELETE',
     path: `/post-to-mailchimp/v1/campaigns/${campaign.post_id}/campaign/${campaign.id}`,
 })
-const CAMPAIGN_TEST = (post_id, campaign_id, email_addresses)=>({
+const CAMPAIGN_TEST = (campaign, email_addresses)=>({
     type: 'CAMPAIGN_UPDATE',
-    path: `/post-to-mailchimp/v1/campaigns/${post_id}/campaign/${campaign_id}/test`,
+    path: `/post-to-mailchimp/v1/campaigns/${campaign.post_id}/campaign/${campaign.id}/test`,
     data: {
         email_addresses: email_addresses,
     }
@@ -70,6 +74,7 @@ const actions = {
     setSegment: ( id ) =>({ type: 'SET_SEGMENT', id }),
     setCampaigns: ( campaigns ) => ({ type: 'SET_CAMPAIGNS',campaigns }),
     setRecentCampaign: actionSetRecentCampaign,
+    setTestEmailAddresses: (testEmailAddresses)=>({type: 'SET_TEST_EMAIL_ADDRESSES', testEmailAddresses}),
 
     // ---------------------------------------------
     // ajax state
@@ -114,8 +119,11 @@ const actions = {
         yield actionSetRecentCampaign(campaign)
         return actionIsRequesting(true);
     },
-    * sendTestMail(){
-        const result = yield CAMPAIGN_TEST()
+    * sendTestMail(campaign, emailAddresses){
+        yield actionIsRequesting(true);
+        const result = yield CAMPAIGN_TEST(campaign, emailAddresses)
+        console.log(result);
+        return actionIsRequesting(false);
     }
 }
 
@@ -170,6 +178,12 @@ registerStore( STORE_NAME, {
                     ...state,
                     recentCampaign: action.campaign
                 }
+            case 'SET_TEST_EMAIL_ADDRESSES':
+                localStorage.setItem("gutenberg-post-to-mailchimp__test_email_addresses", JSON.stringify(action.testEmailAddresses))
+                return {
+                    ...state,
+                    testEmailAddresses: action.testEmailAddresses
+                }
         }
         return state;
     },
@@ -197,6 +211,9 @@ registerStore( STORE_NAME, {
         getRecentCampaign(state, post_id){
             return state.recentCampaign;
         },
+        getTestEmailAddresses(state){
+            return state.testEmailAddresses;
+        },
     },
      // ----------------------------------------------------------------
     //  helps resolving the equivalent selector function
@@ -223,27 +240,27 @@ registerStore( STORE_NAME, {
     // ----------------------------------------------------------------
     controls: {
         CAMPAIGN_FETCH(action){
-            console.log("action fetch recent", action)
+            console.debug("action fetch recent", action)
             return apiFetch({path:action.path})
         },
         CAMPAIGNS_FETCH(action){
-            console.log("action fetch", action)
+            console.debug("action fetch", action)
             return apiFetch({path:action.path});
         },
         CAMPAIGN_ADD(action){
-            console.log("action add", action)
+            console.debug("action add", action)
             return apiFetch({path:action.path, data:action.data, method: "POST"})
         },
         CAMPAIGN_UPDATE(action){
-            console.log("action update", action)
+            console.debug("action update", action)
             return apiFetch({path:action.path, data:action.data, method: "PUT"})
         },
         CAMPAIGN_DELETE(action){
-            console.log("action delete", action)
+            console.debug("action delete", action)
             return apiFetch({path:action.path, method: "DELETE"})
         },
         CAMPAIGN_TEST(action){
-            console.log("action test", action);
+            console.debug("action test", action);
             return apiFetch({path:action.path, data:action.data, method: "POST"})
         }
     },

@@ -125,6 +125,7 @@ class Plugin {
 
 		$this->assets     = new Assets( $this );
 		$this->gutenberg  = new Gutenberg( $this );
+		$this->preview    = new Preview( $this );
 		$this->database   = new Database( $this );
 		$this->api        = new API( $this );
 		$this->repository = new Repository( $this );

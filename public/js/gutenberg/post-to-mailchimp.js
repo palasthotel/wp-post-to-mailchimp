@@ -419,7 +419,7 @@ var AudiencesControl = function AudiencesControl() {
 /*!******************************************!*\
   !*** ./src/script/components/Buttons.js ***!
   \******************************************/
-/*! exports provided: CreateButton, UpdateButton, DeleteButton, SendButton */
+/*! exports provided: CreateButton, UpdateButton, DeleteButton, SendTestButton, SendButton */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -427,6 +427,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateButton", function() { return CreateButton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UpdateButton", function() { return UpdateButton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DeleteButton", function() { return DeleteButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SendTestButton", function() { return SendTestButton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SendButton", function() { return SendButton; });
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
@@ -439,6 +440,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+/* harmony import */ var _utils_email__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/email */ "./src/script/utils/email.js");
 
 
 
@@ -447,6 +449,7 @@ __webpack_require__.r(__webpack_exports__);
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 
 
 
@@ -507,7 +510,7 @@ var UpdateButton = function UpdateButton() {
     return null;
   }
 
-  var disabled = isRequesting || !hasChange;
+  var disabled = _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined) || isRequesting || !hasChange;
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     disabled: disabled,
     isSecondary: true,
@@ -529,16 +532,20 @@ var DeleteButton = function DeleteButton() {
       _2 = _useRecentCampaign6[2],
       deleteCampaign = _useRecentCampaign6[3];
 
-  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return null;
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) {
+    return null;
+  }
+
+  var disabled = _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined) || isRequesting;
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
-    disabled: isRequesting,
+    disabled: disabled,
     isDestructive: true,
     onClick: function onClick() {
       return deleteCampaign();
     }
   }, "Delete");
 };
-var SendButton = function SendButton() {
+var SendTestButton = function SendTestButton() {
   var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
   var hasChanges = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaignHasChanges"])();
 
@@ -546,8 +553,37 @@ var SendButton = function SendButton() {
       _useRecentCampaign8 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign7, 1),
       campaign = _useRecentCampaign8[0];
 
-  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return null;
-  var disabled = isRequesting || hasChanges;
+  var _useTestEmailAddresse = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useTestEmailAddresses"])(),
+      _useTestEmailAddresse2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useTestEmailAddresse, 1),
+      emails = _useTestEmailAddresse2[0];
+
+  var sendTest = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useSendTestEmails"])();
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) {
+    return null;
+  }
+
+  var validEmails = emails.filter(_utils_email__WEBPACK_IMPORTED_MODULE_6__["validateEmail"]);
+  var disabled = isRequesting || hasChanges || validEmails.length == 0;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+    disabled: disabled,
+    isSecondary: true,
+    onClick: sendTest
+  }, "Send test");
+};
+var SendButton = function SendButton() {
+  var isRequesting = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useIsRequesting"])();
+  var hasChanges = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaignHasChanges"])();
+
+  var _useRecentCampaign9 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_5__["useRecentCampaign"])(),
+      _useRecentCampaign10 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign9, 1),
+      campaign = _useRecentCampaign10[0];
+
+  if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) {
+    return null;
+  }
+
+  var disabled = _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined) || isRequesting || hasChanges;
   return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_3__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__["Button"], {
     disabled: disabled,
     isPrimary: true,
@@ -556,6 +592,64 @@ var SendButton = function SendButton() {
     }
   }, "Send!");
 };
+
+/***/ }),
+
+/***/ "./src/script/components/EMailAddressesControl.js":
+/*!********************************************************!*\
+  !*** ./src/script/components/EMailAddressesControl.js ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
+/* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+/* harmony import */ var _utils_email__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/email */ "./src/script/utils/email.js");
+
+
+
+
+
+
+
+var EMailAddressesControl = function EMailAddressesControl() {
+  var _useTestEmailAddresse = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_4__["useTestEmailAddresses"])(),
+      _useTestEmailAddresse2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_1___default()(_useTestEmailAddresse, 2),
+      emails = _useTestEmailAddresse2[0],
+      setEmails = _useTestEmailAddresse2[1];
+
+  var handleChange = function handleChange(values) {
+    setEmails(values.map(function (v) {
+      return _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()(v) === _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_0___default()("") ? v : v.value;
+    }));
+  };
+
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelRow"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_2__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["FormTokenField"], {
+    label: "Email addresses",
+    value: emails.map(function (e) {
+      if (Object(_utils_email__WEBPACK_IMPORTED_MODULE_5__["validateEmail"])(e)) {
+        return e;
+      }
+
+      return {
+        value: e,
+        status: 'error'
+      };
+    }),
+    onChange: handleChange
+  }));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (EMailAddressesControl);
 
 /***/ }),
 
@@ -575,10 +669,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _hooks_use_config_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../hooks/use-config.js */ "./src/script/hooks/use-config.js");
-/* harmony import */ var _Buttons_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Buttons.js */ "./src/script/components/Buttons.js");
+/* harmony import */ var _hooks_use_config_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../hooks/use-config.js */ "./src/script/hooks/use-config.js");
+/* harmony import */ var _Buttons_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Buttons.js */ "./src/script/components/Buttons.js");
+/* harmony import */ var _Steps_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Steps.js */ "./src/script/components/Steps.js");
 
 
 
@@ -589,16 +682,54 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var Plugin = function Plugin() {
-  var audiences = Object(_hooks_use_config_js__WEBPACK_IMPORTED_MODULE_6__["useAudiencesLists"])();
+  var audiences = Object(_hooks_use_config_js__WEBPACK_IMPORTED_MODULE_5__["useAudiencesLists"])();
 
   if (audiences.length < 1) {
     return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], null, "Please make sure there is at least one Mailchimp.com audience available.");
   }
 
-  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_AudiencesControl_js__WEBPACK_IMPORTED_MODULE_1__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_SegmentsControl_js__WEBPACK_IMPORTED_MODULE_2__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["CreateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["UpdateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["DeleteButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_7__["SendButton"], null));
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Steps_js__WEBPACK_IMPORTED_MODULE_7__["Step1"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Steps_js__WEBPACK_IMPORTED_MODULE_7__["Step2"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Steps_js__WEBPACK_IMPORTED_MODULE_7__["Step3"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_6__["CreateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_6__["UpdateButton"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_Buttons_js__WEBPACK_IMPORTED_MODULE_6__["DeleteButton"], null)), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__["PanelBody"], {
+    title: "History",
+    initialOpen: false
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "Old campaigns")));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Plugin);
+
+/***/ }),
+
+/***/ "./src/script/components/PreviewUrl.js":
+/*!*********************************************!*\
+  !*** ./src/script/components/PreviewUrl.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _hooks_use_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../hooks/use-config */ "./src/script/hooks/use-config.js");
+
+
+
+
+var PreviewUrl = function PreviewUrl(_ref) {
+  var _ref$plaintext = _ref.plaintext,
+      plaintext = _ref$plaintext === void 0 ? false : _ref$plaintext,
+      children = _ref.children;
+  var htmlUrl = Object(_hooks_use_config__WEBPACK_IMPORTED_MODULE_2__["useHTMLPreviewUrl"])();
+  var plaintextUrl = Object(_hooks_use_config__WEBPACK_IMPORTED_MODULE_2__["usePlaintextPreviewUrl"])();
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__["PanelRow"], null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__["Button"], {
+    isSecondary: true,
+    href: plaintext ? plaintextUrl : htmlUrl,
+    target: "_blank"
+  }, children));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (PreviewUrl);
 
 /***/ }),
 
@@ -693,6 +824,72 @@ var SegmentsControl = function SegmentsControl() {
 
 /***/ }),
 
+/***/ "./src/script/components/Steps.js":
+/*!****************************************!*\
+  !*** ./src/script/components/Steps.js ***!
+  \****************************************/
+/*! exports provided: Step1, Step2, Step3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Step1", function() { return Step1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Step2", function() { return Step2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Step3", function() { return Step3; });
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/slicedToArray */ "./node_modules/@babel/runtime/helpers/slicedToArray.js");
+/* harmony import */ var _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _hooks_use_store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../hooks/use-store */ "./src/script/hooks/use-store.js");
+/* harmony import */ var _AudiencesControl__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AudiencesControl */ "./src/script/components/AudiencesControl.js");
+/* harmony import */ var _Buttons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Buttons */ "./src/script/components/Buttons.js");
+/* harmony import */ var _EMailAddressesControl__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./EMailAddressesControl */ "./src/script/components/EMailAddressesControl.js");
+/* harmony import */ var _PreviewUrl__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./PreviewUrl */ "./src/script/components/PreviewUrl.js");
+/* harmony import */ var _SegmentsControl__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./SegmentsControl */ "./src/script/components/SegmentsControl.js");
+
+
+
+
+
+
+
+
+
+var Step1 = function Step1() {
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__["PanelBody"], {
+    title: "Step 1: Configure",
+    initialOpen: true
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_AudiencesControl__WEBPACK_IMPORTED_MODULE_4__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_SegmentsControl__WEBPACK_IMPORTED_MODULE_8__["default"], null));
+};
+var Step2 = function Step2() {
+  var _useRecentCampaign = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_3__["useRecentCampaign"])(),
+      _useRecentCampaign2 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useRecentCampaign, 1),
+      campaign = _useRecentCampaign2[0];
+
+  if (!campaign) return null;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__["PanelBody"], {
+    title: "Step 2: Test",
+    initialOpen: false
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_PreviewUrl__WEBPACK_IMPORTED_MODULE_7__["default"], null, "HTML Preview"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_PreviewUrl__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    plaintext: true
+  }, "Plaintext Preview"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])("hr", null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_EMailAddressesControl__WEBPACK_IMPORTED_MODULE_6__["default"], null), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_Buttons__WEBPACK_IMPORTED_MODULE_5__["SendTestButton"], null));
+};
+var Step3 = function Step3() {
+  var _useRecentCampaign3 = Object(_hooks_use_store__WEBPACK_IMPORTED_MODULE_3__["useRecentCampaign"])(),
+      _useRecentCampaign4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_0___default()(_useRecentCampaign3, 1),
+      campaign = _useRecentCampaign4[0];
+
+  if (!campaign) return null;
+  return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__["PanelBody"], {
+    title: "Step 3: Send",
+    initialOpen: false
+  }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])("p", null, "send right now or schedule"), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__["createElement"])(_Buttons__WEBPACK_IMPORTED_MODULE_5__["SendButton"], null));
+};
+
+/***/ }),
+
 /***/ "./src/script/data/store.js":
 /*!**********************************!*\
   !*** ./src/script/data/store.js ***!
@@ -715,6 +912,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _utils_email__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/email */ "./src/script/utils/email.js");
 
 
 
@@ -725,15 +923,19 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
+
  // ---------------------------------------------
 // default store state
 // ---------------------------------------------
+// TODO: collect default from settings?
 
+var testEmailAddressesCache = localStorage.getItem("gutenberg-post-to-mailchimp__test_email_addresses") || "[]";
 var DEFAULT_STATE = {
   isRequesting: false,
   audience: localStorage.getItem("gutenberg-post-to-mailchimp__audience") || "",
   segment: localStorage.getItem("gutenberg-post-to-mailchimp__segment") || "",
-  campaigns: []
+  campaigns: [],
+  testEmailAddresses: JSON.parse(testEmailAddressesCache).filter(_utils_email__WEBPACK_IMPORTED_MODULE_6__["validateEmail"])
 }; // ---------------------------------------------
 // api actions
 // ---------------------------------------------
@@ -775,10 +977,10 @@ var CAMPAIGN_DELETE = function CAMPAIGN_DELETE(campaign) {
   };
 };
 
-var CAMPAIGN_TEST = function CAMPAIGN_TEST(post_id, campaign_id, email_addresses) {
+var CAMPAIGN_TEST = function CAMPAIGN_TEST(campaign, email_addresses) {
   return {
     type: 'CAMPAIGN_UPDATE',
-    path: "/post-to-mailchimp/v1/campaigns/".concat(post_id, "/campaign/").concat(campaign_id, "/test"),
+    path: "/post-to-mailchimp/v1/campaigns/".concat(campaign.post_id, "/campaign/").concat(campaign.id, "/test"),
     data: {
       email_addresses: email_addresses
     }
@@ -845,6 +1047,12 @@ var actions = {
     };
   },
   setRecentCampaign: actionSetRecentCampaign,
+  setTestEmailAddresses: function setTestEmailAddresses(testEmailAddresses) {
+    return {
+      type: 'SET_TEST_EMAIL_ADDRESSES',
+      testEmailAddresses: testEmailAddresses
+    };
+  },
   // ---------------------------------------------
   // ajax state
   // ---------------------------------------------
@@ -1011,19 +1219,25 @@ var actions = {
       }
     }, fetchRecentCampaign);
   }),
-  sendTestMail: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function sendTestMail() {
+  sendTestMail: /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.mark(function sendTestMail(campaign, emailAddresses) {
     var result;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_3___default.a.wrap(function sendTestMail$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
             _context6.next = 2;
-            return CAMPAIGN_TEST();
+            return actionIsRequesting(true);
 
           case 2:
-            result = _context6.sent;
+            _context6.next = 4;
+            return CAMPAIGN_TEST(campaign, emailAddresses);
 
-          case 3:
+          case 4:
+            result = _context6.sent;
+            console.log(result);
+            return _context6.abrupt("return", actionIsRequesting(false));
+
+          case 7:
           case "end":
             return _context6.stop();
         }
@@ -1082,6 +1296,12 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
         return _objectSpread(_objectSpread({}, state), {}, {
           recentCampaign: action.campaign
         });
+
+      case 'SET_TEST_EMAIL_ADDRESSES':
+        localStorage.setItem("gutenberg-post-to-mailchimp__test_email_addresses", JSON.stringify(action.testEmailAddresses));
+        return _objectSpread(_objectSpread({}, state), {}, {
+          testEmailAddresses: action.testEmailAddresses
+        });
     }
 
     return state;
@@ -1108,6 +1328,9 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
     },
     getRecentCampaign: function getRecentCampaign(state, post_id) {
       return state.recentCampaign;
+    },
+    getTestEmailAddresses: function getTestEmailAddresses(state) {
+      return state.testEmailAddresses;
     }
   },
   // ----------------------------------------------------------------
@@ -1200,19 +1423,19 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
   // ----------------------------------------------------------------
   controls: {
     CAMPAIGN_FETCH: function CAMPAIGN_FETCH(action) {
-      console.log("action fetch recent", action);
+      console.debug("action fetch recent", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path
       });
     },
     CAMPAIGNS_FETCH: function CAMPAIGNS_FETCH(action) {
-      console.log("action fetch", action);
+      console.debug("action fetch", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path
       });
     },
     CAMPAIGN_ADD: function CAMPAIGN_ADD(action) {
-      console.log("action add", action);
+      console.debug("action add", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path,
         data: action.data,
@@ -1220,7 +1443,7 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
       });
     },
     CAMPAIGN_UPDATE: function CAMPAIGN_UPDATE(action) {
-      console.log("action update", action);
+      console.debug("action update", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path,
         data: action.data,
@@ -1228,14 +1451,14 @@ Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_5__["registerStore"])(STORE_NAME
       });
     },
     CAMPAIGN_DELETE: function CAMPAIGN_DELETE(action) {
-      console.log("action delete", action);
+      console.debug("action delete", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path,
         method: "DELETE"
       });
     },
     CAMPAIGN_TEST: function CAMPAIGN_TEST(action) {
-      console.log("action test", action);
+      console.debug("action test", action);
       return _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_4___default()({
         path: action.path,
         data: action.data,
@@ -1262,15 +1485,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_plugins__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_plugins__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_edit_post__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/edit-post */ "@wordpress/edit-post");
 /* harmony import */ var _wordpress_edit_post__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_edit_post__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
-/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _components_Plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Plugin */ "./src/script/components/Plugin.js");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__);
-
-
+/* harmony import */ var _components_Plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Plugin */ "./src/script/components/Plugin.js");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
 
 
 
@@ -1290,16 +1507,7 @@ __webpack_require__.r(__webpack_exports__);
         name: PLUGIN_NAME,
         icon: "email",
         title: "Post to Mailchimp"
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
-        title: "Step 1: Create campaign",
-        initialOpen: true
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "Create Campaign")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
-        title: "Step 2: Test contents",
-        initialOpen: false
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "update and preview contents and send test mails")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_wordpress_components__WEBPACK_IMPORTED_MODULE_6__["PanelBody"], {
-        title: "Step 3: Schedule",
-        initialOpen: false
-      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])("p", null, "send right now or schedule")), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_components_Plugin__WEBPACK_IMPORTED_MODULE_5__["default"], null)));
+      }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__["createElement"])(_components_Plugin__WEBPACK_IMPORTED_MODULE_3__["default"], null)));
     }
   });
 })();
@@ -1310,18 +1518,26 @@ __webpack_require__.r(__webpack_exports__);
 /*!****************************************!*\
   !*** ./src/script/hooks/use-config.js ***!
   \****************************************/
-/*! exports provided: useAudiencesLists, useSegments */
+/*! exports provided: useAudiencesLists, useSegments, useHTMLPreviewUrl, usePlaintextPreviewUrl */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useAudiencesLists", function() { return useAudiencesLists; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useSegments", function() { return useSegments; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useHTMLPreviewUrl", function() { return useHTMLPreviewUrl; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "usePlaintextPreviewUrl", function() { return usePlaintextPreviewUrl; });
 var useAudiencesLists = function useAudiencesLists() {
   return PostToMailchimp.lists;
 };
 var useSegments = function useSegments(listId) {
   return PostToMailchimp.segments[listId] || [];
+};
+var useHTMLPreviewUrl = function useHTMLPreviewUrl() {
+  return PostToMailchimp.preview.html;
+};
+var usePlaintextPreviewUrl = function usePlaintextPreviewUrl() {
+  return PostToMailchimp.preview.plaintext;
 };
 
 /***/ }),
@@ -1351,7 +1567,7 @@ var usePost = function usePost() {
 /*!***************************************!*\
   !*** ./src/script/hooks/use-store.js ***!
   \***************************************/
-/*! exports provided: useIsRequesting, useAudience, useSegment, useRecentCampaign, useRecentCampaignHasChanges, useCampaigns */
+/*! exports provided: useIsRequesting, useAudience, useSegment, useRecentCampaign, useRecentCampaignHasChanges, useCampaigns, useTestEmailAddresses, useValidTestEmailAddresses, useSendTestEmails */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1362,6 +1578,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useRecentCampaign", function() { return useRecentCampaign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useRecentCampaignHasChanges", function() { return useRecentCampaignHasChanges; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useCampaigns", function() { return useCampaigns; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useTestEmailAddresses", function() { return useTestEmailAddresses; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useValidTestEmailAddresses", function() { return useValidTestEmailAddresses; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "useSendTestEmails", function() { return useSendTestEmails; });
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
@@ -1375,6 +1594,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _use_config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./use-config */ "./src/script/hooks/use-config.js");
 /* harmony import */ var _use_post_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./use-post.js */ "./src/script/hooks/use-post.js");
+/* harmony import */ var _utils_email_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/email.js */ "./src/script/utils/email.js");
 
 
 
@@ -1382,6 +1602,7 @@ __webpack_require__.r(__webpack_exports__);
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 
 
 
@@ -1439,7 +1660,6 @@ var useRecentCampaign = function useRecentCampaign() {
   var isRequesting = useIsRequesting();
   var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
   return [campaign, function (campaign) {
-    console.log("update campaign", campaign);
     dispatch.updateCampaign(campaign);
   }, function (new_campaign) {
     if (isRequesting) {
@@ -1475,7 +1695,6 @@ var useRecentCampaignHasChanges = function useRecentCampaignHasChanges() {
       segment = _useSegment2[0];
 
   if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) === ( true ? "undefined" : undefined)) return false;
-  console.log("has changes", campaign, audience, segment, campaign.audience_id !== audience, campaign.segment_id !== parseInt(segment));
   return _babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) !== ( true ? "undefined" : undefined) && (campaign.audience_id !== audience || campaign.segment_id !== parseInt(segment));
 };
 var useCampaigns = function useCampaigns() {
@@ -1487,12 +1706,54 @@ var useCampaigns = function useCampaigns() {
   });
   var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
   return [campaigns, function (campaign) {
-    console.log("update campaign", campaign);
     dispatch.updateCampaign(campaign);
   }, function (campaign) {
-    console.log("add campaign", campaign);
     dispatch.addCampaign(campaign);
   }];
+};
+var useTestEmailAddresses = function useTestEmailAddresses() {
+  var emails = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getTestEmailAddresses();
+  });
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
+  return [emails, function (_emails) {
+    dispatch.setTestEmailAddresses(_emails);
+  }];
+};
+var useValidTestEmailAddresses = function useValidTestEmailAddresses() {
+  return Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useSelect"])(function (select) {
+    return select(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]).getTestEmailAddresses();
+  }).filter(_utils_email_js__WEBPACK_IMPORTED_MODULE_8__["validateEmail"]);
+};
+var useSendTestEmails = function useSendTestEmails() {
+  var emails = useValidTestEmailAddresses();
+
+  var _useRecentCampaign3 = useRecentCampaign(),
+      _useRecentCampaign4 = _babel_runtime_helpers_slicedToArray__WEBPACK_IMPORTED_MODULE_2___default()(_useRecentCampaign3, 1),
+      campaign = _useRecentCampaign4[0];
+
+  var dispatch = Object(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__["useDispatch"])(_data_store_js__WEBPACK_IMPORTED_MODULE_3__["STORE_NAME"]);
+  return function () {
+    if (_babel_runtime_helpers_typeof__WEBPACK_IMPORTED_MODULE_1___default()(campaign) !== ( true ? "undefined" : undefined) && emails.length > 0) {
+      dispatch.sendTestMail(campaign, emails);
+    }
+  };
+};
+
+/***/ }),
+
+/***/ "./src/script/utils/email.js":
+/*!***********************************!*\
+  !*** ./src/script/utils/email.js ***!
+  \***********************************/
+/*! exports provided: validateEmail */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validateEmail", function() { return validateEmail; });
+var validateEmail = function validateEmail(mail) {
+  return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail);
 };
 
 /***/ }),

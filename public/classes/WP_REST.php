@@ -32,6 +32,10 @@ class WP_REST extends _Component {
 
 	const ARG_RECENT = "recent";
 
+	const ARG_EMAIL_ADDRESSES = "email_addresses";
+
+	const ARG_EMAIL_TYPE = "email_type";
+
 	/**
 	 * start component
 	 */

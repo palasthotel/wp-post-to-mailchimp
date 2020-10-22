@@ -4,6 +4,7 @@ import {useEffect} from "@wordpress/element";
 import {useSegments} from "./use-config";
 import { STORE_NAME } from "../data/store.js";
 import { usePost } from "./use-post.js";
+import { validateEmail } from "../utils/email.js";
 
 export const useIsRequesting = ()=>{
     const state = useSelect(select=>select(STORE_NAME).isRequesting(), []);
@@ -51,7 +52,6 @@ export const useRecentCampaign = () => {
     return [
         campaign,
         (campaign) => {
-            console.log("update campaign", campaign)
             dispatch.updateCampaign(campaign)
         },
         (new_campaign) => {
@@ -82,8 +82,6 @@ export const useRecentCampaignHasChanges = ()=>{
 
     if(typeof campaign === typeof undefined) return false;
 
-    console.log("has changes", campaign, audience, segment, campaign.audience_id !== audience, campaign.segment_id !== parseInt(segment) )
-
     return typeof campaign !== typeof undefined &&
         (campaign.audience_id !== audience || campaign.segment_id !== parseInt(segment));
 }
@@ -95,13 +93,37 @@ export const useCampaigns = () => {
     return [
         campaigns,
         (campaign) => {
-            console.log("update campaign", campaign)
             dispatch.updateCampaign(campaign)
         },
         (campaign) => {
-            console.log("add campaign", campaign)
             dispatch.addCampaign(campaign)
         }
     ];
 }
 
+export const useTestEmailAddresses = ()=>{
+    const emails = useSelect(select => select(STORE_NAME).getTestEmailAddresses())
+    const dispatch = useDispatch(STORE_NAME)
+    return [
+        emails,
+        (_emails)=>{
+            dispatch.setTestEmailAddresses(_emails);
+        }
+    ]
+}
+
+export const useValidTestEmailAddresses = ()=>{
+    return useSelect(select => select(STORE_NAME).getTestEmailAddresses()).filter(validateEmail)
+}
+
+export const useSendTestEmails = ()=>{
+    const emails = useValidTestEmailAddresses();
+    const [campaign] = useRecentCampaign();
+    const dispatch = useDispatch(STORE_NAME);
+
+    return ()=>{
+        if(typeof campaign !== typeof undefined && emails.length > 0){
+            dispatch.sendTestMail(campaign, emails)
+        }
+    }
+}
