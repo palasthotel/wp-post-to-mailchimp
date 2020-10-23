@@ -9,6 +9,10 @@
 namespace Palasthotel\PostToMailchimp;
 
 use DrewM\MailChimp\MailChimp;
+use Palasthotel\PostToMailchimp\Model\Audience;
+use Palasthotel\PostToMailchimp\Model\Segment;
+use Palasthotel\PostToMailchimp\Model\GroupCategory;
+use Palasthotel\PostToMailchimp\Model\GroupInterest;
 
 class API extends _Component {
 

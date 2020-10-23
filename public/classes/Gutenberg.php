@@ -4,6 +4,8 @@
 namespace Palasthotel\PostToMailchimp;
 
 
+use Palasthotel\PostToMailchimp\Model\Campaign;
+
 class Gutenberg extends _Component {
 
 	public function onCreate() {

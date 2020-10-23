@@ -3,6 +3,7 @@
 
 namespace Palasthotel\PostToMailchimp;
 
+use Palasthotel\PostToMailchimp\Model\Campaign;
 use wpdb;
 
 /**

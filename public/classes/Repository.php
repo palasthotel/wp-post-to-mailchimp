@@ -4,6 +4,10 @@
 namespace Palasthotel\PostToMailchimp;
 
 
+use Palasthotel\PostToMailchimp\Model\Audience;
+use Palasthotel\PostToMailchimp\Model\Campaign;
+use Palasthotel\PostToMailchimp\Model\GroupCategory;
+use Palasthotel\PostToMailchimp\Model\Segment;
 use WP_Error;
 
 class Repository extends _Component {

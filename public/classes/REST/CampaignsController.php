@@ -3,10 +3,8 @@
 
 namespace Palasthotel\PostToMailchimp\REST;
 
-
-use Palasthotel\PostToMailchimp\Campaign;
-use Palasthotel\PostToMailchimp\MailchimpTestMail;
-use Palasthotel\PostToMailchimp\Plugin;
+use Palasthotel\PostToMailchimp\Model\Campaign;
+use Palasthotel\PostToMailchimp\Model\MailchimpTestMail;
 use Palasthotel\PostToMailchimp\WP_REST;
 use WP_REST_Request;
 use WP_REST_Server;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Palasthotel\PostToMailchimp;
+namespace Palasthotel\PostToMailchimp\Model;
 
 
 class MailchimpCampaignArgs {
