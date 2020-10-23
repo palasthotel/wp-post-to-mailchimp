@@ -110,13 +110,15 @@ class Database extends _Component {
 			"attributes"  => $campaign->attributes !== null ? json_encode( $campaign->attributes ) : null,
 		];
 
-		return $this->wpdb->update(
+		$response =  $this->wpdb->update(
 			$this->table,
 			$data,
 			[
 				"id" => $campaign->id,
 			]
 		);
+
+		return $response;
 	}
 
 	/**

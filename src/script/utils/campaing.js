@@ -1,4 +1,6 @@
 
+export const isCampaign = (campaign) => typeof campaign === typeof {} && typeof campaign.id === typeof 1;
+
 export const campaignGetAudienceId =(attributes)=>{
     if(
         typeof attributes !== typeof {}

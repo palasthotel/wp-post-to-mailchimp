@@ -1,7 +1,7 @@
 import "../data/store.js";
-import {useDispatch, useSelect} from "@wordpress/data";
-import {useEffect} from "@wordpress/element";
-import {useSegments} from "./use-config";
+import { useDispatch, useSelect } from "@wordpress/data";
+import { useEffect } from "@wordpress/element";
+import { useSegments } from "./use-config";
 import { STORE_NAME } from "../data/store.js";
 import { usePost } from "./use-post.js";
 import { validateEmail } from "../utils/email.js";
@@ -11,79 +11,46 @@ export const useIsRequesting = ()=>{
     return state;
 }
 
-export const useAudience = ()=>{
-    const state = useSelect(select=>select(STORE_NAME).getAudience(), []);
-    const dispatch = useDispatch(STORE_NAME);
+export const useRecentCampaign = ()=>{
+    const value = useSelect(select => select('core/editor').getEditedPostAttribute("recent_campaign"))
+    const dispatch = useDispatch('core/editor')
     return [
-        state,
-        (id) =>{
-            dispatch.setAudience(id)
-        }
+        value || {},
+        (changeSet)=>{
+            dispatch.editPost({recent_campaign: {
+                ...value,
+                ...changeSet,
+            }})
+        },
+    ]
+}
+
+export const useAudience = ()=>{
+    const [campaign, setValue] = useRecentCampaign();
+    return [
+        campaign.audience_id,
+        (id) => setValue({audience_id:id})
     ];
 }
 
 export const useSegment = ()=>{
-    const [audienceListId] = useAudience();
-    const segments = useSegments(audienceListId);
-    const state = useSelect(select=>select(STORE_NAME).getSegment(), []);
-    const dispatch = useDispatch(STORE_NAME);
+    const [audience_id] = useAudience();
+    const [campaign, setValue] = useRecentCampaign()
+    const segments = useSegments(audience_id);
+    const state = campaign.segment_id;
 
     useEffect(()=>{
         if( segments.find(s=>s.id+"" === state+"") ) return;
         const timeout = setTimeout(()=>{
-            dispatch.setSegment("")
+            setValue({segment_id:""})
         }, 600)
         return ()=> clearTimeout(timeout)
-    }, [audienceListId])
+    }, [audience_id])
 
     return [
         state,
-        (id) =>{
-            dispatch.setSegment(id)
-        }
+        (id) =>setValue({segment_id:id})
     ];
-}
-
-export const useRecentCampaign = () => {
-    const {id} = usePost();
-    const campaign = useSelect(select=>select(STORE_NAME).getRecentCampaign(id));
-    const isRequesting = useIsRequesting();
-    const dispatch = useDispatch(STORE_NAME);
-    return [
-        campaign,
-        (campaign) => {
-            dispatch.updateCampaign(campaign)
-        },
-        (new_campaign) => {
-            if(isRequesting){
-                console.error("Wait for running requst to be finished")
-                return;
-            }
-            if(typeof campaign !== typeof undefined){
-                console.error("Can only add new campaign if there is no recent one for this post.", campaign)
-                return;
-            }
-            dispatch.addCampaign({
-                post_id: id,
-                ...new_campaign,
-            })
-        },
-        ()=>{
-            dispatch.deleteCampaign(campaign);
-        },
-    ];
-}
-
-export const useRecentCampaignHasChanges = ()=>{
-    const Post = usePost()
-    const [campaign] = useRecentCampaign(Post.id)
-    const [audience] = useAudience();
-    const [segment] = useSegment();
-
-    if(typeof campaign === typeof undefined) return false;
-
-    return typeof campaign !== typeof undefined &&
-        (campaign.audience_id !== audience || campaign.segment_id !== parseInt(segment));
 }
 
 export const useCampaigns = () => {
@@ -92,12 +59,9 @@ export const useCampaigns = () => {
     const dispatch = useDispatch(STORE_NAME)
     return [
         campaigns,
-        (campaign) => {
-            dispatch.updateCampaign(campaign)
+        () => {
+            dispatch.fetchCampaigns(id)
         },
-        (campaign) => {
-            dispatch.addCampaign(campaign)
-        }
     ];
 }
 

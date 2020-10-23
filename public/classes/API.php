@@ -10,6 +10,7 @@ namespace Palasthotel\PostToMailchimp;
 
 use DrewM\MailChimp\MailChimp;
 use Palasthotel\PostToMailchimp\Model\Audience;
+use Palasthotel\PostToMailchimp\Model\MailchimpTestMail;
 use Palasthotel\PostToMailchimp\Model\Segment;
 use Palasthotel\PostToMailchimp\Model\GroupCategory;
 use Palasthotel\PostToMailchimp\Model\GroupInterest;
@@ -21,13 +22,23 @@ class API extends _Component {
 	 */
 	private $api = null;
 
+	public function onCreate() {
+		add_filter(Plugin::FILTER_ADD_CAMPAIGN_ARGS, function($args){
+			return array_merge_recursive($args, array(
+				"tracking" => array(
+					"google_analytics" => Option::getGoogleAnalyticsId()
+				)
+			));
+		});
+	}
+
 	/**
 	 * @return bool|MailChimp|null
 	 */
 	private function getApi() {
 		try {
 			if ( $this->api === null ) {
-				$this->api = new MailChimp( $this->plugin->settings->getApiKey() );
+				$this->api = new MailChimp( Option::getApiKey() );
 			}
 		} catch ( \Exception $e ) {
 			error_log( $e, 4 );
@@ -180,16 +191,34 @@ class API extends _Component {
 
 	/**
 	 * @param string $campaignId
-	 * @param $args
+	 * @param string $title
+	 * @param string $list_id
+	 * @param int|null $segment_id
+	 * @param array $args
 	 *
 	 * @return array|bool
 	 */
-	public function updateCampaign(string $campaignId, $args){
+	public function updateCampaign(string $campaignId, string $title, string $list_id, ?int $segment_id , array $args = []){
 
-		$required = ["settings" => []];
+		$required = [
+			"recipients" => [
+				"list_id" => $list_id,
+			],
+			"settings" => [
+				"title" => $title,
+			]
+		];
+		if($segment_id){
+			$required["recipients"]["segment_opts"] = [
+				"saved_segment_id" => $segment_id,
+			];
+		}
 		$args = array_merge_recursive($required, $args);
 
-		return $this->getApi()->patch("/campaigns/$campaignId", apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args, $this ));
+		return $this->getApi()->patch(
+			"/campaigns/$campaignId",
+			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args, $this )
+		);
 
 	}
 

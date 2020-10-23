@@ -12,11 +12,25 @@ namespace Palasthotel\PostToMailchimp;
 class Settings extends _Component {
 
 	public function onCreate() {
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_filter('plugin_action_links_' . $this->plugin->basename, array($this, 'add_action_links'));
-		add_filter(Plugin::FILTER_ADD_CAMPAIGN_ARGS, array($this, 'add_to_campaign_args'));
 		add_filter('pre_update_option_'.Plugin::OPTION_MAILCHIMP_API_KEY, [$this, 'before_update']);
+		add_filter('pre_update_site_option_'.Plugin::OPTION_MAILCHIMP_API_KEY , [$this, 'before_update']);
+	}
+
+	/**
+	 * register admin menu page for settings
+	 */
+	function admin_menu(){
+		add_submenu_page(
+			'options-general.php',
+			__('Post to Mailchimp', Plugin::DOMAIN),
+			__('Post to Mailchimp', Plugin::DOMAIN),
+			'manage_options',
+			'ph_mailchimp_settings',
+			array( $this, 'render_settings_form' )
+		);
 	}
 
 	/**
@@ -30,6 +44,26 @@ class Settings extends _Component {
 	            isset($_POST["clear_cache"]) && !empty($_POST["clear_cache"])
         ){
             $this->plugin->repository->cacheClear();
+        }
+
+	    if( is_array($_POST) && isset($_POST['update_whitelists'])){
+
+	        Option::deleteSegmentWhitelists();
+	        if(isset($_POST["ptm_segments"]) && is_array($_POST["ptm_segments"])){
+		        $audiences = $_POST["ptm_segments"];
+		        foreach ($audiences as $audienceId => $segments){
+			        Option::setSegmentsWhitelist($audienceId,array_map('intval', $segments));
+		        }
+            }
+
+		    Option::deleteTagsWhitelists();
+		    if(isset($_POST["ptm_tags"]) && is_array($_POST["ptm_tags"])){
+			    $audiences = $_POST["ptm_tags"];
+			    foreach ($audiences as $audienceId => $tags){
+				    Option::setTagWhitelist($audienceId,array_map('intval', $tags));
+			    }
+		    }
+
         }
 
 		add_settings_section(
@@ -68,19 +102,6 @@ class Settings extends _Component {
 
 	}
 
-	/**
-	 * register admin menu page for settings
-	 */
-	function admin_menu(){
-		add_submenu_page(
-			'options-general.php',
-			__('Post to Mailchimp', Plugin::DOMAIN),
-			__('Post to Mailchimp', Plugin::DOMAIN),
-			'manage_options',
-			'ph_mailchimp_settings',
-			array( $this, 'render_settings_form' )
-		);
-	}
 
 	/**
 	 * action link to settings on plugins list page
@@ -121,17 +142,9 @@ class Settings extends _Component {
 		}
 	}
 
-	public function isApiKeyInConstant(){
-	    return false !== POST_TO_MAILCHIMP_API_KEY;
-	}
-
-	public function getApiKey(){
-		return $this->isApiKeyInConstant() ? POST_TO_MAILCHIMP_API_KEY: get_option(Plugin::OPTION_MAILCHIMP_API_KEY, '');
-	}
-
 	public function render_api_key(){
-	    $isConstantOption = $this->isApiKeyInConstant();
-	    $apiKey = $this->getApiKey();
+	    $isConstantOption = Option::isApiKeyInConstant();
+	    $apiKey = Option::getApiKey();
 		$this->renderInput("ph_mailchimp_api_key", $apiKey, $isConstantOption);
 		echo "<br/>";
 		if($isConstantOption){
@@ -148,27 +161,17 @@ class Settings extends _Component {
 		echo "</span>";
 	}
 
-	public function isGoogleAnalyticsIdInConstant(){
-	    return false !== POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY;
-	}
-	public function getGoogleAnalyticsId(){
-		return $this->isGoogleAnalyticsIdInConstant() ? POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY: get_option(Plugin::OPTION_GA_API_KEY, '');
-	}
 	public function render_ga(){
-		$this->renderInput("ph_mailchimp_ga", $this->getGoogleAnalyticsId(), $this->isGoogleAnalyticsIdInConstant());
+		$this->renderInput(
+		        "ph_mailchimp_ga",
+                Option::getGoogleAnalyticsId(),
+                Option::isGoogleAnalyticsIdInConstant()
+        );
 	}
 
 	private function renderInput($name, $value, $isReadonly = false){
 	    $readonly = $isReadonly ? "readonly": "";
 	    echo "<input id='$name' name='$name' value='$value' type='text' $readonly class='regular-text' />";
-	}
-
-	public function getAudiencesWhitelist(){
-		$whitelist = get_option(Plugin::OPTION_AUDIENCE_WHITELIST);
-		return is_array($whitelist) ? $whitelist : [];
-	}
-	public function isAudienceWhitelisted($id){
-	    return in_array($id, $this->getAudiencesWhitelist());
 	}
 
 	public function render_lists(){
@@ -185,7 +188,7 @@ class Settings extends _Component {
 				$default_subject = $list->campaignDefaults["subject"];
 
 				echo "<li style='border-bottom: 1px solid #cecece;padding: 10px 0;'>";
-				$checked = $this->isAudienceWhitelisted($list->listId) ? "checked": "";
+				$checked = Option::isAudienceWhitelisted($list->listId) ? "checked": "";
 				echo "<input type='checkbox' value='$list->listId' name='".Plugin::OPTION_AUDIENCE_WHITELIST."[]' $checked />";
 				echo render_list_link($list->name, $web_id);
 				echo "<br>";
@@ -203,19 +206,22 @@ class Settings extends _Component {
                 // https://mailchimp.com/developer/api/marketing/list-segments/list-segments/
 				$tags = array_filter($segments, function($item){return $item->type === "static";});
 				$noTags = array_filter($segments, function ($item){return $item->type !== "static";});
+				echo "<input type='hidden' name='update_whitelists' value='yes'  />";
 				if(count($noTags)){
 					echo "<strong>Segments</strong>";
 					echo "<ul style='padding-left: 20px;'>";
 					foreach ($noTags as $segment){
-						echo "<li>$segment->name</li>";
+					    $checked = Option::isSegmentWhitelisted($list_id, $segment->id) ? "checked": "";
+						echo "<li><input $checked type='checkbox' name='ptm_segments[$list_id][]' value='$segment->id' /> $segment->name</li>";
 					}
 					echo "</ul>";
 				}
 				if(count($tags)){
 					echo "<strong>Tags</strong>";
 					echo "<ul style='padding-left: 20px;'>";
-					foreach ($tags as $segment){
-						echo "<li>$segment->name</li>";
+					foreach ($tags as $tag){
+						$checked = Option::isTagWhitelisted($list_id, $tag->id) ? "checked": "";
+						echo "<li><input $checked type='checkbox' name='ptm_tags[$list_id][]' value='$tag->id' /> $tag->name</li>";
 					}
 					echo "</ul>";
 				}
@@ -243,19 +249,6 @@ class Settings extends _Component {
 			echo "---";
 		}
 
-	}
-
-	/**
-	 * @param $args
-	 *
-	 * @return array
-	 */
-	public function add_to_campaign_args($args){
-		return array_merge_recursive($args, array(
-			"tracking" => array(
-				"google_analytics" => $this->getGoogleAnalyticsId()
-			)
-		));
 	}
 
 	public function before_update(){

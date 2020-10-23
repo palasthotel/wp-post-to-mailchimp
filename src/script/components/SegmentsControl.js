@@ -1,12 +1,19 @@
-import {BaseControl, SelectControl} from "@wordpress/components";
+import {BaseControl} from "@wordpress/components";
 import {useSegments} from "../hooks/use-config";
-import {useAudience, useSegment} from "../hooks/use-store";
+import {useRecentCampaign} from "../hooks/use-store";
 
 const SegmentsControl = ()=> {
 
-    const [audience] = useAudience()
-    const segments = useSegments(audience)
-    const [state, setState] = useSegment()
+    const [campaign = {}, setCampaign ] = useRecentCampaign();
+    const { audience_id:audience = "", segment_id:state = "" } = campaign;
+    const segments = useSegments(audience);
+
+    const setState = (_segment_id) => {
+        setCampaign({
+            ...campaign,
+            segment_id: _segment_id,
+        })
+    }
 
     if(typeof segments !== typeof [] || segments.length === 0){
         return null;
@@ -21,9 +28,9 @@ const SegmentsControl = ()=> {
     >
         <select 
             id="mailchimp-segment" 
-            style={{width:'100%'}} 
-            value={state}
-            onChange={(e)=> setState(e.target.value)}
+            style={{width:'100%'}}
+            value={state || ""}
+            onChange={(e)=> setState(parseInt(e.target.value))}
         >
             <option value=''>-</option>
             <optgroup label="Segments">

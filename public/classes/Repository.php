@@ -226,6 +226,31 @@ class Repository extends _Component {
 	}
 
 	/**
+	 * @param string|Campaign $id
+	 * @param string $title
+	 * @param string $audienceId
+	 * @param int|null $segmentId
+	 *
+	 * @return array|bool
+	 */
+	public function updateCampaign( $id, string $title, string $audienceId, ?int $segmentId ) {
+
+		$campaign = $id instanceof Campaign ? $id : $this->plugin->database->getCampaign($id);
+
+		if(!($campaign instanceof Campaign)){
+			return false;
+		}
+
+
+
+		$response = $this->plugin->api->updateCampaign($campaign->campaign_id, $title, $audienceId, $segmentId);
+
+		$campaign->setAttributes($response);
+
+		return $this->plugin->database->updateCampaign($campaign);
+	}
+
+	/**
 	 * @param int $id
 	 *
 	 * @return bool|WP_Error
@@ -283,6 +308,8 @@ class Repository extends _Component {
 		);
 
 	}
+
+
 
 
 }

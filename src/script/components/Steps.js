@@ -22,7 +22,7 @@ export const Step2 = ()=>{
 
     const [campaign] = useRecentCampaign()
 
-    if(!campaign) return null;
+    if(!campaign.id) return null;
 
     return <PanelBody
         title="Step 2: Test"
@@ -40,7 +40,8 @@ export const Step2 = ()=>{
 export const Step3 = ()=>{
 
     const [campaign] = useRecentCampaign()
-    if(!campaign) return null;
+    console.log(campaign)
+    if(!campaign.id) return null;
 
     return <PanelBody
         title="Step 3: Send"

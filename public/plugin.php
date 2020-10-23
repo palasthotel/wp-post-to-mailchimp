@@ -71,6 +71,11 @@ class Plugin {
 	const POST_META_CAMPAIGNS = "_post_to_mailchimp_campaigns";
 
 	/**
+	 * rest field
+	 */
+	const REST_FIELD_RECENT_CAMPAIGN = "recent_campaign";
+
+	/**
 	 * actions
 	 */
 	const ACTION_NEWSLETTER_THE_CONTENT = "post_to_mailchimp_the_content";
@@ -83,6 +88,7 @@ class Plugin {
 	const FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT = "post_to_mailchimp_change_content_plaintext";
 	const FILTER_GET_LISTS_ARGS = "post_to_mailchimp_get_lists_args";
 	const FILTER_ADD_CAMPAIGN_ARGS = "post_to_mailchimp_add_campaign_args";
+	const FILTER_UPDATE_CAMPAIGN_ARGS = "post_to_mailchimp_update_campaign_args";
 	const FILTER_SCHEDULE_CAMPAIGN_ARGS = "post_to_mailchimp_schedule_campaign_args";
 	const FILTER_POST_TYPES = "post_to_mailchimp_post_types";
 	const FILTER_ADD_TEMPLATE_PATHS = "post_to_mailchimp_add_template_paths";
@@ -93,6 +99,8 @@ class Plugin {
 	const OPTION_MAILCHIMP_API_KEY = "ph_mailchimp_api_key";
 	const OPTION_GA_API_KEY = "ph_mailchimp_ga";
 	const OPTION_AUDIENCE_WHITELIST = "ph_mailchimp_audience_whitelist";
+	const OPTION_SEGMENT_WHITELIST = "ph_mailchimp_segment_%s_whitelist";
+	const OPTION_TAG_WHITELIST = "ph_mailchimp_tag_%s_whitelist";
 
 	/**
 	 * transients

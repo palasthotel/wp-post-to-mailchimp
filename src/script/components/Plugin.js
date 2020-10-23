@@ -1,9 +1,7 @@
-import AudienceControl from "./AudiencesControl.js";
-import SegmentsControl from "./SegmentsControl.js";
-import {Button, PanelBody} from "@wordpress/components";
-import {useAudience, useCampaigns, useIsRequesting, useRecentCampaign, useSegment} from "../hooks/use-store";
+import { PanelBody} from "@wordpress/components";
 import { useAudiencesLists } from "../hooks/use-config.js";
-import { CreateButton, DeleteButton, SendButton, UpdateButton } from "./Buttons.js";
+import { CreateButton, DeleteButton } from "./Buttons.js";
+import NextStepsInfo from "./NextStepsInfo.js";
 import { Step1, Step2, Step3 } from "./Steps.js";
 
 const Plugin = ()=>{
@@ -21,8 +19,7 @@ const Plugin = ()=>{
         <Step3 />
         
         <PanelBody>
-            <CreateButton />
-            <UpdateButton />
+            <NextStepsInfo />
             <DeleteButton />
         </PanelBody>
 

@@ -62,7 +62,7 @@ class CampaignsController extends _BaseController {
 				},
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
-					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
+					WP_REST::ARG_CAMPAIGN_ID => $this->arg_string_required,
 					WP_REST::ARG_AUDIENCE_ID => $this->arg_string,
 					WP_REST::ARG_SEGMENT_ID  => $this->arg_int,
 				]
@@ -161,11 +161,12 @@ class CampaignsController extends _BaseController {
 	}
 
 	public function update_item( $request ) {
-		return [
-			"post_id"     => $request->get_param( WP_REST::ARG_POST_ID ),
-			"audience_id" => $request->get_param( WP_REST::ARG_AUDIENCE_ID ),
-			"segment_id"  => $request->get_param( WP_REST::ARG_SEGMENT_ID ),
-		];
+		$postId     = $request->get_param( WP_REST::ARG_POST_ID );
+		$audienceId = $request->get_param( WP_REST::ARG_AUDIENCE_ID );
+		$segmentId  = $request->get_param( WP_REST::ARG_SEGMENT_ID );
+		return $this->plugin->repository->updateCampaign(
+			get_the_title( $postId ), $postId, $audienceId, $segmentId
+		);
 	}
 
 	public function delete_item( $request ) {

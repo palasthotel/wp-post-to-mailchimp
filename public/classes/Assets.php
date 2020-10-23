@@ -18,13 +18,15 @@ class Assets extends _Component {
 
 		$lists = $this->plugin->repository->getAudiences();
 		$lists = array_values(array_filter($lists, function($list){
-			return $this->plugin->settings->isAudienceWhitelisted($list->listId);
+			return Option::isAudienceWhitelisted($list->listId);
 		}));
 
 		$segments = [];
 		$groups = [];
 		foreach ($lists as $list){
-			$segments[$list->listId]= $this->plugin->repository->getSegments($list);
+			$segments[$list->listId]= array_values(array_filter($this->plugin->repository->getSegments($list),function($segment) use ( $list ) {
+				return Option::isSegmentWhitelisted($list->listId, $segment->id) || Option::isTagWhitelisted($list->listId, $segment->id);
+			}));
 			$groups[$list->listId] = $this->plugin->repository->getGroups($list);
 		}
 
