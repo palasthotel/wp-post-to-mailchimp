@@ -22,6 +22,6 @@ class Gutenberg extends _Component {
 		}
 
 		$campaign = $this->plugin->repository->getRecentCampaign($post_id);
-		if($campaign instanceof Campaign) $this->plugin->repository->updateCampaignContent($campaign->post_id);
+		if($campaign instanceof Campaign) $this->plugin->repository->updateCampaignContent($campaign->id);
 	}
 }

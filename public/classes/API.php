@@ -205,11 +205,11 @@ class API extends _Component {
 	 *
 	 * @param string $url
 	 *
-	 * @return bool
+	 * @return bool|array
 	 */
 	public function addContent( $campaignId, $html, $plain_text, $url = "" ) {
 
-		if ( WP_DEBUG ) {
+		if ( WP_DEBUG && !POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
 
