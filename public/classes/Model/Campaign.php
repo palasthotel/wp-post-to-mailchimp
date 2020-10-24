@@ -12,13 +12,14 @@ namespace Palasthotel\PostToMailchimp\Model;
  * @property null|string $campaign_id
  * @property null|array $attributes
  * @property string $state
+ * @property null|int $schedule
  */
 class Campaign {
 
-	const STATE_NEW = "new";
-	const STATE_SAVED = "draft";
-	const STATE_READY = "ready";
-	const STATE_SENT = "sent";
+	const STATE_NEW = "new"; // is in database
+	const STATE_DRAFT = "draft"; // is created in mailchimp
+	const STATE_READY = "ready"; // has all necessary settings and contents provided to mailchimp
+	const STATE_DONE = "done"; // was sent or scheduled
 
 	/**
 	 * Campaign constructor.
@@ -37,6 +38,8 @@ class Campaign {
 
 		$this->audience_id = null;
 		$this->segment_id  = null;
+
+		$this->schedule = null;
 
 		$this->attributes  = null;
 
@@ -75,13 +78,21 @@ class Campaign {
 		return $this;
 	}
 
+	public function setSchedule(?int $schedule){
+		$this->schedule = $schedule;
+		return $this;
+	}
+
 	/**
+	 * sets attributes and overwrites object props: campaign_id, audience_id and segment_id
 	 * @param array|null $attributes
 	 *
 	 * @return $this
 	 */
 	public function setAttributes( ?array $attributes ) {
 		$this->attributes = $attributes;
+
+		if(isset($attributes["id"])) $this->campaign_id = $attributes["id"];
 
 		if(
 			isset($attributes["recipients"])

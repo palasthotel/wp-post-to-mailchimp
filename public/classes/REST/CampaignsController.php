@@ -36,23 +36,6 @@ class CampaignsController extends _BaseController {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign',
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'create_item' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
-				'args'                => [
-					WP_REST::ARG_POST_ID     => $this->arg_int_required,
-					WP_REST::ARG_AUDIENCE_ID => $this->arg_string_required,
-					WP_REST::ARG_SEGMENT_ID  => $this->arg_int,
-				]
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign/(?P<' . WP_REST::ARG_CAMPAIGN_ID . '>\d+)',
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
@@ -62,7 +45,7 @@ class CampaignsController extends _BaseController {
 				},
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
-					WP_REST::ARG_CAMPAIGN_ID => $this->arg_string_required,
+					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
 					WP_REST::ARG_AUDIENCE_ID => $this->arg_string,
 					WP_REST::ARG_SEGMENT_ID  => $this->arg_int,
 				]
@@ -89,7 +72,7 @@ class CampaignsController extends _BaseController {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign/(?P<' . WP_REST::ARG_CAMPAIGN_ID . '>\d+)/test',
 			array(
-				'methods'             => WP_REST_Server::EDITABLE,
+				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'test' ),
 				'permission_callback' => function ( WP_REST_Request $request ) {
 					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
@@ -104,32 +87,16 @@ class CampaignsController extends _BaseController {
 							'type'   => 'string',
 							'format' => 'email',
 						),
-
 					],
 					WP_REST::ARG_EMAIL_TYPE      => [
 						'type'    => 'string',
 						'enum'    => array(
+							MailchimpTestMail::TYPE_BOTH,
 							MailchimpTestMail::TYPE_HTML,
 							MailchimpTestMail::TYPE_PLAINTEXT,
 						),
-						'default' => MailchimpTestMail::TYPE_HTML,
+						'default' => MailchimpTestMail::TYPE_BOTH,
 					]
-				]
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign/(?P<' . WP_REST::ARG_CAMPAIGN_ID . '>\d+)/send',
-			array(
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'send' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
-				'args'                => [
-					WP_REST::ARG_POST_ID     => $this->arg_int_required,
-					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
 				]
 			)
 		);
@@ -148,59 +115,34 @@ class CampaignsController extends _BaseController {
 		return $this->plugin->repository->getCampaigns( $post_id );
 	}
 
-	public function create_item( $request ) {
-
-		$postId     = $request->get_param( WP_REST::ARG_POST_ID );
-		$audienceId = $request->get_param( WP_REST::ARG_AUDIENCE_ID );
-		$segmentId  = $request->get_param( WP_REST::ARG_SEGMENT_ID );
-
-		// TODO: create campaign via mailchimp api
-		return $this->plugin->repository->addCampaign(
-			get_the_title( $postId ), $postId, $audienceId, $segmentId
-		);
-	}
-
 	public function update_item( $request ) {
-		$postId     = $request->get_param( WP_REST::ARG_POST_ID );
+		$campaignId     = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
 		$audienceId = $request->get_param( WP_REST::ARG_AUDIENCE_ID );
 		$segmentId  = $request->get_param( WP_REST::ARG_SEGMENT_ID );
 		return $this->plugin->repository->updateCampaign(
-			get_the_title( $postId ), $postId, $audienceId, $segmentId
+			$campaignId, $audienceId, $segmentId
 		);
 	}
 
 	public function delete_item( $request ) {
-		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
 		$id      = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
-
 		return $this->plugin->repository->deleteCampaign( $id );
 	}
 
 	public function test( WP_REST_Request $request ) {
-		$post_id         = $request->get_param( WP_REST::ARG_POST_ID );
 		$id              = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
 		$email_addresses = $request->get_param( WP_REST::ARG_EMAIL_ADDRESSES );
 		$type            = $request->get_param( WP_REST::ARG_EMAIL_TYPE );
 
-		$campaign = $this->plugin->repository->getRecentCampaign( $post_id );
+		$campaign = $this->plugin->repository->getCampaign( $id );
 		if ( ! ( $campaign instanceof Campaign ) ) {
 			return false;
 		}
-
-		$this->plugin->repository->updateCampaignContent($id);
 
 		return $this->plugin->api->sendTestMail( $campaign->campaign_id, new MailchimpTestMail(
 			$email_addresses,
 			$type
 		) );
-	}
-
-	public function send( WP_REST_Request $request ) {
-		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
-		$id      = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
-
-		// TODO: send message
-		return true;
 	}
 
 }

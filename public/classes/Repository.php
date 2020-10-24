@@ -7,9 +7,14 @@ namespace Palasthotel\PostToMailchimp;
 use Palasthotel\PostToMailchimp\Model\Audience;
 use Palasthotel\PostToMailchimp\Model\Campaign;
 use Palasthotel\PostToMailchimp\Model\GroupCategory;
+use Palasthotel\PostToMailchimp\Model\MailchimpCampaignArgs;
 use Palasthotel\PostToMailchimp\Model\Segment;
 use WP_Error;
 
+/**
+ * @property API api
+ * @property Database database
+ */
 class Repository extends _Component {
 
 	/**
@@ -36,6 +41,8 @@ class Repository extends _Component {
 		$this->audienceMap = [];
 		$this->segments    = [];
 		$this->groups      = [];
+		$this->api         = $this->plugin->api;
+		$this->database    = $this->plugin->database;
 	}
 
 	/**
@@ -53,12 +60,17 @@ class Repository extends _Component {
 			return $this->audiences;
 		}
 
-		$this->audiences = $this->plugin->api->getAudiences();
+		$this->audiences = $this->api->getAudiences();
 		set_transient( Plugin::TRANSIENT_LISTS, $this->audiences, 60 * 10 );
 
 		return $this->audiences;
 	}
 
+	/**
+	 * @param $audienceListId
+	 *
+	 * @return false|Audience
+	 */
 	public function getAudience( $audienceListId ) {
 		if ( isset( $this->audienceMap[ $audienceListId ] ) ) {
 			return $this->audienceMap[ $audienceListId ];
@@ -71,7 +83,7 @@ class Repository extends _Component {
 				return $found[0];
 			}
 		}
-		$audience                             = $this->plugin->api->getAudience( $audienceListId );
+		$audience                             = $this->api->getAudience( $audienceListId );
 		$this->audienceMap[ $audienceListId ] = $audience;
 
 		return $audience;
@@ -97,7 +109,7 @@ class Repository extends _Component {
 			return $this->segments[ $id ];
 		}
 
-		$this->segments[ $id ] = $this->plugin->api->getSegments( $id );
+		$this->segments[ $id ] = $this->api->getSegments( $id );
 		set_transient( $transientKey, $this->segments[ $id ], 60 * 10 );
 
 		return $this->segments[ $id ];
@@ -124,11 +136,11 @@ class Repository extends _Component {
 			return $this->groups[ $id ];
 		}
 
-		$groups = $this->plugin->api->getGroups( $id );
-		$this->groups[$id] = $groups;
-		set_transient($transientKey, $this->groups[$id], 60*10);
+		$groups              = $this->api->getGroups( $id );
+		$this->groups[ $id ] = $groups;
+		set_transient( $transientKey, $this->groups[ $id ], 60 * 10 );
 
-		return $this->groups[$id];
+		return $this->groups[ $id ];
 	}
 
 	/**
@@ -138,8 +150,8 @@ class Repository extends _Component {
 		$this->audiences = null;
 		delete_transient( Plugin::TRANSIENT_LISTS );
 		$this->audienceMap = [];
-		$this->segments = [];
-		$this->groups = [];
+		$this->segments    = [];
+		$this->groups      = [];
 		global $wpdb;
 		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '" . Plugin::TRANSIENT_DELETE_SEGMENTS_LIKE . "'" );
 		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '" . Plugin::TRANSIENT_DELETE_GROUPS_LIKE . "'" );
@@ -151,7 +163,16 @@ class Repository extends _Component {
 	 * @return Campaign[]
 	 */
 	public function getCampaigns( $post_id ) {
-		return $this->plugin->database->getCampaigns( $post_id );
+		return $this->database->getCampaigns( $post_id );
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return Campaign|null
+	 */
+	public function getCampaign(int $id){
+		return $this->database->getCampaign($id);
 	}
 
 	/**
@@ -159,21 +180,20 @@ class Repository extends _Component {
 	 *
 	 * @return Campaign|null
 	 */
-	public function getRecentCampaign( $post_id ){
-		return $this->plugin->database->getRecentCampaign($post_id);
+	public function getRecentCampaign( $post_id ) {
+		return $this->database->getRecentCampaign( $post_id );
 	}
 
 	/**
-	 * @param string $title
 	 * @param int $post_id
 	 * @param string $audienceListId
 	 * @param null|int $segmentId
 	 *
 	 * @return Campaign|WP_Error
 	 */
-	public function addCampaign( string $title, int $post_id, string $audienceListId, ?int $segmentId ) {
+	public function addCampaign( int $post_id, string $audienceListId, ?int $segmentId ) {
 
-		$campaign = $this->plugin->database->addCampaign( $post_id );
+		$campaign = $this->database->addCampaign( $post_id );
 
 		$audience = $this->getAudience( $audienceListId );
 
@@ -184,27 +204,22 @@ class Repository extends _Component {
 			] );
 		}
 
-		$campaign->audience_id = $audienceListId;
-		$campaign->segment_id = $segmentId;
-
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			// only local if debug
 			$campaign->campaign_id = "debug-" . $campaign->id;
 			$campaign->attributes  = [];
-			$this->plugin->database->updateCampaign( $campaign );
+			$this->database->updateCampaign( $campaign );
 
 			return $campaign;
 		}
 
 		// create campaign at mailchimp
-		$response = $this->plugin->api->addCampaign( $title, $audienceListId, $segmentId, array(
-			"settings" => array(
-				"from_name"    => $audience->campaignDefaults["from_name"],
-				"from_email"   => $audience->campaignDefaults["from_email"],
-				"reply_to"     => $audience->campaignDefaults["from_email"],
-				"subject_line" => $title,
-			),
-		) );
+		$args = MailchimpCampaignArgs::build()
+		                             ->setTitle( get_the_title( $post_id ) )
+		                             ->setAudience( $audience )
+		                             ->setSegmentId( $segmentId );
+
+		$response = $this->api->addCampaign( $args);
 		if ( ! is_array( $response ) ) {
 			return new WP_Error(
 				500,
@@ -216,38 +231,49 @@ class Repository extends _Component {
 			);
 		}
 
-		$this->plugin->database->updateCampaign(
-			$campaign->setCampaignId($response["id"])
-			         ->setState(Campaign::STATE_SAVED)
-			         ->setAttributes($response)
+		$this->database->updateCampaign(
+			$campaign->setState( Campaign::STATE_DRAFT )
+			         ->setAttributes( $response )
 		);
 
 		return $campaign;
 	}
 
 	/**
-	 * @param string|Campaign $id
-	 * @param string $title
+	 * @param int|Campaign $id
 	 * @param string $audienceId
 	 * @param int|null $segmentId
 	 *
-	 * @return array|bool
+	 * @return bool|int|WP_Error
 	 */
-	public function updateCampaign( $id, string $title, string $audienceId, ?int $segmentId ) {
+	public function updateCampaign( $id, string $audienceId, ?int $segmentId ) {
 
-		$campaign = $id instanceof Campaign ? $id : $this->plugin->database->getCampaign($id);
+		$campaign = $id instanceof Campaign ? $id : $this->database->getCampaign( $id );
 
-		if(!($campaign instanceof Campaign)){
-			return false;
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return new WP_Error(
+				404,
+				"Could not find campaign.",
+				[
+					"id" => $id,
+				]
+			);
 		}
 
+		$audience = $this->getAudience($audienceId);
+		if(!($audience instanceof Audience)) return false;
 
+		$args = MailchimpCampaignArgs::build()
+		                     ->setCampaignId($campaign->campaign_id)
+		                     ->setTitle(get_the_title($campaign->post_id))
+			->setAudience($audience)
+			->setSegmentId($segmentId);
 
-		$response = $this->plugin->api->updateCampaign($campaign->campaign_id, $title, $audienceId, $segmentId);
+		$response = $this->api->updateCampaign( $args);
 
-		$campaign->setAttributes($response);
+		$campaign->setAttributes( $response );
 
-		return $this->plugin->database->updateCampaign($campaign);
+		return $this->database->updateCampaign( $campaign );
 	}
 
 	/**
@@ -256,39 +282,58 @@ class Repository extends _Component {
 	 * @return bool|WP_Error
 	 */
 	public function deleteCampaign( int $id ) {
-		$campaign = $this->plugin->database->getCampaign($id);
-		if(null === $campaign) return new WP_Error(
-			404,
-			"Could not find campaign.",
-			[
-				"id" => $id,
-			]
-		);
-		$apiResponse = $this->plugin->api->deleteCampaign($campaign->campaign_id);
-		if(!$apiResponse) return new WP_Error(
-			500,
-			"Could not delete campaign from Mailchimp",
-			[
-				"response" => $apiResponse,
-				"id" => $id,
-			]
-		);
-		$dbResult = $this->plugin->database->deleteCampaign($campaign->id);
-		if(!$dbResult) return new WP_Error(
-			500,
-			"Could not delete campaign from database",
-			[
-				"id" => $id,
-			]
-		);
+		$campaign = $this->database->getCampaign( $id );
+		if ( null === $campaign ) {
+			return new WP_Error(
+				404,
+				"Could not find campaign.",
+				[
+					"id" => $id,
+				]
+			);
+		}
+		$apiResponse = $this->api->deleteCampaign( $campaign->campaign_id );
+		if ( ! $apiResponse ) {
+			return new WP_Error(
+				500,
+				"Could not delete campaign from Mailchimp",
+				[
+					"response" => $apiResponse,
+					"id"       => $id,
+				]
+			);
+		}
+		$dbResult = $this->database->deleteCampaign( $campaign->id );
+		if ( ! $dbResult ) {
+			return new WP_Error(
+				500,
+				"Could not delete campaign from database",
+				[
+					"id" => $id,
+				]
+			);
+		}
 
 		return true;
 	}
 
-	public function updateCampaignContent(int $id){
-		$campaign = $this->plugin->database->getCampaign($id);
+	/**
+	 * @param int $id
+	 *
+	 * @return array|bool|WP_Error
+	 */
+	public function updateCampaignContent( int $id ) {
+		$campaign = $this->database->getCampaign( $id );
 
-		if (!( $campaign instanceof Campaign)) return false;
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return new WP_Error(
+				404,
+				"Could not find campaign.",
+				[
+					"id" => $id,
+				]
+			);
+		}
 
 		ob_start();
 		do_action( Plugin::ACTION_NEWSLETTER_THE_CONTENT, $campaign->post_id );
@@ -300,16 +345,55 @@ class Repository extends _Component {
 		$content_plaintext = ob_get_contents();
 		ob_end_clean();
 
-		return $this->plugin->api->addContent(
+		$response = $this->api->addContent(
 			$campaign->campaign_id,
 			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT, $content, $campaign->post_id ),
 			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT, $content_plaintext, $campaign->post_id ),
 			get_permalink( $campaign->post_id )
 		);
 
+		$campaign->setState( Campaign::STATE_READY );
+
+		$this->database->updateCampaign( $campaign );
+
+		return true;
+
 	}
 
+	/**
+	 * delete all open campaigns of post
+	 *
+	 * @param int $post_id
+	 *
+	 * @return bool|int
+	 */
+	public function deletePost( int $post_id ) {
 
+		$campaigns = $this->database->getCampaigns( $post_id );
+		foreach ( $campaigns as $campaign ) {
+			// do not delete sent campaigns from mailchimp
+			if ( $campaign->state === Campaign::STATE_DONE ) {
+				continue;
+			}
+			$this->api->deleteCampaign( $campaign->campaign_id );
+		}
 
+		return $this->database->deleteCampaigns( $post_id );
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return false
+	 */
+	public function sendCampaign( $id ) {
+		$campaign = $this->plugin->repository->getCampaign($id);
+
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return false;
+		}
+
+		return $this->api->send($campaign->campaign_id);
+	}
 
 }

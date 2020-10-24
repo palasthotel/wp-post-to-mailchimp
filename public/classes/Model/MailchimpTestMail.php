@@ -10,6 +10,7 @@ namespace Palasthotel\PostToMailchimp\Model;
  */
 class MailchimpTestMail {
 
+	const TYPE_BOTH = "both";
 	const TYPE_PLAINTEXT = "plaintext";
 	const TYPE_HTML = "html";
 

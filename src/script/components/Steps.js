@@ -1,8 +1,9 @@
 import { PanelBody } from "@wordpress/components"
 import { useRecentCampaign } from "../hooks/use-store"
 import AudiencesControl from "./AudiencesControl"
-import { SendButton, SendTestButton } from "./Buttons"
+import { SendTestButton } from "./Buttons"
 import EMailAddressesControl from "./EMailAddressesControl"
+import FinishControl from "./FinishControl"
 import PreviewUrl from "./PreviewUrl"
 import SegmentsControl from "./SegmentsControl"
 
@@ -40,16 +41,12 @@ export const Step2 = ()=>{
 export const Step3 = ()=>{
 
     const [campaign] = useRecentCampaign()
-    console.log(campaign)
     if(!campaign.id) return null;
 
     return <PanelBody
-        title="Step 3: Send"
+        title="Step 3: Deliver"
         initialOpen={false}
     >
-        
-        <p>send right now or schedule</p>
-
-        <SendButton />
+        <FinishControl />
     </PanelBody>
 }

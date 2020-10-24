@@ -46,6 +46,8 @@ if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
  * @property API $api
  * @property WP_REST rest
  * @property Database database
+ * @property Post post
+ * @property Preview preview
  */
 class Plugin {
 
@@ -131,16 +133,21 @@ class Plugin {
 
 		require_once dirname( __FILE__ ) . "/vendor/autoload.php";
 
-		$this->assets     = new Assets( $this );
-		$this->gutenberg  = new Gutenberg( $this );
-		$this->preview    = new Preview( $this );
 		$this->database   = new Database( $this );
 		$this->api        = new API( $this );
 		$this->repository = new Repository( $this );
+
 		$this->settings   = new Settings( $this );
-		$this->metaBox    = new MetaBox( $this );
+
+		$this->assets     = new Assets( $this );
+		$this->gutenberg  = new Gutenberg( $this );
 		$this->templates  = new Templates( $this );
+		$this->preview    = new Preview( $this );
+
 		$this->rest       = new WP_REST( $this );
+		$this->post       = new Post( $this );
+
+		$this->metaBox    = new MetaBox( $this );
 
 		require_once dirname( __FILE__ ) . "/inc/utils.php";
 

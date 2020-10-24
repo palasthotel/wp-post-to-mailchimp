@@ -10,6 +10,7 @@ namespace Palasthotel\PostToMailchimp;
 
 use DrewM\MailChimp\MailChimp;
 use Palasthotel\PostToMailchimp\Model\Audience;
+use Palasthotel\PostToMailchimp\Model\MailchimpCampaignArgs;
 use Palasthotel\PostToMailchimp\Model\MailchimpTestMail;
 use Palasthotel\PostToMailchimp\Model\Segment;
 use Palasthotel\PostToMailchimp\Model\GroupCategory;
@@ -156,68 +157,27 @@ class API extends _Component {
 	}
 
 	/**
-	 * @param $title string administrative title
-	 * @param $list_id string id of mailing list
-	 * @param int|null $segment_id
-	 * @param array $args arguments see
-	 *     https://developer.mailchimp.com/documentation/mailchimp/reference/campaigns/
+	 * @param MailchimpCampaignArgs $args
 	 *
 	 * @return array|false
 	 */
-	public function addCampaign( string $title, string $list_id, ?int $segment_id, $args = array() ) {
-
-		$defaultArgs = array(
-			"type"       => "regular",
-			"recipients" => array(
-				"list_id" => $list_id,
-			),
-			"settings"   => array(
-				"title" => $title,
-			),
-		);
-		if($segment_id){
-			$defaultArgs["recipients"]["segment_opts"] = [
-				"saved_segment_id" => $segment_id,
-			];
-		}
-
-		$args = array_merge_recursive( $defaultArgs, $args );
-
+	public function addCampaign( MailchimpCampaignArgs $args ) {
 		return $this->getApi()->post(
 			"/campaigns",
-			apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args, $this )
+			apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args->toArray(), $this )
 		);
 	}
 
 	/**
-	 * @param string $campaignId
-	 * @param string $title
-	 * @param string $list_id
-	 * @param int|null $segment_id
-	 * @param array $args
+	 * @param MailchimpCampaignArgs $args
 	 *
 	 * @return array|bool
 	 */
-	public function updateCampaign(string $campaignId, string $title, string $list_id, ?int $segment_id , array $args = []){
-
-		$required = [
-			"recipients" => [
-				"list_id" => $list_id,
-			],
-			"settings" => [
-				"title" => $title,
-			]
-		];
-		if($segment_id){
-			$required["recipients"]["segment_opts"] = [
-				"saved_segment_id" => $segment_id,
-			];
-		}
-		$args = array_merge_recursive($required, $args);
-
+	public function updateCampaign(MailchimpCampaignArgs $args){
+		if(empty($args->campaign_id)) return false;
 		return $this->getApi()->patch(
-			"/campaigns/$campaignId",
-			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args, $this )
+			"/campaigns/$args->campaign_id",
+			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args->toArray(), $this )
 		);
 
 	}
@@ -260,10 +220,22 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function sendTestMail(string $campaignId, MailchimpTestMail $test){
-		return $this->getApi()->post("/campaigns/$campaignId/actions/test",[
-			"test_emails" => $test->emailAddresses,
-			"send_type" => $test->type,
-		]);
+		$mails = [];
+		if($test->type === MailchimpTestMail::TYPE_HTML || $test->type === MailchimpTestMail::TYPE_BOTH){
+			$mails[] = [
+				"test_emails" => $test->emailAddresses,
+				"send_type" => MailchimpTestMail::TYPE_HTML,
+			];
+		}
+		if($test->type === MailchimpTestMail::TYPE_PLAINTEXT || $test->type === MailchimpTestMail::TYPE_BOTH){
+			$mails[] = [
+				"test_emails" => $test->emailAddresses,
+				"send_type" => MailchimpTestMail::TYPE_PLAINTEXT,
+			];
+		}
+		return array_map(function($mail) use ( $campaignId ) {
+			return $this->getApi()->post("/campaigns/$campaignId/actions/test",$mail);
+		}, $mails);
 	}
 
 	/**

@@ -149,7 +149,7 @@ registerStore( STORE_NAME, {
             return apiFetch({path:action.path, data:action.data, method: "POST"})
         },
         CAMPAIGN_SEND(action){
-            console.log("action send");
+            console.debug("action send");
             return apiFetch({path:action.path, method: "POST"})
         }
     },

@@ -28,13 +28,13 @@ class Database extends _Component {
 	public function addCampaign( int $post_id ) {
 		$row = $this->wpdb->get_row( "SELECT * FROM $this->table WHERE campaign_id IS NULL LIMIT 1" );
 		if ( $row ) {
-			return $this->campaignRowToModel($row);
+			return $this->campaignRowToModel( $row );
 		}
 		$inserted = $this->wpdb->insert(
 			$this->table,
 			[
-				"post_id" => $post_id,
-				"campaign_state"   => Campaign::STATE_NEW,
+				"post_id"        => $post_id,
+				"campaign_state" => Campaign::STATE_NEW,
 			]
 		);
 		if ( ! $inserted ) {
@@ -53,12 +53,13 @@ class Database extends _Component {
 	public function getRecentCampaign( int $post_id ) {
 		$row = $this->wpdb->get_row(
 			$this->wpdb->prepare(
-				"SELECT * FROM $this->table WHERE post_id = %d AND campaign_state != %s ORDER BY id LIMIT 1", $post_id, Campaign::STATE_SENT
+				"SELECT * FROM $this->table WHERE post_id = %d AND campaign_state != %s ORDER BY id LIMIT 1", $post_id, Campaign::STATE_DONE
 			)
 		);
-		if($row){
-			return $this->campaignRowToModel($row);
+		if ( $row ) {
+			return $this->campaignRowToModel( $row );
 		}
+
 		return null;
 	}
 
@@ -73,12 +74,12 @@ class Database extends _Component {
 				"SELECT * FROM $this->table WHERE id = %d ORDER BY id LIMIT 1", $id
 			)
 		);
-		if($row){
-			return $this->campaignRowToModel($row);
+		if ( $row ) {
+			return $this->campaignRowToModel( $row );
 		}
+
 		return null;
 	}
-
 
 
 	/**
@@ -94,7 +95,7 @@ class Database extends _Component {
 			return [];
 		}
 
-		return array_map( [$this, 'campaignRowToModel'], $result );
+		return array_map( [ $this, 'campaignRowToModel' ], $result );
 	}
 
 	/**
@@ -104,13 +105,14 @@ class Database extends _Component {
 	 */
 	public function updateCampaign( Campaign $campaign ) {
 		$data = [
-			"post_id"     => $campaign->post_id,
-			"campaign_id" => $campaign->campaign_id,
-			"campaign_state"       => $campaign->state,
-			"attributes"  => $campaign->attributes !== null ? json_encode( $campaign->attributes ) : null,
+			"post_id"        => $campaign->post_id,
+			"campaign_id"    => $campaign->campaign_id,
+			"campaign_state" => $campaign->state,
+			"schedule"       => $campaign->schedule,
+			"attributes"     => $campaign->attributes !== null ? json_encode( $campaign->attributes ) : null,
 		];
 
-		$response =  $this->wpdb->update(
+		$response = $this->wpdb->update(
 			$this->table,
 			$data,
 			[
@@ -127,7 +129,16 @@ class Database extends _Component {
 	 * @return bool|int
 	 */
 	public function deleteCampaign( int $id ) {
-		return $this->wpdb->delete( $this->table, [ "id" => $id, ], ["%d"]);
+		return $this->wpdb->delete( $this->table, [ "id" => $id, ], [ "%d" ] );
+	}
+
+	/**
+	 * @param int $post_id
+	 *
+	 * @return bool|int
+	 */
+	public function deleteCampaigns( int $post_id ) {
+		return $this->wpdb->delete( $this->table, [ "post_id" => $post_id ], [ '%d' ] );
 	}
 
 	// ------------------------------------------------------------------------
@@ -138,11 +149,13 @@ class Database extends _Component {
 	 *
 	 * @return Campaign
 	 */
-	private function campaignRowToModel(object $row){
+	private function campaignRowToModel( object $row ) {
 		$attributes = ! empty( $row->attributes ) ? json_decode( $row->attributes, true ) : null;
-		return Campaign::build($row->id, $row->post_id, $row->campaign_state)
-		               ->setCampaignId($row->campaign_id)
-		               ->setAttributes($attributes);
+
+		return Campaign::build( $row->id, $row->post_id, $row->campaign_state )
+		               ->setSchedule( $row->schedule )
+		               ->setCampaignId( $row->campaign_id )
+		               ->setAttributes( $attributes );
 	}
 
 	/**
@@ -156,17 +169,17 @@ class Database extends _Component {
 			 post_id bigint(20) unsigned NOT NULL,
 			 campaign_id varchar (30) default null,
 			 campaign_state varchar(10) NOT NULL,
+			 schedule bigint(20) unsigned default null,
 			 attributes text default NULL,
 			 primary key (id),
 			 unique key unique_post_campaign (post_id, campaign_id, campaign_state),
 			 key (campaign_state),
 			 key (campaign_id),
+			 key (schedule),
 			 key (post_id)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;" );
 
 	}
-
-
 
 
 }
