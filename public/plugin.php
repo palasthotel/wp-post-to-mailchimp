@@ -9,7 +9,7 @@
  * Text Domain: post_to_mailchimp
  * Domain Path: /languages
  * Requires at least: 5.x
- * Tested up to: 5.5.1
+ * Tested up to: 5.5.3
  * License: http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @copyright Copyright (c) 2020, Palasthotel
  * @package Palasthotel\PostToMailchimp
@@ -57,7 +57,7 @@ class Plugin {
 	 * ---------------------------------------------
 	 */
 	const DOMAIN = "post_to_mailchimp";
-	const THEME_FOLDER = "plugin-parts";
+	const THEME_FOLDER = "post-to-mailchimp";
 	const TEMPLATE_HTML = "post-to-mailchimp.php";
 	const TEMPLATE_PLAINTEXT = "post-plaintext-to-mailchimp.php";
 
