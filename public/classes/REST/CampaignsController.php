@@ -38,6 +38,22 @@ class CampaignsController extends _BaseController {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign/(?P<' . WP_REST::ARG_CAMPAIGN_ID . '>\d+)',
 			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_item' ),
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) ) || WP_DEBUG;
+				},
+				'args'                => [
+					WP_REST::ARG_POST_ID     => $this->arg_int_required,
+					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
+				]
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<' . WP_REST::ARG_POST_ID . '>\d+)/campaign/(?P<' . WP_REST::ARG_CAMPAIGN_ID . '>\d+)',
+			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'update_item' ),
 				'permission_callback' => function ( WP_REST_Request $request ) {
@@ -113,6 +129,12 @@ class CampaignsController extends _BaseController {
 		}
 
 		return $this->plugin->repository->getCampaigns( $post_id );
+	}
+
+	public function get_item( $request ) {
+		$post_id  = $request->get_param( WP_REST::ARG_POST_ID );
+		$campaign_id = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
+		return $this->plugin->repository->fetchCampaign($campaign_id);
 	}
 
 	public function update_item( $request ) {

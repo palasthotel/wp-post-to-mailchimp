@@ -171,8 +171,8 @@ class Repository extends _Component {
 	 *
 	 * @return Campaign|null
 	 */
-	public function getCampaign(int $id){
-		return $this->database->getCampaign($id);
+	public function getCampaign( int $id ) {
+		return $this->database->getCampaign( $id );
 	}
 
 	/**
@@ -219,7 +219,7 @@ class Repository extends _Component {
 		                             ->setAudience( $audience )
 		                             ->setSegmentId( $segmentId );
 
-		$response = $this->api->addCampaign( $args);
+		$response = $this->api->addCampaign( $args );
 		if ( ! is_array( $response ) ) {
 			return new WP_Error(
 				500,
@@ -260,16 +260,18 @@ class Repository extends _Component {
 			);
 		}
 
-		$audience = $this->getAudience($audienceId);
-		if(!($audience instanceof Audience)) return false;
+		$audience = $this->getAudience( $audienceId );
+		if ( ! ( $audience instanceof Audience ) ) {
+			return false;
+		}
 
 		$args = MailchimpCampaignArgs::build()
-		                     ->setCampaignId($campaign->campaign_id)
-		                     ->setTitle(get_the_title($campaign->post_id))
-			->setAudience($audience)
-			->setSegmentId($segmentId);
+		                             ->setCampaignId( $campaign->campaign_id )
+		                             ->setTitle( get_the_title( $campaign->post_id ) )
+		                             ->setAudience( $audience )
+		                             ->setSegmentId( $segmentId );
 
-		$response = $this->api->updateCampaign( $args);
+		$response = $this->api->updateCampaign( $args );
 
 		$campaign->setAttributes( $response );
 
@@ -277,13 +279,13 @@ class Repository extends _Component {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int|Campaign $id
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function deleteCampaign( int $id ) {
-		$campaign = $this->database->getCampaign( $id );
-		if ( null === $campaign ) {
+	public function deleteCampaign( $id ) {
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
 			return new WP_Error(
 				404,
 				"Could not find campaign.",
@@ -318,14 +320,13 @@ class Repository extends _Component {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int|Campaign $id
 	 *
 	 * @return array|bool|WP_Error
 	 */
-	public function updateCampaignContent( int $id ) {
-		$campaign = $this->database->getCampaign( $id );
-
-		if ( ! ( $campaign instanceof Campaign ) ) {
+	public function updateCampaignContent( $id ) {
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
 			return new WP_Error(
 				404,
 				"Could not find campaign.",
@@ -352,7 +353,9 @@ class Repository extends _Component {
 			get_permalink( $campaign->post_id )
 		);
 
-		$campaign->setState( Campaign::STATE_READY );
+		if ( Campaign::STATE_NEW || Campaign::STATE_DRAFT ) {
+			$campaign->setState( Campaign::STATE_READY );
+		}
 
 		$this->database->updateCampaign( $campaign );
 
@@ -384,22 +387,147 @@ class Repository extends _Component {
 	/**
 	 * @param Campaign|int $id
 	 *
-	 * @return false
+	 * @return boolean
 	 */
-	public function sendCampaign( $id ) {
+	public function send( $id ) {
 
-		$campaign = $id instanceof Campaign ? $id: $this->plugin->repository->getCampaign($id);
+		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
 
 		if ( ! ( $campaign instanceof Campaign ) ) {
 			return false;
 		}
 
-		$response = $this->api->send($campaign->campaign_id);
+		$result = $this->api->send( $campaign->campaign_id );
+		if ( false === $result ) {
+			return false;
+		}
 
-		$campaign->state = Campaign::STATE_DONE;
-		$this->database->updateCampaign($campaign);
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
+		$this->database->updateCampaign( $campaign );
 
 		return true;
 	}
+
+	/**
+	 * @param int|Campaign $id
+	 *
+	 * @return bool
+	 */
+	public function cancel( $id ) {
+		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
+
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return false;
+		}
+
+		$result = $this->api->cancel( $campaign->campaign_id );
+		if ( false === $result ) {
+			return false;
+		}
+
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		$campaign->setState( Campaign::STATE_READY )->setAttributes( $response );
+		$this->database->updateCampaign( $campaign );
+
+		return true;
+	}
+
+	/**
+	 * @param Campaign|int $id
+	 *
+	 * @return array|bool|WP_Error
+	 */
+	public function schedule( $id ) {
+
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
+			return false;
+		}
+
+		if ( empty( $campaign->schedule ) ) {
+			return new WP_Error(
+				501,
+				"Campaign has no schedule.",
+				[
+					"id" => $campaign->id,
+				]
+			);
+		}
+
+		$datetime = new \DateTime();
+		$datetime->setTimestamp( $campaign->schedule / 1000 );
+
+		$result = $this->api->schedule( $campaign->campaign_id, $datetime );
+		if ( false === $result ) {
+			return new WP_Error(
+				501,
+				"API rejected schedule.",
+				[
+					"id" => $campaign->id,
+				]
+			);
+		}
+
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
+		$this->database->updateCampaign( $campaign );
+
+		return $result;
+	}
+
+	/**
+	 * @param int|Campaign $id
+	 *
+	 * @return false
+	 */
+	public function unschedule( $id ) {
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
+			return false;
+		}
+
+		$this->api->unschedule( $campaign->campaign_id );
+
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		$campaign->setState( Campaign::STATE_READY )->setAttributes( $response );
+		$this->database->updateCampaign( $campaign );
+
+		return true;
+	}
+
+	/**
+	 * @param int|Campaign $id
+	 *
+	 * @return false|Campaign
+	 */
+	public function fetchCampaign( $id ) {
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
+			return false;
+		}
+
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		$campaign->setAttributes( $response );
+		$this->database->updateCampaign( $campaign );
+
+		return $campaign;
+	}
+
+
+	/**
+	 * @param int|Campaign $id
+	 *
+	 * @return false|Campaign
+	 */
+	private function getCampaignOrFalse( $id ) {
+		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
+		if ( ! ( $campaign instanceof Campaign ) ) {
+			return false;
+		}
+
+		return $campaign;
+	}
+
 
 }

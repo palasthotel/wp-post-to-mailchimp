@@ -38,7 +38,6 @@ if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
  * @property string url
  * @property string basename
  * @property Settings settings
- * @property MetaBox metaBox
  * @property Templates templates
  * @property Assets assets
  * @property Gutenberg gutenberg
@@ -148,9 +147,7 @@ class Plugin {
 
 		$this->rest       = new WP_REST( $this );
 		$this->post       = new Post( $this );
-
-		$this->metaBox    = new MetaBox( $this );
-
+		
 		require_once dirname( __FILE__ ) . "/inc/utils.php";
 
 		/**

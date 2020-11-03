@@ -8,6 +8,7 @@
 
 namespace Palasthotel\PostToMailchimp;
 
+use DateTime;
 use DrewM\MailChimp\MailChimp;
 use Palasthotel\PostToMailchimp\Model\Audience;
 use Palasthotel\PostToMailchimp\Model\MailchimpCampaignArgs;
@@ -24,13 +25,13 @@ class API extends _Component {
 	private $api = null;
 
 	public function onCreate() {
-		add_filter(Plugin::FILTER_ADD_CAMPAIGN_ARGS, function($args){
-			return array_merge_recursive($args, array(
+		add_filter( Plugin::FILTER_ADD_CAMPAIGN_ARGS, function ( $args ) {
+			return array_merge_recursive( $args, array(
 				"tracking" => array(
 					"google_analytics" => Option::getGoogleAnalyticsId()
 				)
-			));
-		});
+			) );
+		} );
 	}
 
 	/**
@@ -54,20 +55,20 @@ class API extends _Component {
 	 *
 	 * @return bool
 	 */
-	private $isReady = null;
+	private $isConnected = null;
 
 	/**
 	 * @return bool
 	 */
-	public function isReady() {
-		if ( $this->isReady == null ) {
-			$this->isReady = false;
+	public function isConnected() {
+		if ( $this->isConnected == null ) {
+			$this->isConnected = false;
 			if ( $this->getApi() ) {
-				$this->isReady = $this->api->get( "/ping" );
+				$this->isConnected = $this->api->get( "/ping" );
 			}
 		}
 
-		return $this->isReady;
+		return $this->isConnected;
 	}
 
 	/**
@@ -77,7 +78,10 @@ class API extends _Component {
 	 */
 	public function getAudiences( array $args = array() ) {
 		$result = $this->getApi()->get( '/lists', apply_filters( Plugin::FILTER_GET_LISTS_ARGS, $args ) );
-		if ( !is_array( $result ) || !is_array( $result["lists"] ) ) return [];
+		if ( ! is_array( $result ) || ! is_array( $result["lists"] ) ) {
+			return [];
+		}
+
 		return array_map( function ( $item ) {
 			return Audience::parse( $item );
 		}, $result["lists"] );
@@ -85,11 +89,12 @@ class API extends _Component {
 
 	/**
 	 * @param string $id
+	 *
 	 * @return Audience|false
 	 */
-	public function getAudience( string $id ){
-		$result = $this->getApi()->get("/lists/$id");
-		return Audience::parse($result);
+	public function getAudience( string $id ) {
+		$result = $this->getApi()->get( "/lists/$id" );
+		return Audience::parse( $result );
 	}
 
 	/**
@@ -100,9 +105,9 @@ class API extends _Component {
 	public function getSegments( string $audienceId ) {
 		$result = $this->getApi()->get( "/lists/$audienceId/segments" );
 		if ( is_array( $result ) && is_array( $result["segments"] ) ) {
-			return array_map(function($item){
-				return new Segment($item["id"], $item["name"], $item["list_id"], $item["type"], $item["created_at"], $item["updated_at"]);
-			},$result["segments"]);
+			return array_map( function ( $item ) {
+				return new Segment( $item["id"], $item["name"], $item["list_id"], $item["type"], $item["created_at"], $item["updated_at"] );
+			}, $result["segments"] );
 		}
 
 		return false;
@@ -113,19 +118,22 @@ class API extends _Component {
 	 *
 	 * @return array|bool
 	 */
-	public function getGroups( string $audienceId){
+	public function getGroups( string $audienceId ) {
 		$baseUrl = "/lists/$audienceId/interest-categories";
-		$result = $this->getApi()->get($baseUrl);
-		if(!is_array($result) || !is_array($result["categories"])) return [];
+		$result  = $this->getApi()->get( $baseUrl );
+		if ( ! is_array( $result ) || ! is_array( $result["categories"] ) ) {
+			return [];
+		}
 
-		return array_map(function($cat) use ( $baseUrl ) {
-			$id = $cat["id"];
-			$interests = $this->getApi()->get($baseUrl."/$id/interests");
-			return new GroupCategory($cat["id"], $cat["title"], array_map(function($item){
-					return new GroupInterest($item["id"], $item["name"]);
-				}, is_array($interests) && is_array($interests["interests"]) ? $interests["interests"] : [])
+		return array_map( function ( $cat ) use ( $baseUrl ) {
+			$id        = $cat["id"];
+			$interests = $this->getApi()->get( $baseUrl . "/$id/interests" );
+
+			return new GroupCategory( $cat["id"], $cat["title"], array_map( function ( $item ) {
+					return new GroupInterest( $item["id"], $item["name"] );
+				}, is_array( $interests ) && is_array( $interests["interests"] ) ? $interests["interests"] : [] )
 			);
-		},$result["categories"]);
+		}, $result["categories"] );
 	}
 
 	/**
@@ -134,9 +142,6 @@ class API extends _Component {
 	 * @return array|false
 	 */
 	public function getCampaigns( array $args = array() ) {
-		if ( ! $this->isReady() ) {
-			return false;
-		}
 		$items = $this->getApi()->get( "/campaigns", $args );
 
 		return ( $items !== false ) ? $items["campaigns"] : false;
@@ -149,10 +154,6 @@ class API extends _Component {
 	 * @return array|bool|false
 	 */
 	public function getCampaign( string $campaignID, array $args = array() ) {
-		if ( ! $this->isReady() ) {
-			return false;
-		}
-
 		return $this->getApi()->get( "/campaigns/$campaignID", $args );
 	}
 
@@ -173,8 +174,11 @@ class API extends _Component {
 	 *
 	 * @return array|bool
 	 */
-	public function updateCampaign(MailchimpCampaignArgs $args){
-		if(empty($args->campaign_id)) return false;
+	public function updateCampaign( MailchimpCampaignArgs $args ) {
+		if ( empty( $args->campaign_id ) ) {
+			return false;
+		}
+
 		return $this->getApi()->patch(
 			"/campaigns/$args->campaign_id",
 			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args->toArray(), $this )
@@ -188,7 +192,7 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function deleteCampaign( string $campaignId ) {
-		return $this->getApi()->delete("/campaigns/$campaignId");
+		return $this->getApi()->delete( "/campaigns/$campaignId" );
 	}
 
 	/**
@@ -202,7 +206,7 @@ class API extends _Component {
 	 */
 	public function addContent( $campaignId, $html, $plain_text, $url = "" ) {
 
-		if ( WP_DEBUG && !POST_TO_MAILCHIMP_DEBUG_OFF ) {
+		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
 
@@ -219,23 +223,24 @@ class API extends _Component {
 	 *
 	 * @return array|bool
 	 */
-	public function sendTestMail(string $campaignId, MailchimpTestMail $test){
+	public function sendTestMail( string $campaignId, MailchimpTestMail $test ) {
 		$mails = [];
-		if($test->type === MailchimpTestMail::TYPE_HTML || $test->type === MailchimpTestMail::TYPE_BOTH){
+		if ( $test->type === MailchimpTestMail::TYPE_HTML || $test->type === MailchimpTestMail::TYPE_BOTH ) {
 			$mails[] = [
 				"test_emails" => $test->emailAddresses,
-				"send_type" => MailchimpTestMail::TYPE_HTML,
+				"send_type"   => MailchimpTestMail::TYPE_HTML,
 			];
 		}
-		if($test->type === MailchimpTestMail::TYPE_PLAINTEXT || $test->type === MailchimpTestMail::TYPE_BOTH){
+		if ( $test->type === MailchimpTestMail::TYPE_PLAINTEXT || $test->type === MailchimpTestMail::TYPE_BOTH ) {
 			$mails[] = [
 				"test_emails" => $test->emailAddresses,
-				"send_type" => MailchimpTestMail::TYPE_PLAINTEXT,
+				"send_type"   => MailchimpTestMail::TYPE_PLAINTEXT,
 			];
 		}
-		return array_map(function($mail) use ( $campaignId ) {
-			return $this->getApi()->post("/campaigns/$campaignId/actions/test",$mail);
-		}, $mails);
+
+		return array_map( function ( $mail ) use ( $campaignId ) {
+			return $this->getApi()->post( "/campaigns/$campaignId/actions/test", $mail );
+		}, $mails );
 	}
 
 	/**
@@ -243,9 +248,9 @@ class API extends _Component {
 	 *
 	 * @return array|bool|false
 	 */
-	public function send( $campaignId ) {
+	public function send( string $campaignId ) {
 
-		if ( WP_DEBUG && !POST_TO_MAILCHIMP_DEBUG_OFF) {
+		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
 
@@ -253,29 +258,53 @@ class API extends _Component {
 	}
 
 	/**
+	 * @param string $campaignId
+	 *
+	 * @return array|bool
+	 */
+	public function cancel( string $campaignId ) {
+
+		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
+			return false;
+		}
+
+		return $this->getApi()->post( "/campaigns/$campaignId/actions/cancel-send" );
+	}
+
+	/**
 	 * @param $campaignId string
 	 *
-	 * @param $utc_datetime string quarter hour only
+	 * @param $utc_datetime DateTime quarter hour only
 	 *
 	 * @return array|bool|false
 	 */
-	public function schedule( $campaignId, $utc_datetime ) {
+	public function schedule( string $campaignId, DateTime $utc_datetime ) {
 
-		if ( WP_DEBUG ) {
+		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
 
 		// round to next quarter hour
 		return $this->getApi()->post(
 			"/campaigns/$campaignId/actions/schedule",
-			apply_filters(
-				Plugin::FILTER_SCHEDULE_CAMPAIGN_ARGS,
-				array(
-					"schedule_time" => $utc_datetime,
-					"timewrap"      => true,
-				)
+			array(
+				"schedule_time" => $utc_datetime->format( 'Y-m-d H:i:00 e' ),
+				"timewrap"      => true,
 			)
 		);
+	}
+
+	/**
+	 * @param string $campaignId
+	 *
+	 * @return array|bool
+	 */
+	public function unschedule( string $campaignId ) {
+		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
+			return false;
+		}
+
+		return $this->getApi()->post( "/campaigns/$campaignId/actions/unschedule" );
 	}
 
 	// ------------------------------------------------------------
@@ -302,7 +331,6 @@ class API extends _Component {
 
 		return array_pop( $found );
 	}
-
 
 
 }

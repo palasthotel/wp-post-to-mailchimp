@@ -150,7 +150,7 @@ class Settings extends _Component {
 
 	public function render_section(){
 		$controller = $this->plugin->api;
-		if($controller->isReady()){
+		if($controller->isConnected()){
 			echo "<p>✅ ".__("Yep, this is working!", Plugin::DOMAIN)."</p>";
 		} else {
 			echo "<p>🚨 ".__("Nope, this is not working. Is your API key valid?", Plugin::DOMAIN)."</p>";

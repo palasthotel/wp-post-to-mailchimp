@@ -33,7 +33,14 @@ class RecentCampaignField extends _Component {
 					if ( isset( $value["delete"] ) && true === $value["delete"] ) {
 						// if delete flag is set, delete campaign
 						if ( $campaign instanceof Campaign ) {
-							$this->plugin->repository->deleteCampaign( $campaign->id );
+							$this->plugin->repository->deleteCampaign( $campaign );
+						}
+						return;
+					}
+
+					if( isset($value["unschedule"]) && true === $value["unschedule"]){
+						if ( $campaign instanceof Campaign ) {
+							$this->plugin->repository->unschedule( $campaign );
 						}
 						return;
 					}
@@ -58,15 +65,17 @@ class RecentCampaignField extends _Component {
 						}
 
 						if(isset($value["is_ready"]) && true === $value["is_ready"]){
+
+							// update content of campaign
+							$this->plugin->repository->updateCampaignContent($campaign->id);
+
 							// we are ready to deliver the campaign
 							if($campaign->schedule){
-
-								// TODO: schedule
+								$this->plugin->repository->schedule($campaign);
 							} else {
-								// TODO: send campaign
-								$this->plugin->repository->sendCampaign($campaign);
+								$this->plugin->repository->send($campaign);
 							}
-						} else
+						}
 
 						return;
 					}
@@ -78,6 +87,7 @@ class RecentCampaignField extends _Component {
 							sanitize_text_field( $value["audience_id"] ),
 							isset( $value["segment_id"] ) ? intval( $value["segment_id"] ) : null
 						);
+						$this->plugin->repository->updateCampaignContent($campaign);
 					}
 
 				},

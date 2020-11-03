@@ -53,8 +53,7 @@ class Database extends _Component {
 	public function getRecentCampaign( int $post_id ) {
 		$row = $this->wpdb->get_row(
 			$this->wpdb->prepare(
-				"SELECT * FROM $this->table WHERE post_id = %d AND campaign_state != %s ORDER BY id LIMIT 1", $post_id, Campaign::STATE_DONE
-			)
+				"SELECT * FROM $this->table WHERE post_id = %d ORDER BY id LIMIT 1", $post_id)
 		);
 		if ( $row ) {
 			return $this->campaignRowToModel( $row );
