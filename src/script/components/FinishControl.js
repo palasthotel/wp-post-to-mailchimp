@@ -1,8 +1,8 @@
 import { useEffect } from "@wordpress/element";
 import { CheckboxControl, DateTimePicker, ToggleControl } from "@wordpress/components";
-import { __experimentalGetSettings, date } from '@wordpress/date';
 import { useRecentCampaign } from "../hooks/use-store";
 import { useDefaultScheduleNextDateTime } from "../hooks/use-config";
+import ReadableTimestamp, { is12HourTime } from "./ReadableTimestamp";
 
 const Schedule = ()=>{
     const [campaign, changeCampaign] = useRecentCampaign();
@@ -22,21 +22,13 @@ const Schedule = ()=>{
         }
     }
 
-    const settings = __experimentalGetSettings();
-
     // To know if the current timezone is a 12 hour time with look for an "a" in the time format.
    // We also make sure this a is not escaped by a "/".
-    const is12HourTime = /a(?!\\)/i.test(
-        settings.formats.time
-            .toLowerCase() // Test only the lower case a
-            .replace( /\\\\/g, '' ) // Replace "//" with empty strings
-            .split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
-    );
 
     return <DateTimePicker 
         currentDate={dateState}
         onChange={setDate}
-        is12Hour={is12HourTime}
+        is12Hour={is12HourTime()}
     />
 }
 
@@ -80,9 +72,6 @@ const FinishControl = ()=>{
         backgroundColor: is_ready ? "#AED581" :"#ECEFF1"
     }
 
-    const settings = __experimentalGetSettings();
-    const schedule_date_string = schedule ? date( settings.formats.datetime ,schedule) :""
-
     return <>
         
             <ToggleControl 
@@ -101,7 +90,7 @@ const FinishControl = ()=>{
                 />
                 {is_ready ? 
                     isSchedule ? 
-                        <p>As soon as you save this campaign will be scheduled to be started at {schedule_date_string}.</p> 
+                        <p>As soon as you save this campaign will be scheduled to be started at <ReadableTimestamp timestamp={schedule} />.</p> 
                         : 
                         <p>As soon as you save this campaign will be started.</p>
                     :

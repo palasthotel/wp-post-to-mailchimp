@@ -1,5 +1,5 @@
 const { useRecentCampaign } = require("../hooks/use-store");
-const { isCampaign } = require("../utils/campaing");
+const { isCampaign } = require("../utils/campaign");
 
 const NextStepsInfo = ()=>{
 

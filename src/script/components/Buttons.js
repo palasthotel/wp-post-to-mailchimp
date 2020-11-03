@@ -1,6 +1,6 @@
 import { Button } from "@wordpress/components";
 import { useAudience, useIsRequesting, useRecentCampaign, useSegment, useSendTestEmails, useTestEmailAddresses } from "../hooks/use-store";
-import { isCampaign } from "../utils/campaing";
+import { isCampaign } from "../utils/campaign";
 import { validateEmail } from "../utils/email";
 
 
