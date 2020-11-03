@@ -9,14 +9,12 @@
   },
   "dependencies": {
     "@wordpress/api-fetch": "^3.20.0",
-    "@wordpress/components": "^11.1.0",
+    "@wordpress/components": "^11.1.1",
     "@wordpress/data": "^4.25.0",
     "@wordpress/date": "^3.12.0",
-    "@wordpress/edit-post": "^3.25.0",
+    "@wordpress/edit-post": "^3.25.2",
     "@wordpress/element": "^2.18.0",
     "@wordpress/plugins": "^2.23.0",
-    "@wordpress/scripts": "^12.3.0",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "@wordpress/scripts": "^12.5.0"
   }
 }
