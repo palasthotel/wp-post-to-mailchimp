@@ -1,16 +1,18 @@
 import { useEffect } from "@wordpress/element";
-import { CheckboxControl, DateTimePicker, PanelRow, ToggleControl } from "@wordpress/components";
+import { CheckboxControl, DateTimePicker, ToggleControl } from "@wordpress/components";
 import { __experimentalGetSettings, date } from '@wordpress/date';
 import { useRecentCampaign } from "../hooks/use-store";
+import { useDefaultScheduleNextDate } from "../hooks/use-config";
 
 const Schedule = ()=>{
     const [campaign, changeCampaign] = useRecentCampaign()
+    const defaultNextDate = useDefaultScheduleNextDate();
 
     const {
-        schedule = (new Date()).getTime(),
+        schedule,
     } = campaign
-
-    const date = new Date(schedule)
+    
+    const dateState = new Date(schedule ? defaultNextDate.getTime() : schedule)
 
     const setDate = (_date)=>{
         if(_date){
@@ -32,7 +34,7 @@ const Schedule = ()=>{
     );
 
     return <DateTimePicker 
-        currentDate={date}
+        currentDate={dateState}
         onChange={setDate}
         is12Hour={is12HourTime}
     />
@@ -45,14 +47,14 @@ const FinishControl = ()=>{
         schedule,
         audience_id,
         segment_id,
-        isReady = false
+        is_ready = false
     } =  campaign
 
     const isSchedule = typeof schedule !== typeof undefined && null !== schedule;
 
     useEffect(()=>{
         // if something changed uncheck ready checkbox
-        changeCampaign({isReady: false})
+        changeCampaign({is_ready: false})
     }, [audience_id, segment_id, schedule])
 
     const handleScheduleCheckbox = (_isSchedule) => {
@@ -64,7 +66,7 @@ const FinishControl = ()=>{
     }
     const handleStartCheckbox = (isChecked)=>{
         changeCampaign({
-            isReady: isChecked
+            is_ready: isChecked
         })
     }
 
@@ -74,7 +76,7 @@ const FinishControl = ()=>{
         marginBottom: -16,
         padding: 16,
         paddingBottom: 8,
-        backgroundColor: isReady ? "#AED581" :"#ECEFF1"
+        backgroundColor: is_ready ? "#AED581" :"#ECEFF1"
     }
 
     const settings = __experimentalGetSettings();
@@ -92,11 +94,11 @@ const FinishControl = ()=>{
             
             <div style={style}>
                 <CheckboxControl 
-                    checked={isReady}
+                    checked={is_ready}
                     label="I'm ready to start this campaign"
                     onChange={handleStartCheckbox}
                 />
-                {isReady ? 
+                {is_ready ? 
                     isSchedule ? 
                         <p>As soon as you save this campaign will be scheduled to be started at {schedule_date_string}.</p> 
                         : 

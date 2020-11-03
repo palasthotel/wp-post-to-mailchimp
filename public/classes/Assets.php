@@ -38,6 +38,7 @@ class Assets extends _Component {
 					"html" => $this->plugin->preview->getHTMLUrl(get_the_ID()),
 					"plaintext" => $this->plugin->preview->getPlaintextUrl(get_the_ID()),
 				],
+				"defaultScheduleTime" => Option::getScheduleTime(),
 				"lists" => $lists,
 				"segments" => $segments,
 				"groups" => $groups,

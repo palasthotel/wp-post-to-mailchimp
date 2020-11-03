@@ -29,6 +29,13 @@ class Option {
 	}
 
 	// ------------------------------------------------
+	// schedule time
+	// ------------------------------------------------
+	public static function getScheduleTime(){
+		return get_option(Plugin::OPTION_SCHEDULE_TIME, '');
+	}
+
+	// ------------------------------------------------
 	// audiences
 	// ------------------------------------------------
 
@@ -82,6 +89,17 @@ class Option {
 		foreach ($names as $name){
 			delete_option($name);
 		}
+	}
+
+	// ------------------------------------------------
+	// empty segments/tags allowed
+	// ------------------------------------------------
+	public static function setEmptySegmentsAllowed(array $audienceIds){
+		return update_option(Plugin::OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST, $audienceIds);
+	}
+	public static function isEmptySegmentAllowed(string $audienceId){
+		$whitelist = get_option(sprintf(Plugin::OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST, $audienceId));
+		return is_array($whitelist) ? in_array($audienceId,$whitelist) : false;
 	}
 
 }

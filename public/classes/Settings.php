@@ -64,6 +64,12 @@ class Settings extends _Component {
 			    }
 		    }
 
+		    if(is_array($_POST["ptm_allow_no_segment_selection"])){
+			   Option::setEmptySegmentsAllowed(array_map('sanitize_text_field',$_POST["ptm_allow_no_segment_selection"]));
+            } else {
+		        Option::setEmptySegmentsAllowed([]);
+            }
+
         }
 
 		add_settings_section(
@@ -90,6 +96,15 @@ class Settings extends _Component {
 			'ph_mailchimp_settings_section'
 		);
 		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_GA_API_KEY);
+
+		add_settings_field(
+			'ph_mailchimp_schedule_time',
+			__('Default schedule time', Plugin::DOMAIN),
+			array( $this, 'render_schedule_time' ),
+			'ph_mailchimp_settings',
+			'ph_mailchimp_settings_section'
+		);
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_SCHEDULE_TIME);
 
 		add_settings_field(
 			'ph_mailchimp_lists',
@@ -163,10 +178,60 @@ class Settings extends _Component {
 
 	public function render_ga(){
 		$this->renderInput(
-		        "ph_mailchimp_ga",
+		        Plugin::OPTION_GA_API_KEY,
                 Option::getGoogleAnalyticsId(),
                 Option::isGoogleAnalyticsIdInConstant()
         );
+	}
+
+	public function render_schedule_time(){
+	    $id = Plugin::OPTION_SCHEDULE_TIME;
+	    $value = Option::getScheduleTime();
+		echo "<input id='$id' name='$id' value='$value' type='hidden' />";
+		echo "<select id='$id-hour'>";
+		echo "<option value=''></option>";
+		for ($i = 0; $i < 24; $i++){
+			$label = str_pad($i, 2, "0", STR_PAD_LEFT);
+		    echo "<option value='$label'>$label</option>";
+		}
+		echo "</select>";
+        echo "<select id='$id-minute'>";
+		echo "<option value=''></option>";
+        for($i = 0; $i <= 45; $i+=15){
+            $label = str_pad($i, 2, "0", STR_PAD_LEFT);
+            echo "<option value='$label'>$label</option>";
+        }
+		echo "</select>";
+        echo " o'clock the next day.";
+
+		?>
+        <script>
+            jQuery(function($){
+                const inputId = '<?= $id; ?>';
+                const $input = $("#"+inputId);
+                const $hour = $("#"+inputId+"-hour");
+                const $minute = $("#"+inputId+"-minute");
+                const val = $input.val();
+                const init =  val.split(":");
+                if(init.length === 2){
+                    $hour.val(init[0]);
+                    $minute.val(init[1]);
+                }
+                $hour.on("change", update);
+                $minute.on("change", update)
+                function update(){
+                    const h = $hour.val();
+                    if(h === ""){
+                        $input.val("");
+                        return;
+                    }
+                    const min = $minute.val() === "" ? "00": $minute.val();
+                    $input.val(h+":"+min);
+                }
+            });
+        </script>
+        <?php
+
 	}
 
 	private function renderInput($name, $value, $isReadonly = false){
@@ -207,40 +272,49 @@ class Settings extends _Component {
 				$tags = array_filter($segments, function($item){return $item->type === "static";});
 				$noTags = array_filter($segments, function ($item){return $item->type !== "static";});
 				echo "<input type='hidden' name='update_whitelists' value='yes'  />";
-				if(count($noTags)){
-					echo "<strong>Segments</strong>";
-					echo "<ul style='padding-left: 20px;'>";
-					foreach ($noTags as $segment){
-					    $checked = Option::isSegmentWhitelisted($list_id, $segment->id) ? "checked": "";
-						echo "<li><input $checked type='checkbox' name='ptm_segments[$list_id][]' value='$segment->id' /> $segment->name</li>";
+				if(count($tags) > 0 || count($noTags) > 0){
+					echo "<p><strong>Segments/Tags</strong></p>";
+					echo "<ul style='padding-left: 20px;margin: 5px 0;'>";
+
+					$checked = Option::isEmptySegmentAllowed($list_id) ? "checked": "";
+
+					echo "<li><input $checked type='checkbox' name='ptm_allow_no_segment_selection[$list_id]' value='$list_id' /><i>- No segment or tag - (only if other options are selected)</i></li>";
+
+					if(count($noTags)){
+						foreach ($noTags as $segment){
+							$checked = Option::isSegmentWhitelisted($list_id, $segment->id) ? "checked": "";
+							echo "<li><input $checked type='checkbox' name='ptm_segments[$list_id][]' value='$segment->id' /> $segment->name</li>";
+						}
 					}
-					echo "</ul>";
-				}
-				if(count($tags)){
-					echo "<strong>Tags</strong>";
-					echo "<ul style='padding-left: 20px;'>";
-					foreach ($tags as $tag){
-						$checked = Option::isTagWhitelisted($list_id, $tag->id) ? "checked": "";
-						echo "<li><input $checked type='checkbox' name='ptm_tags[$list_id][]' value='$tag->id' /> $tag->name</li>";
+
+					if(count($tags)){
+						foreach ($tags as $tag){
+							$checked = Option::isTagWhitelisted($list_id, $tag->id) ? "checked": "";
+							echo "<li><input $checked type='checkbox' name='ptm_tags[$list_id][]' value='$tag->id' /> $tag->name</li>";
+						}
 					}
+
 					echo "</ul>";
+
 				}
 
-				$groups = $this->plugin->repository->getGroups($list_id);
-				if(count($groups)){
-				    echo "<strong>Groups</strong>";
-					echo "<ul style='padding-left: 20px;'>";
-				    foreach ($groups as $group){
-				        echo "<li><em>Category: $group->title</em>";
-				        echo "<ul style='padding-left: 20px;'>";
-				        foreach ($group->interests as $item){
-				            echo "<li>$item->name</li>";
-				        }
-				        echo "</ul>";
-				        echo "</li>";
-				    }
-				    echo "</ul>";
-				}
+
+
+//				$groups = $this->plugin->repository->getGroups($list_id);
+//				if(count($groups)){
+//				    echo "<strong>Groups</strong>";
+//					echo "<ul style='padding-left: 20px;'>";
+//				    foreach ($groups as $group){
+//				        echo "<li><em>Category: $group->title</em>";
+//				        echo "<ul style='padding-left: 20px;'>";
+//				        foreach ($group->interests as $item){
+//				            echo "<li>$item->name</li>";
+//				        }
+//				        echo "</ul>";
+//				        echo "</li>";
+//				    }
+//				    echo "</ul>";
+//				}
 
 				echo "</li>";
 			}
