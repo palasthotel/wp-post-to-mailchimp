@@ -100,9 +100,11 @@ class Plugin {
 	 */
 	const OPTION_MAILCHIMP_API_KEY = "ph_mailchimp_api_key";
 	const OPTION_GA_API_KEY = "ph_mailchimp_ga";
+	const OPTION_SCHEDULE_TIME = "ph_mailchimp_schedule_time";
 	const OPTION_AUDIENCE_WHITELIST = "ph_mailchimp_audience_whitelist";
 	const OPTION_SEGMENT_WHITELIST = "ph_mailchimp_segment_%s_whitelist";
 	const OPTION_TAG_WHITELIST = "ph_mailchimp_tag_%s_whitelist";
+	const OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST = "ph_mailchimp_empty_segment_allowed_audiences_list";
 
 	/**
 	 * transients

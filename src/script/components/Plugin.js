@@ -27,7 +27,7 @@ const Plugin = ()=>{
             title="History"
             initialOpen={false}
         >
-            <p>Old campaigns</p>
+            <p>TODO: list of all campaigns</p>
         </PanelBody>
         
     </>

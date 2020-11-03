@@ -245,7 +245,7 @@ class API extends _Component {
 	 */
 	public function send( $campaignId ) {
 
-		if ( WP_DEBUG ) {
+		if ( WP_DEBUG && !POST_TO_MAILCHIMP_DEBUG_OFF) {
 			return false;
 		}
 

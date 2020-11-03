@@ -382,18 +382,24 @@ class Repository extends _Component {
 	}
 
 	/**
-	 * @param int $id
+	 * @param Campaign|int $id
 	 *
 	 * @return false
 	 */
 	public function sendCampaign( $id ) {
-		$campaign = $this->plugin->repository->getCampaign($id);
+
+		$campaign = $id instanceof Campaign ? $id: $this->plugin->repository->getCampaign($id);
 
 		if ( ! ( $campaign instanceof Campaign ) ) {
 			return false;
 		}
 
-		return $this->api->send($campaign->campaign_id);
+		$response = $this->api->send($campaign->campaign_id);
+
+		$campaign->state = Campaign::STATE_DONE;
+		$this->database->updateCampaign($campaign);
+
+		return true;
 	}
 
 }

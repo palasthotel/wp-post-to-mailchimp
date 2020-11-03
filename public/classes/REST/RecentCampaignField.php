@@ -57,14 +57,14 @@ class RecentCampaignField extends _Component {
 							$campaign = $this->plugin->repository->getCampaign($campaign->id);
 						}
 
-						if(isset($value["ready_to_deliver"]) && true === $value["ready_to_deliver"]){
+						if(isset($value["is_ready"]) && true === $value["is_ready"]){
 							// we are ready to deliver the campaign
 							if($campaign->schedule){
 
 								// TODO: schedule
 							} else {
 								// TODO: send campaign
-								//$this->plugin->repository->sendCampaign($id);
+								$this->plugin->repository->sendCampaign($campaign);
 							}
 						} else
 
