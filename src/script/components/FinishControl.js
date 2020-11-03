@@ -2,23 +2,23 @@ import { useEffect } from "@wordpress/element";
 import { CheckboxControl, DateTimePicker, ToggleControl } from "@wordpress/components";
 import { __experimentalGetSettings, date } from '@wordpress/date';
 import { useRecentCampaign } from "../hooks/use-store";
-import { useDefaultScheduleNextDate } from "../hooks/use-config";
+import { useDefaultScheduleNextDateTime } from "../hooks/use-config";
 
 const Schedule = ()=>{
-    const [campaign, changeCampaign] = useRecentCampaign()
-    const defaultNextDate = useDefaultScheduleNextDate();
+    const [campaign, changeCampaign] = useRecentCampaign();
+    const nextScheduleDateTime = useDefaultScheduleNextDateTime();
 
     const {
         schedule,
     } = campaign
-    
-    const dateState = new Date(schedule ? defaultNextDate.getTime() : schedule)
+
+    const dateState = new Date(schedule)
 
     const setDate = (_date)=>{
         if(_date){
             changeCampaign({schedule: Date.parse(_date)})
         } else {
-            changeCampaign({schedule: (new Date()).getTime()})
+            changeCampaign({schedule: nextScheduleDateTime})
         }
     }
 
@@ -42,6 +42,7 @@ const Schedule = ()=>{
 
 const FinishControl = ()=>{
     const [campaign, changeCampaign] = useRecentCampaign()
+    const nextScheduleDateTime = useDefaultScheduleNextDateTime();
 
     const {
         schedule,
@@ -59,7 +60,7 @@ const FinishControl = ()=>{
 
     const handleScheduleCheckbox = (_isSchedule) => {
         if(_isSchedule){
-            changeCampaign({schedule: (new Date()).getTime()})
+            changeCampaign({schedule: nextScheduleDateTime})
         } else {
             changeCampaign({schedule: undefined})
         }

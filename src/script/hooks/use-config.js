@@ -4,7 +4,7 @@ export const useSegments = (listId) => PostToMailchimp.segments[listId] || []
 export const useHTMLPreviewUrl = ()=> PostToMailchimp.preview.html;
 export const usePlaintextPreviewUrl = ()=> PostToMailchimp.preview.plaintext;
 export const useDefaultScheduleTime = ()=> PostToMailchimp.defaultScheduleTime;
-export const useDefaultScheduleNextDate = ()=>{
+export const useDefaultScheduleNextDateTime = ()=>{
     const time = useDefaultScheduleTime();
     const date = new Date();
     if(time === "") return date;
