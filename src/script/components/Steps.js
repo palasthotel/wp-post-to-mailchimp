@@ -1,5 +1,6 @@
 import { PanelBody } from "@wordpress/components"
 import { useRecentCampaign } from "../hooks/use-store"
+import { campaignStateIsReady } from "../utils/campaign"
 import AudiencesControl from "./AudiencesControl"
 import { SendTestButton } from "./Buttons"
 import EMailAddressesControl from "./EMailAddressesControl"
@@ -22,6 +23,8 @@ export const Step1 = ()=>{
 export const Step2 = ()=>{
 
     const [campaign] = useRecentCampaign()
+
+    const isReady = campaignStateIsReady(campaign)
 
     if(!campaign.id) return null;
 

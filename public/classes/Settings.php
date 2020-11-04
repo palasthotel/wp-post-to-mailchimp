@@ -65,7 +65,14 @@ class Settings extends _Component {
 			}
 
 			if ( is_array( $_POST["ptm_allow_no_segment_selection"] ) ) {
-				Option::setEmptySegmentsAllowed( array_map( 'sanitize_text_field', $_POST["ptm_allow_no_segment_selection"] ) );
+				Option::setEmptySegmentsAllowed(
+                    array_values(
+                        array_map(
+                            'sanitize_text_field',
+                            $_POST["ptm_allow_no_segment_selection"]
+                        )
+                    )
+                );
 			} else {
 				Option::setEmptySegmentsAllowed( [] );
 			}

@@ -5,6 +5,7 @@ namespace Palasthotel\PostToMailchimp\REST;
 
 use Palasthotel\PostToMailchimp\Model\Campaign;
 use Palasthotel\PostToMailchimp\Model\MailchimpTestMail;
+use Palasthotel\PostToMailchimp\Option;
 use Palasthotel\PostToMailchimp\WP_REST;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -21,9 +22,7 @@ class CampaignsController extends _BaseController {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_items' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
+				'permission_callback' => [$this, 'permission'],
 				'args'                => [
 					WP_REST::ARG_POST_ID => $this->arg_int_required,
 					WP_REST::ARG_RECENT  => [
@@ -40,9 +39,7 @@ class CampaignsController extends _BaseController {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_item' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) ) || WP_DEBUG;
-				},
+				'permission_callback' => [$this, 'permission'],
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
 					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
@@ -56,9 +53,7 @@ class CampaignsController extends _BaseController {
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => array( $this, 'update_item' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
+				'permission_callback' => [$this, 'permission'],
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
 					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
@@ -74,9 +69,7 @@ class CampaignsController extends _BaseController {
 			array(
 				'methods'             => WP_REST_Server::DELETABLE,
 				'callback'            => array( $this, 'delete_item' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
+				'permission_callback' => [$this, 'permission'],
 				'args'                => [
 					WP_REST::ARG_POST_ID     => $this->arg_int_required,
 					WP_REST::ARG_CAMPAIGN_ID => $this->arg_int_required,
@@ -90,9 +83,7 @@ class CampaignsController extends _BaseController {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'test' ),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return current_user_can( 'edit_post', $request->get_param( WP_REST::ARG_POST_ID ) );
-				},
+				'permission_callback' => [$this, 'permission'],
 				'args'                => [
 					WP_REST::ARG_POST_ID         => $this->arg_int_required,
 					WP_REST::ARG_CAMPAIGN_ID     => $this->arg_int_required,
@@ -117,6 +108,13 @@ class CampaignsController extends _BaseController {
 			)
 		);
 
+	}
+
+	public function permission(WP_REST_Request $request){
+		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
+		$post_type = get_post_type($post_id);
+		$isActive =  Option::isActiveFor($post_type);
+		return $isActive && (current_user_can( 'edit_post', $post_id ) || WP_DEBUG);
 	}
 
 	public function get_items( $request ) {

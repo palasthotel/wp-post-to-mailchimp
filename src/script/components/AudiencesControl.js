@@ -1,10 +1,12 @@
 import {SelectControl, TextControl} from "@wordpress/components";
 import {useEffect} from '@wordpress/element'
 import {useAudiencesLists} from "../hooks/use-config";
+import { useIsSavingPost } from "../hooks/use-post";
 import {useRecentCampaign} from "../hooks/use-store";
 
 const AudiencesControl = ()=> {
 
+    const isSaving = useIsSavingPost();
     const audiences = useAudiencesLists();
     const [campaign, setCampaign] = useRecentCampaign();
 
@@ -39,6 +41,7 @@ const AudiencesControl = ()=> {
 
     return <SelectControl
         label="Audience"
+        disabled={isSaving}
         value={state || ""}
         onChange={setState}
         options={options}

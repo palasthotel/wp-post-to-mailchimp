@@ -1,6 +1,6 @@
 import { Button } from "@wordpress/components";
 import { useAudience, useIsRequesting, useRecentCampaign, useSegment, useSendTestEmails, useTestEmailAddresses } from "../hooks/use-store";
-import { isCampaign } from "../utils/campaign";
+import { campaignStateIsDraft, campaignStateIsNew, campaignStateIsReady, isCampaign } from "../utils/campaign";
 import { validateEmail } from "../utils/email";
 
 
@@ -22,6 +22,8 @@ export const SendTestButton = ()=>{
     const [campaign] = useRecentCampaign();
     const [emails] = useTestEmailAddresses();
     const sendTest = useSendTestEmails();
+    const isCampaignNew = campaignStateIsNew(campaign)
+    const isCampaignDraft = campaignStateIsDraft(campaign)
 
     if(!isCampaign(campaign)){
         return null;
@@ -29,9 +31,15 @@ export const SendTestButton = ()=>{
 
     const validEmails = emails.filter(validateEmail)
 
-    const disabled = isRequesting || validEmails.length == 0;
+    const disabled = isCampaignNew || isCampaignDraft || validEmails.length == 0;
 
-    return <Button disabled={disabled} isSecondary onClick={sendTest}>Send test</Button>
+    return <Button 
+        disabled={disabled} 
+        isSecondary 
+        onClick={sendTest}
+    >
+        Send test
+    </Button>
 }
 
 export const SendButton = ()=>{

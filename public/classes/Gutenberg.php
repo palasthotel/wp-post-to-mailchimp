@@ -8,8 +8,12 @@ class Gutenberg extends _Component {
 
 	public function onCreate() {
 		add_action( 'enqueue_block_editor_assets', function () {
-			$this->plugin->assets->enqueueGutenberg();
-		} );
+			$post_type = get_post_type();
+			$isActive =Option::isActiveFor($post_type);
+			if($isActive){
+				$this->plugin->assets->enqueueGutenberg();
+			}
+		});
 	}
 
 }

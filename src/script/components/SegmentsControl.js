@@ -1,5 +1,6 @@
-import {BaseControl} from "@wordpress/components";
-import {useSegments} from "../hooks/use-config";
+import {BaseControl, TextControl} from "@wordpress/components";
+import { useEffect } from "@wordpress/element";
+import {useIsEmptySegmentAllowed, useSegments} from "../hooks/use-config";
 import {useRecentCampaign} from "../hooks/use-store";
 
 const SegmentsControl = ()=> {
@@ -7,6 +8,7 @@ const SegmentsControl = ()=> {
     const [campaign = {}, setCampaign ] = useRecentCampaign();
     const { audience_id:audience = "", segment_id:state = "" } = campaign;
     const segments = useSegments(audience);
+    const isEmptySegmentAllowed = useIsEmptySegmentAllowed(audience);
 
     const setState = (_segment_id) => {
         setCampaign({
@@ -15,8 +17,26 @@ const SegmentsControl = ()=> {
         })
     }
 
+    useEffect(()=>{
+        if(segments.length === 1 && !isEmptySegmentAllowed){
+            const id = segments[0].id;
+            if(state != id) setState(id);
+        } else if(segments.length === 0){
+            if(state !== "") setState("");
+        }
+    }, [segments.length, state])
+
     if(typeof segments !== typeof [] || segments.length === 0){
         return null;
+    }
+
+    if(segments.length === 1 && !isEmptySegmentAllowed){
+        const isTag = segments[0].type === "static";
+        return <TextControl 
+            label={isTag ? "Tag": "Segment"}
+            value={segments[0].name}
+            readOnly
+        />
     }
 
     const _segments = segments.filter(({type})=>type !== "static");

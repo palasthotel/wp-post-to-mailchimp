@@ -287,9 +287,12 @@ class API extends _Component {
 		// round to next quarter hour
 		return $this->getApi()->post(
 			"/campaigns/$campaignId/actions/schedule",
-			array(
-				"schedule_time" => $utc_datetime->format( 'Y-m-d H:i:00 e' ),
-				"timewrap"      => true,
+			apply_filters(
+				Plugin::FILTER_SCHEDULE_CAMPAIGN_ARGS,
+				array(
+					"schedule_time" => $utc_datetime->format( 'Y-m-d H:i:00 e' ),
+					"timewrap"      => true,
+				)
 			)
 		);
 	}

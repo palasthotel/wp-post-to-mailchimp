@@ -94,12 +94,26 @@ class Option {
 	// ------------------------------------------------
 	// empty segments/tags allowed
 	// ------------------------------------------------
-	public static function setEmptySegmentsAllowed(array $audienceIds){
+	public static function setEmptySegmentsAllowed(array $audienceIds) {
 		return update_option(Plugin::OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST, $audienceIds);
 	}
-	public static function isEmptySegmentAllowed(string $audienceId){
-		$whitelist = get_option(sprintf(Plugin::OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST, $audienceId));
-		return is_array($whitelist) ? in_array($audienceId,$whitelist) : false;
+	public static function isEmptySegmentAllowed(string $audienceId): bool {
+		return in_array($audienceId,static::getAudienceIdsWithEmptySegmentAllowed());
+	}
+	public static function getAudienceIdsWithEmptySegmentAllowed(): array {
+		$whitelist = get_option(Plugin::OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST);
+		return is_array($whitelist) ? $whitelist : [];
+	}
+
+	// ------------------------------------------------
+	// activated post types
+	// ------------------------------------------------
+	public static function getPostTypes(): array {
+		return apply_filters(Plugin::FILTER_POST_TYPES, ["post"]);
+	}
+
+	public static function isActiveFor($post_type): bool {
+		return in_array($post_type, static::getPostTypes());
 	}
 
 }

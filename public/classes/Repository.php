@@ -374,10 +374,6 @@ class Repository extends _Component {
 
 		$campaigns = $this->database->getCampaigns( $post_id );
 		foreach ( $campaigns as $campaign ) {
-			// do not delete sent campaigns from mailchimp
-			if ( $campaign->state === Campaign::STATE_DONE ) {
-				continue;
-			}
 			$this->api->deleteCampaign( $campaign->campaign_id );
 		}
 
@@ -412,18 +408,50 @@ class Repository extends _Component {
 	/**
 	 * @param int|Campaign $id
 	 *
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
 	public function cancel( $id ) {
 		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
 
 		if ( ! ( $campaign instanceof Campaign ) ) {
-			return false;
+			return new WP_Error(
+				404,
+				"Could not find campaign.",
+				[
+					"id" => $id,
+				]
+			);
+		}
+
+		$response = $this->api->getCampaign( $campaign->campaign_id );
+		if ( ! is_array( $response ) || empty( $response["status"] ) ) {
+			return new WP_Error(
+				404,
+				"Could not fetch campaign info from api.",
+				[
+					"id" => $campaign->id,
+				]
+			);
+		}
+
+		if ( $response["status"] === "sent" ) {
+
+			$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
+			$this->database->updateCampaign( $campaign );
+
+			return true;
 		}
 
 		$result = $this->api->cancel( $campaign->campaign_id );
 		if ( false === $result ) {
-			return false;
+			return new WP_Error(
+				404,
+				"Could not cancel campaign via api.",
+				[
+					"id"       => $campaign->id,
+					"response" => $result
+				]
+			);
 		}
 
 		$response = $this->api->getCampaign( $campaign->campaign_id );
@@ -445,12 +473,13 @@ class Repository extends _Component {
 			return false;
 		}
 
-		if ( empty( $campaign->schedule ) ) {
+		if ( ! is_int( $campaign->schedule ) || $campaign->schedule / 1000 < time() ) {
 			return new WP_Error(
 				501,
-				"Campaign has no schedule.",
+				"Campaign has no valid schedule.",
 				[
-					"id" => $campaign->id,
+					"id"       => $campaign->id,
+					"schedule" => $campaign->schedule,
 				]
 			);
 		}
@@ -459,7 +488,7 @@ class Repository extends _Component {
 		$datetime->setTimestamp( $campaign->schedule / 1000 );
 
 		$result = $this->api->schedule( $campaign->campaign_id, $datetime );
-		if ( false === $result ) {
+		if ( true !== $result ) {
 			return new WP_Error(
 				501,
 				"API rejected schedule.",
@@ -471,6 +500,7 @@ class Repository extends _Component {
 
 		$response = $this->api->getCampaign( $campaign->campaign_id );
 		$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
+
 		$this->database->updateCampaign( $campaign );
 
 		return $result;

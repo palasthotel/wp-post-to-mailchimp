@@ -1,5 +1,6 @@
-const { useRecentCampaign } = require("../hooks/use-store");
-const { isCampaign } = require("../utils/campaign");
+import { PanelBody } from "@wordpress/components";
+import { useRecentCampaign } from "../hooks/use-store";
+import { isCampaign } from "../utils/campaign";
 
 const NextStepsInfo = ()=>{
 
@@ -7,7 +8,9 @@ const NextStepsInfo = ()=>{
 
     if(isCampaign(campaign)) return null;
 
-    return <p>You need to save the post to proceed to next steps.</p>
+    return <PanelBody>
+            <p>You need to save the post to proceed to next steps.</p>
+    </PanelBody>
 }
 
 export default NextStepsInfo;

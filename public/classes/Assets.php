@@ -41,6 +41,7 @@ class Assets extends _Component {
 				"defaultScheduleTime" => Option::getScheduleTime(),
 				"lists" => $lists,
 				"segments" => $segments,
+				"audienceIdsWithEmptySegmentsAllowed" => Option::getAudienceIdsWithEmptySegmentAllowed(),
 				"groups" => $groups,
 			]
 		);

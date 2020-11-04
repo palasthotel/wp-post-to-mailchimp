@@ -2,12 +2,12 @@ import { FormTokenField, PanelRow } from "@wordpress/components";
 import { useTestEmailAddresses } from "../hooks/use-store";
 import { validateEmail } from "../utils/email";
 
-const EMailAddressesControl = ()=>{
+const EMailAddressesControl = () => {
 
     const [emails, setEmails] = useTestEmailAddresses();
 
-    const handleChange = (values)=>{
-        setEmails(values.map(v=>{
+    const handleChange = (values) => {
+        setEmails( values.map( v => {
             return typeof v === typeof "" ? v : v.value;
         }))
     }

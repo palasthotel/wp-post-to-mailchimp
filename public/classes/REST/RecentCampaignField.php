@@ -6,14 +6,18 @@ namespace Palasthotel\PostToMailchimp\REST;
 
 use Palasthotel\PostToMailchimp\_Component;
 use Palasthotel\PostToMailchimp\Model\Campaign;
+use Palasthotel\PostToMailchimp\Option;
 use Palasthotel\PostToMailchimp\Plugin;
 
 class RecentCampaignField extends _Component {
 
 	public function onCreate() {
+		$post_types = Option::getPostTypes();
+		if(empty($post_types)) return;
+
 		register_rest_field(
 
-			[ "post", "newsletter" ], // TODO: settings
+			$post_types,
 
 			Plugin::REST_FIELD_RECENT_CAMPAIGN,
 			[
@@ -41,6 +45,13 @@ class RecentCampaignField extends _Component {
 					if( isset($value["unschedule"]) && true === $value["unschedule"]){
 						if ( $campaign instanceof Campaign ) {
 							$this->plugin->repository->unschedule( $campaign );
+						}
+						return;
+					}
+
+					if( isset($value["cancel"]) && true === $value["cancel"]){
+						if ( $campaign instanceof Campaign ) {
+							$this->plugin->repository->cancel( $campaign );
 						}
 						return;
 					}

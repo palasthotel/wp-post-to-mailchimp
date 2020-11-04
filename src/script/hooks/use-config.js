@@ -1,6 +1,7 @@
 
 export const useAudiencesLists = ()=> PostToMailchimp.lists;
 export const useSegments = (listId) => PostToMailchimp.segments[listId] || []
+export const useIsEmptySegmentAllowed = (listId) => PostToMailchimp.audienceIdsWithEmptySegmentsAllowed.includes(listId)
 export const useHTMLPreviewUrl = ()=> PostToMailchimp.preview.html;
 export const usePlaintextPreviewUrl = ()=> PostToMailchimp.preview.plaintext;
 export const useDefaultScheduleTime = ()=> PostToMailchimp.defaultScheduleTime;
