@@ -1,8 +1,49 @@
-import { Button, PanelBody, PanelRow } from "@wordpress/components";
+import { BaseControl, Button, PanelBody, PanelRow, TextControl } from "@wordpress/components";
+import { useEffect } from "@wordpress/element";
 import { useIsSavingPost } from "../hooks/use-post.js";
 import { useRecentCampaign } from "../hooks/use-store.js";
 import { campaignIsScheduled, campaignIsSending, campaignIsSent } from "../utils/campaign.js";
+import { getAudience, getSegment, isSegment } from "../utils/config.js";
+import { showError } from "../utils/notice.js";
 import ReadableTimestamp from "./ReadableTimestamp.js";
+
+const CampaignAudienceInfo = ()=>{
+    const [campaign] = useRecentCampaign();
+    
+    const audience = getAudience(campaign.audience_id)
+    const segment = campaign.segment_id !== null ? getSegment(campaign.audience_id, campaign.segment_id) : null;
+
+    useEffect(()=>{
+        if(!audience){
+            showError(`Missing audience with id ${campaign.audience_id}`)
+        }
+    }, [audience])
+
+    useEffect(()=>{
+        if(campaign.segment_id !== null && !segment){
+            showError(`Missing segment with id ${campaign.segment_id}`)
+        }
+    }, [audience])
+
+    return <>
+        <TextControl 
+            label="Audience"
+            value={audience? audience.name:"<ERROR: missing audience>"}
+            readOnly
+        />
+        {
+            segment ? 
+                <TextControl 
+                    label={isSegment(segment) ? "Segment": "Tag"}
+                    value={segment? segment.name:"<ERROR: missing segment>"}
+                    readOnly
+                />
+                :
+                null
+        }
+        
+    </>
+}
 
 const SendingInfo = ()=>{
     return <p>This campaign is being sent.</p>
@@ -37,6 +78,8 @@ const CampaignLocked = ()=>{
     }
 
     return <PanelBody>
+
+        <CampaignAudienceInfo />
         
         <PanelRow>
             {isSending ? <SendingInfo />: null}
@@ -56,9 +99,6 @@ const CampaignLocked = ()=>{
             : 
             null
         }
-
-
-        
 
     </PanelBody>
 }

@@ -1,7 +1,7 @@
 import "../data/store.js";
 import { useDispatch, useSelect } from "@wordpress/data";
 import { useEffect } from "@wordpress/element";
-import { useSegments } from "./use-config";
+import { getSegments } from "../utils/config.js";
 import { STORE_NAME } from "../data/store.js";
 import { usePost } from "./use-post.js";
 import { validateEmail } from "../utils/email.js";
@@ -36,7 +36,7 @@ export const useAudience = ()=>{
 export const useSegment = ()=>{
     const [audience_id] = useAudience();
     const [campaign, setValue] = useRecentCampaign()
-    const segments = useSegments(audience_id);
+    const segments = getSegments(audience_id);
     const state = campaign.segment_id;
 
     useEffect(()=>{

@@ -1,9 +1,9 @@
 import { Button, PanelRow } from "@wordpress/components";
-import { useHTMLPreviewUrl, usePlaintextPreviewUrl } from "../hooks/use-config";
+import { getHTMLPreviewUrl, getPlaintextPreviewUrl } from "../utils/config.js";
 
 const PreviewUrl = ({plaintext = false, children })=>{
-    const htmlUrl = useHTMLPreviewUrl();
-    const plaintextUrl = usePlaintextPreviewUrl();
+    const htmlUrl = getHTMLPreviewUrl();
+    const plaintextUrl = getPlaintextPreviewUrl();
     return <PanelRow>
         <Button 
             isSecondary

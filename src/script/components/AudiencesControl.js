@@ -1,13 +1,13 @@
 import {SelectControl, TextControl} from "@wordpress/components";
 import {useEffect} from '@wordpress/element'
-import {useAudiencesLists} from "../hooks/use-config";
+import { getAudiencesLists } from "../utils/config.js";
 import { useIsSavingPost } from "../hooks/use-post";
 import {useRecentCampaign} from "../hooks/use-store";
 
 const AudiencesControl = ()=> {
 
     const isSaving = useIsSavingPost();
-    const audiences = useAudiencesLists();
+    const audiences = getAudiencesLists();
     const [campaign, setCampaign] = useRecentCampaign();
 
     const {

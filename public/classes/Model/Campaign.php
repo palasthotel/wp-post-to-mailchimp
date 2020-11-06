@@ -21,6 +21,13 @@ class Campaign {
 	const STATE_READY = "ready"; // has all necessary settings and contents provided to mailchimp
 	const STATE_DONE = "done"; // was sent or scheduled
 
+	const MC_STATUS_UNKNOWN = "";
+	const MC_STATUS_SAVED = "saved";
+	const MC_STATUS_PAUSED = "paused";
+	const MC_STATUS_SCHEDULED = "scheduled";
+	const MC_STATUS_SENDING = "sending";
+	const MC_STATUS_SENT = "sent";
+
 	/**
 	 * Campaign constructor.
 	 *
@@ -30,9 +37,9 @@ class Campaign {
 	 */
 	public function __construct( int $id, int $post_id, ?string $state = null ) {
 
-		$this->id          = $id;
-		$this->post_id     = $post_id;
-		$this->state       = null === $state ? static::STATE_NEW : $state;
+		$this->id      = $id;
+		$this->post_id = $post_id;
+		$this->state   = null === $state ? static::STATE_NEW : $state;
 
 		$this->campaign_id = null;
 
@@ -41,7 +48,7 @@ class Campaign {
 
 		$this->schedule = null;
 
-		$this->attributes  = null;
+		$this->attributes = null;
 
 	}
 
@@ -73,18 +80,21 @@ class Campaign {
 	 *
 	 * @return $this
 	 */
-	public function setState(string $state){
+	public function setState( string $state ) {
 		$this->state = $state;
+
 		return $this;
 	}
 
-	public function setSchedule(?int $schedule){
+	public function setSchedule( ?int $schedule ) {
 		$this->schedule = $schedule;
+
 		return $this;
 	}
 
 	/**
 	 * sets attributes and overwrites object props: campaign_id, audience_id and segment_id
+	 *
 	 * @param array|null $attributes
 	 *
 	 * @return $this
@@ -92,20 +102,40 @@ class Campaign {
 	public function setAttributes( ?array $attributes ) {
 		$this->attributes = $attributes;
 
-		if(isset($attributes["id"])) $this->campaign_id = $attributes["id"];
+		if ( isset( $attributes["id"] ) ) {
+			$this->campaign_id = $attributes["id"];
+		}
 
-		if(
-			isset($attributes["recipients"])
+		if (
+			isset( $attributes["recipients"] )
 			&&
-			is_array($attributes["recipients"])
-		){
-			if(isset($attributes["recipients"]["list_id"])) $this->audience_id = $attributes["recipients"]["list_id"];
-			if(isset($attributes["recipients"]["segment_opts"]) && isset($attributes["recipients"]["segment_opts"]["saved_segment_id"])){
+			is_array( $attributes["recipients"] )
+		) {
+			if ( isset( $attributes["recipients"]["list_id"] ) ) {
+				$this->audience_id = $attributes["recipients"]["list_id"];
+			}
+			if ( isset( $attributes["recipients"]["segment_opts"] ) && isset( $attributes["recipients"]["segment_opts"]["saved_segment_id"] ) ) {
 				$this->segment_id = $attributes["recipients"]["segment_opts"]["saved_segment_id"];
 			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMailchimpStatus() {
+		return (
+			is_array( $this->attributes )
+			&&
+			isset( $this->attributes["status"] )
+			&&
+			is_string( $this->attributes["status"] )
+		) ?
+			$this->attributes["status"]
+			:
+			static::MC_STATUS_UNKNOWN;
 	}
 
 

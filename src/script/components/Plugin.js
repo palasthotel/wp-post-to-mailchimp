@@ -1,5 +1,5 @@
 import { PanelBody} from "@wordpress/components";
-import { useAudiencesLists } from "../hooks/use-config.js";
+import { getAudiencesLists } from "../utils/config.js";
 import { useRecentCampaign } from "../hooks/use-store.js";
 import { campaignStateIsDone, isCampaign } from "../utils/campaign.js";
 import CampaignEditor from "./CampaignEditor.js";
@@ -7,7 +7,7 @@ import CampaignLocked from "./CampaignLocked.js";
 
 const Plugin = ()=>{
 
-    const audiences = useAudiencesLists();
+    const audiences = getAudiencesLists();
     const [campaign] = useRecentCampaign();
 
     const hasRecentCampaign = isCampaign(campaign);

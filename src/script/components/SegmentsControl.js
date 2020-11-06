@@ -1,14 +1,14 @@
 import {BaseControl, TextControl} from "@wordpress/components";
 import { useEffect } from "@wordpress/element";
-import {useIsEmptySegmentAllowed, useSegments} from "../hooks/use-config";
+import { getIsEmptySegmentAllowed, getSegments, isSegment, isTag} from "../utils/config.js";
 import {useRecentCampaign} from "../hooks/use-store";
 
 const SegmentsControl = ()=> {
 
     const [campaign = {}, setCampaign ] = useRecentCampaign();
     const { audience_id:audience = "", segment_id:state = "" } = campaign;
-    const segments = useSegments(audience);
-    const isEmptySegmentAllowed = useIsEmptySegmentAllowed(audience);
+    const segments = getSegments(audience);
+    const isEmptySegmentAllowed = getIsEmptySegmentAllowed(audience);
 
     const setState = (_segment_id) => {
         setCampaign({
@@ -31,7 +31,7 @@ const SegmentsControl = ()=> {
     }
 
     if(segments.length === 1 && !isEmptySegmentAllowed){
-        const isTag = segments[0].type === "static";
+        const isTag = isTag(segments[0]);
         return <TextControl 
             label={isTag ? "Tag": "Segment"}
             value={segments[0].name}
@@ -39,8 +39,8 @@ const SegmentsControl = ()=> {
         />
     }
 
-    const _segments = segments.filter(({type})=>type !== "static");
-    const _tags = segments.filter(({type})=>type === "static");
+    const _segments = segments.filter(isSegment);
+    const _tags = segments.filter(isTag);
 
     return <BaseControl
         id="mailchimp-segment"

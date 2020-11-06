@@ -1,14 +1,14 @@
 import { useEffect, useState } from "@wordpress/element";
 import { CheckboxControl, DateTimePicker, ToggleControl } from "@wordpress/components";
 import { useRecentCampaign } from "../hooks/use-store";
-import { useDefaultScheduleNextDateTime } from "../hooks/use-config";
+import { getDefaultScheduleNextDateTime } from "../utils/config.js";
 import ReadableTimestamp, { is12HourTime } from "./ReadableTimestamp";
 import { useIsSavingPost } from "../hooks/use-post";
 import { ceil15Minutes, floor15Minutes, isPastDay } from "../utils/date";
 
 const Schedule = ()=>{
     const [campaign, changeCampaign] = useRecentCampaign();
-    const nextScheduleDateTime = useDefaultScheduleNextDateTime();
+    const nextScheduleDateTime = getDefaultScheduleNextDateTime();
     const [_, setRendered] = useState(0)
     
 
@@ -57,7 +57,7 @@ const Schedule = ()=>{
 const FinishControl = ()=>{
     const isSaving = useIsSavingPost();
     const [campaign, changeCampaign] = useRecentCampaign()
-    const nextScheduleDateTime = useDefaultScheduleNextDateTime();
+    const nextScheduleDateTime = getDefaultScheduleNextDateTime();
 
     const {
         schedule,
