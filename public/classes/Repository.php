@@ -4,6 +4,7 @@
 namespace Palasthotel\PostToMailchimp;
 
 
+use DateTime;
 use Palasthotel\PostToMailchimp\Model\Audience;
 use Palasthotel\PostToMailchimp\Model\Campaign;
 use Palasthotel\PostToMailchimp\Model\GroupCategory;
@@ -231,10 +232,7 @@ class Repository extends _Component {
 			);
 		}
 
-		$this->database->updateCampaign(
-			$campaign->setState( Campaign::STATE_DRAFT )
-			         ->setAttributes( $response )
-		);
+		$this->database->updateCampaign( $campaign->setAttributes( $response ) );
 
 		return $campaign;
 	}
@@ -353,11 +351,7 @@ class Repository extends _Component {
 			get_permalink( $campaign->post_id )
 		);
 
-		if ( Campaign::STATE_NEW || Campaign::STATE_DRAFT ) {
-			$campaign->setState( Campaign::STATE_READY );
-		}
-
-		$this->database->updateCampaign( $campaign );
+		$this->fetchCampaign( $campaign );
 
 		return true;
 
@@ -385,6 +379,26 @@ class Repository extends _Component {
 	 *
 	 * @return boolean
 	 */
+	public function startCampaign( $id ) {
+
+		$campaign = $this->getCampaignOrFalse( $id );
+		if ( false === $campaign ) {
+			return false;
+		}
+
+		$datetime = get_post_datetime( $campaign->post_id );
+		if ( time() <= $datetime->getTimestamp() ) {
+			return $this->schedule( $campaign, $datetime->getTimestamp() );
+		}
+
+		return $this->send( $campaign );
+	}
+
+	/**
+	 * @param Campaign|int $id
+	 *
+	 * @return boolean
+	 */
 	public function send( $id ) {
 
 		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
@@ -398,9 +412,7 @@ class Repository extends _Component {
 			return false;
 		}
 
-		$response = $this->api->getCampaign( $campaign->campaign_id );
-		$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
-		$this->database->updateCampaign( $campaign );
+		$this->fetchCampaign( $campaign );
 
 		return true;
 	}
@@ -413,7 +425,7 @@ class Repository extends _Component {
 	public function cancel( $id ) {
 		$campaign = $id instanceof Campaign ? $id : $this->plugin->repository->getCampaign( $id );
 
-		if ( ! ( $campaign instanceof Campaign ) ) {
+		if ( false === $campaign ) {
 			return new WP_Error(
 				404,
 				"Could not find campaign.",
@@ -423,23 +435,16 @@ class Repository extends _Component {
 			);
 		}
 
-		$response = $this->api->getCampaign( $campaign->campaign_id );
-		if ( ! is_array( $response ) || empty( $response["status"] ) ) {
+		$campaign = $this->fetchCampaign( $campaign );
+
+		if ( $campaign === Campaign::MC_STATUS_SENT ) {
 			return new WP_Error(
-				404,
-				"Could not fetch campaign info from api.",
+				200,
+				"Campaign already sent.",
 				[
-					"id" => $campaign->id,
+					"id" => $id,
 				]
 			);
-		}
-
-		if ( $response["status"] === "sent" ) {
-
-			$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
-			$this->database->updateCampaign( $campaign );
-
-			return true;
 		}
 
 		$result = $this->api->cancel( $campaign->campaign_id );
@@ -454,9 +459,7 @@ class Repository extends _Component {
 			);
 		}
 
-		$response = $this->api->getCampaign( $campaign->campaign_id );
-		$campaign->setState( Campaign::STATE_READY )->setAttributes( $response );
-		$this->database->updateCampaign( $campaign );
+		$this->fetchCampaign( $campaign );
 
 		return true;
 	}
@@ -464,28 +467,30 @@ class Repository extends _Component {
 	/**
 	 * @param Campaign|int $id
 	 *
+	 * @param int $schedule timestamp in seconds
+	 *
 	 * @return array|bool|WP_Error
 	 */
-	public function schedule( $id ) {
+	public function schedule( $id, int $schedule ) {
 
 		$campaign = $this->getCampaignOrFalse( $id );
 		if ( false === $campaign ) {
 			return false;
 		}
 
-		if ( ! is_int( $campaign->schedule ) || $campaign->schedule / 1000 < time() ) {
+		if ( $schedule < time() ) {
 			return new WP_Error(
 				501,
 				"Campaign has no valid schedule.",
 				[
 					"id"       => $campaign->id,
-					"schedule" => $campaign->schedule,
+					"schedule" => $schedule,
 				]
 			);
 		}
 
-		$datetime = new \DateTime();
-		$datetime->setTimestamp( $campaign->schedule / 1000 );
+		$datetime = new DateTime();
+		$datetime->setTimestamp( $schedule );
 
 		$result = $this->api->schedule( $campaign->campaign_id, $datetime );
 		if ( true !== $result ) {
@@ -498,10 +503,7 @@ class Repository extends _Component {
 			);
 		}
 
-		$response = $this->api->getCampaign( $campaign->campaign_id );
-		$campaign->setState( Campaign::STATE_DONE )->setAttributes( $response );
-
-		$this->database->updateCampaign( $campaign );
+		$this->fetchCampaign( $campaign );
 
 		return $result;
 	}
@@ -518,10 +520,7 @@ class Repository extends _Component {
 		}
 
 		$this->api->unschedule( $campaign->campaign_id );
-
-		$response = $this->api->getCampaign( $campaign->campaign_id );
-		$campaign->setState( Campaign::STATE_READY )->setAttributes( $response );
-		$this->database->updateCampaign( $campaign );
+		$this->fetchCampaign( $campaign );
 
 		return true;
 	}

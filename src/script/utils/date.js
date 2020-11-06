@@ -16,6 +16,17 @@ export const isPastDay = (date)=>{
     return isPastDay;
 }
 
+export const isFutureDate = (date_string, tolerance_in_seconds = 0)=>{
+    if(!date_string ) return false;
+    const timestamp = Date.parse(date_string);
+    const now = new Date();
+    return (now.getTime() - tolerance_in_seconds * 1000) < timestamp;
+}
+
+export const is15MinutesStep = (timestamp) => {
+    return (timestamp / (1000 * 60) % 15) === 0
+}
+
 export const ceil15Minutes = (timestamp) => {
     const minutes = timestamp / (1000 * 60);
     return Math.ceil(minutes/15) * 15 * 60 * 1000;
@@ -24,4 +35,9 @@ export const ceil15Minutes = (timestamp) => {
 export const floor15Minutes = (timestamp) => {
     const minutes = timestamp / (1000 * 60);
     return Math.floor(minutes/15) * 15 * 60 * 1000;
+}
+
+export const round15Minutes = (timestamp) => {
+    const minutes = timestamp / (1000 * 60);
+    return minutes % 15 > 7 ? ceil15Minutes(timestamp) : floor15Minutes(timestamp);
 }

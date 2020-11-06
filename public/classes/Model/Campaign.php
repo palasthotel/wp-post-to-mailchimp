@@ -16,15 +16,10 @@ namespace Palasthotel\PostToMailchimp\Model;
  */
 class Campaign {
 
-	const STATE_NEW = "new"; // is in database
-	const STATE_DRAFT = "draft"; // is created in mailchimp
-	const STATE_READY = "ready"; // has all necessary settings and contents provided to mailchimp
-	const STATE_DONE = "done"; // was sent or scheduled
-
-	const MC_STATUS_UNKNOWN = "";
-	const MC_STATUS_SAVED = "saved";
+	const STATE_NEW = "new";
+	const MC_STATUS_SAVED = "save";
 	const MC_STATUS_PAUSED = "paused";
-	const MC_STATUS_SCHEDULED = "scheduled";
+	const MC_STATUS_SCHEDULED = "schedule";
 	const MC_STATUS_SENDING = "sending";
 	const MC_STATUS_SENT = "sent";
 
@@ -33,13 +28,12 @@ class Campaign {
 	 *
 	 * @param int $id
 	 * @param int $post_id
-	 * @param null|string $state
 	 */
-	public function __construct( int $id, int $post_id, ?string $state = null ) {
+	public function __construct( int $id, int $post_id ) {
 
 		$this->id      = $id;
 		$this->post_id = $post_id;
-		$this->state   = null === $state ? static::STATE_NEW : $state;
+		$this->state   = static::STATE_NEW;
 
 		$this->campaign_id = null;
 
@@ -56,12 +50,10 @@ class Campaign {
 	 * @param int $id
 	 * @param int $post_id
 	 *
-	 * @param null|string $state
-	 *
 	 * @return static
 	 */
-	public static function build( int $id, int $post_id, ?string $state = null ) {
-		return new static( $id, $post_id, $state );
+	public static function build( int $id, int $post_id ) {
+		return new static( $id, $post_id );
 	}
 
 	/**
@@ -71,23 +63,6 @@ class Campaign {
 	 */
 	public function setCampaignId( ?string $campaignId ) {
 		$this->campaign_id = $campaignId;
-
-		return $this;
-	}
-
-	/**
-	 * @param string $state
-	 *
-	 * @return $this
-	 */
-	public function setState( string $state ) {
-		$this->state = $state;
-
-		return $this;
-	}
-
-	public function setSchedule( ?int $schedule ) {
-		$this->schedule = $schedule;
 
 		return $this;
 	}
@@ -117,6 +92,34 @@ class Campaign {
 			if ( isset( $attributes["recipients"]["segment_opts"] ) && isset( $attributes["recipients"]["segment_opts"]["saved_segment_id"] ) ) {
 				$this->segment_id = $attributes["recipients"]["segment_opts"]["saved_segment_id"];
 			}
+		}
+
+		$this->state = (
+			is_array( $this->attributes )
+			&&
+			isset( $this->attributes["status"] )
+			&&
+			is_string( $this->attributes["status"] )
+		) ?
+			$this->attributes["status"]
+			:
+			static::MC_STATUS_UNKNOWN;
+
+		if(
+			is_array( $this->attributes )
+			&&
+			isset($this->attributes["send_time"])
+			&&
+			!empty($this->attributes["send_time"])
+		){
+			try {
+				$dateTime = new \DateTime( $this->attributes["send_time"] );
+				$this->schedule = $dateTime->getTimestamp() * 1000; // go with javascript microseconds
+			} catch ( \Exception $e ) {
+				$this->schedule = null;
+			}
+		} else {
+			$this->schedule = null;
 		}
 
 		return $this;

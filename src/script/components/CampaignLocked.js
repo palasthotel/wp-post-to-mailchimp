@@ -1,7 +1,8 @@
 import { BaseControl, Button, PanelBody, PanelRow, TextControl } from "@wordpress/components";
 import { useEffect } from "@wordpress/element";
 import { useIsSavingPost } from "../hooks/use-post.js";
-import { useRecentCampaign } from "../hooks/use-store.js";
+import { useUnschedule } from "../hooks/use-schedule.js";
+import { useCancelCampaign, useRecentCampaign } from "../hooks/use-store.js";
 import { campaignIsScheduled, campaignIsSending, campaignIsSent } from "../utils/campaign.js";
 import { getAudience, getSegment, isSegment } from "../utils/config.js";
 import { showError } from "../utils/notice.js";
@@ -59,9 +60,10 @@ const CampaignLocked = ()=>{
 
     const [campaign, changeCampaign] = useRecentCampaign();
     const isSaving = useIsSavingPost();
+    const executeUnschedule = useUnschedule();
+    const executeCancelCampaign = useCancelCampaign();
 
     const {
-        unschedule = false,
         cancel = false,
         schedule,
     } = campaign;
@@ -69,13 +71,6 @@ const CampaignLocked = ()=>{
     const isSending = campaignIsSending(campaign)
     const isSent = campaignIsSent(campaign)
     const isScheduled = campaignIsScheduled(campaign)
-
-    const toggleUnschedule = ()=>{
-        changeCampaign({unschedule:!unschedule});
-    }
-    const toggleCancel = ()=>{
-        changeCampaign({cancel:!cancel});
-    }
 
     return <PanelBody>
 
@@ -87,18 +82,9 @@ const CampaignLocked = ()=>{
             {isSent ? <SentInfo />: null}
         </PanelRow>
 
-        {isSending && !cancel ? <Button disabled={isSaving} onClick={toggleCancel} isDestructive>Cancel campaign</Button>: null}
-        {isSending && cancel ? <Button disabled={isSaving} onClick={toggleCancel} isSecondary>Nope, don't cancel</Button> : null}
+        {isSending ? <Button disabled={isSaving} onClick={executeCancelCampaign} isDestructive>Cancel campaign</Button>: null}
 
-        {isScheduled && !unschedule ? <Button disabled={isSaving} onClick={toggleUnschedule} isDestructive>Unschedule</Button> : null}
-        {isScheduled && unschedule ? <Button disabled={isSaving} onClick={toggleUnschedule} isSecondary>Cancel unschedule</Button> : null}
-        
-        {
-            unschedule || cancel ? 
-            <PanelRow><p className="description">Save post to apply changes.</p></PanelRow>
-            : 
-            null
-        }
+        {isScheduled ? <Button disabled={isSaving} onClick={executeUnschedule} isDestructive>Unschedule</Button> : null}
 
     </PanelBody>
 }

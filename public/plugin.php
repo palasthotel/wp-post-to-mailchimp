@@ -47,6 +47,7 @@ if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
  * @property Database database
  * @property Post post
  * @property Preview preview
+ * @property PostsTable postsTable
  */
 class Plugin {
 
@@ -138,16 +139,17 @@ class Plugin {
 		$this->api        = new API( $this );
 		$this->repository = new Repository( $this );
 
-		$this->settings   = new Settings( $this );
+		$this->settings = new Settings( $this );
 
-		$this->assets     = new Assets( $this );
-		$this->gutenberg  = new Gutenberg( $this );
-		$this->templates  = new Templates( $this );
-		$this->preview    = new Preview( $this );
+		$this->assets    = new Assets( $this );
+		$this->gutenberg = new Gutenberg( $this );
+		$this->templates = new Templates( $this );
+		$this->preview   = new Preview( $this );
 
 		$this->rest       = new WP_REST( $this );
 		$this->post       = new Post( $this );
-		
+		$this->postsTable = new PostsTable( $this );
+
 		require_once dirname( __FILE__ ) . "/inc/utils.php";
 
 		/**

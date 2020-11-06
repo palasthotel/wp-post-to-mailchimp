@@ -34,7 +34,6 @@ class Database extends _Component {
 			$this->table,
 			[
 				"post_id"        => $post_id,
-				"campaign_state" => Campaign::STATE_NEW,
 			]
 		);
 		if ( ! $inserted ) {
@@ -106,20 +105,16 @@ class Database extends _Component {
 		$data = [
 			"post_id"        => $campaign->post_id,
 			"campaign_id"    => $campaign->campaign_id,
-			"campaign_state" => $campaign->state,
-			"schedule"       => $campaign->schedule,
 			"attributes"     => $campaign->attributes !== null ? json_encode( $campaign->attributes ) : null,
 		];
 
-		$response = $this->wpdb->update(
+		return $this->wpdb->update(
 			$this->table,
 			$data,
 			[
 				"id" => $campaign->id,
 			]
 		);
-
-		return $response;
 	}
 
 	/**
@@ -151,8 +146,7 @@ class Database extends _Component {
 	private function campaignRowToModel( object $row ) {
 		$attributes = ! empty( $row->attributes ) ? json_decode( $row->attributes, true ) : null;
 
-		return Campaign::build( $row->id, $row->post_id, $row->campaign_state )
-		               ->setSchedule( $row->schedule )
+		return Campaign::build( $row->id, $row->post_id )
 		               ->setCampaignId( $row->campaign_id )
 		               ->setAttributes( $attributes );
 	}
@@ -167,14 +161,10 @@ class Database extends _Component {
 			 id bigint(20) unsigned auto_increment,
 			 post_id bigint(20) unsigned NOT NULL,
 			 campaign_id varchar (30) default null,
-			 campaign_state varchar(10) NOT NULL,
-			 schedule bigint(20) unsigned default null,
 			 attributes text default NULL,
 			 primary key (id),
-			 unique key unique_post_campaign (post_id, campaign_id, campaign_state),
-			 key (campaign_state),
+			 unique key unique_post_campaign (post_id, campaign_id),
 			 key (campaign_id),
-			 key (schedule),
 			 key (post_id)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;" );
 

@@ -6,6 +6,7 @@ import { SendTestButton } from "./Buttons"
 import EMailAddressesControl from "./EMailAddressesControl"
 import FinishControl from "./FinishControl"
 import PreviewUrl from "./PreviewUrl"
+import ScheduleControl from "./ScheduleControl"
 import SegmentsControl from "./SegmentsControl"
 
 export const Step1 = ()=>{
@@ -47,6 +48,7 @@ export const Step3 = ()=>{
         title="Step 3: Deliver"
         initialOpen={false}
     >
+        <ScheduleControl />
         <FinishControl />
     </PanelBody>
 }

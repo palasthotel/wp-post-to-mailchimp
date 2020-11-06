@@ -10,9 +10,13 @@ export const is12HourTime = ()=> /a(?!\\)/i.test(
          .split( '' ).reverse().join( '' ) // Reverse the string and test for "a" not followed by a slash
 );
 
-const ReadableTimestamp = ({timestamp})=>{
+export const dateFormat = (timestamp) =>{
     const settings = __experimentalGetSettings();
-    return <>{date( settings.formats.datetime ,timestamp)}</>
+    return date( settings.formats.datetime ,timestamp);
+}
+
+const ReadableTimestamp = ({timestamp})=>{
+    return <>{dateFormat(timestamp)}</>
 }
 
 export default ReadableTimestamp;

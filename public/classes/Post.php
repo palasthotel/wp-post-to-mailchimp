@@ -38,8 +38,32 @@ class Post extends _Component {
 	 * @param $post
 	 */
 	public function transition_post_status($new_status, $old_status, WP_Post $post){
+
+		if($new_status === "publish") return; // nothing to cleanup here
+
 		if($new_status === "trash" && Option::isActiveFor($post->post_type)){
 			$this->plugin->repository->deletePost($post->ID);
+			return;
+		}
+
+		$campaign = $this->plugin->repository->getRecentCampaign(($post->ID));
+		if( !($campaign instanceof Campaign) ) return; // no recent campaign
+
+		if($new_status === "draft"){
+			switch ($campaign->state){
+				case Campaign::MC_STATUS_SCHEDULED:
+					$this->plugin->repository->unschedule($campaign);
+					break;
+				case Campaign::MC_STATUS_SENDING:
+					$this->plugin->repository->cancel($campaign);
+					break;
+			}
+			return;
+		}
+
+		if($new_status === "future" && $campaign->state === Campaign::MC_STATUS_SENDING){
+			$this->plugin->repository->cancel($campaign);
+			return;
 		}
 	}
 }

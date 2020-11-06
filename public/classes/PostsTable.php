@@ -41,14 +41,7 @@ class PostsTable extends _Component {
 		if($column == 'post-to-mailchimp-state'){
 			$campaign = $this->plugin->repository->getRecentCampaign($post_id);
 			if($campaign instanceof Campaign){
-				switch ($campaign->state){
-					case Campaign::STATE_DONE:
-						echo $campaign->getMailchimpStatus();
-						break;
-					default:
-						echo $campaign->state;
-						break;
-				}
+				echo $campaign->state;
 			}
 		}
 	}

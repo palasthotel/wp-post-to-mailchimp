@@ -11,6 +11,18 @@ export const useIsRequesting = ()=>{
     return state;
 }
 
+export const useCancelCampaign = ()=>{
+    const dispatch = useDispatch('core/editor')
+    const [_, changeCampaign] = useRecentCampaign();
+    return ()=>{
+        dispatch.editPost({
+            status: "draft"
+        });
+        changeCampaign({cancel: true});
+        dispatch.savePost();
+    }
+}
+
 export const useRecentCampaign = ()=>{
     const value = useSelect(select => select('core/editor').getEditedPostAttribute("recent_campaign"))
     const dispatch = useDispatch('core/editor')

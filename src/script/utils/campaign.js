@@ -16,6 +16,8 @@ export const campaignIsSending =  campaign => campaignGetState(campaign) === "se
 export const campaignIsSent =  campaign => campaignGetState(campaign) === "sent";
 
 // internal state
+export const campaignIsLocked = campaign => campaignIsScheduled(campaign) || campaignIsSending(campaign) || campaignIsSent(campaign);
+
 export const campaignStateIsNew = campaign => isCampaign(campaign) && campaign.state === "new";
 export const campaignStateIsDraft = campaign => isCampaign(campaign) && campaign.state === "draft";
 export const campaignStateIsReady = campaign => isCampaign(campaign) && campaign.state === "ready";
