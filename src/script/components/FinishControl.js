@@ -1,63 +1,33 @@
 import { useEffect, useState } from "@wordpress/element";
 import { CheckboxControl, DateTimePicker, ToggleControl } from "@wordpress/components";
 import { useRecentCampaign } from "../hooks/use-store";
-import { getDefaultScheduleNextDateTime } from "../utils/config.js";
+import { getDefaultScheduleNextTimestamp } from "../utils/config.js";
 import ReadableTimestamp, { is12HourTime } from "./ReadableTimestamp";
 import { useIsSavingPost } from "../hooks/use-post";
-import { ceil15Minutes, floor15Minutes, isPastDay } from "../utils/date";
+import { isPastDay } from "../utils/date";
+import { useSchedule } from "../hooks/use-schedule";
 
 const Schedule = ()=>{
-    const [campaign, changeCampaign] = useRecentCampaign();
-    const nextScheduleDateTime = getDefaultScheduleNextDateTime();
-    const [_, setRendered] = useState(0)
-    
-
-    const {
-        schedule,
-    } = campaign
-
-    const dateState = new Date(schedule)
-
-    const forceRender = ()=> setRendered(value => ++value)
-
-    const setDate = (_date)=>{
-        
-        if(_date){
-            const minTimestamp = ceil15Minutes((new Date()).getTime() + 1000 * 60 * 30);
-            const timestamp = Date.parse(_date);
-            const newSchedule = schedule < timestamp ? ceil15Minutes(timestamp) : floor15Minutes(timestamp);
-
-            if( timestamp > minTimestamp ){
-                changeCampaign({schedule: newSchedule })
-                if(newSchedule === schedule){
-                    forceRender();
-                }
-            } else {
-                changeCampaign({schedule: minTimestamp })
-                if(minTimestamp === schedule){
-                    forceRender();
-                }
-            }
-            return;
-        }
-        changeCampaign({schedule: nextScheduleDateTime})
-    }
-
-    // To know if the current timezone is a 12 hour time with look for an "a" in the time format.
-   // We also make sure this a is not escaped by a "/".
+    const isSaving = useIsSavingPost();
+    const [dateState, setSchedule] = useSchedule();
+    const [_, setRendered] = useState(0);
 
     return <DateTimePicker 
         currentDate={dateState}
-        onChange={setDate}
+        onChange={(_date) => {
+            if(isSaving) return;
+            setSchedule(_date);
+            setRendered( value => ++value ); // force re-render to show date restrictions from useSchedule
+        }}
         is12Hour={is12HourTime()}
-        isInvalidDate={isPastDay}
+        isInvalidDate={(date)=> isSaving || isPastDay(date)}
     />
 }
 
 const FinishControl = ()=>{
     const isSaving = useIsSavingPost();
     const [campaign, changeCampaign] = useRecentCampaign()
-    const nextScheduleDateTime = getDefaultScheduleNextDateTime();
+    const nextScheduleTimestamp = getDefaultScheduleNextTimestamp();
 
     const {
         schedule,
@@ -74,13 +44,15 @@ const FinishControl = ()=>{
     }, [audience_id, segment_id, schedule])
 
     const handleScheduleCheckbox = (_isSchedule) => {
+        if(isSaving) return;
         if(_isSchedule){
-            changeCampaign({schedule: nextScheduleDateTime})
+            changeCampaign({schedule: nextScheduleTimestamp})
         } else {
             changeCampaign({schedule: undefined})
         }
     }
     const handleStartCheckbox = (isChecked)=>{
+        if(isSaving) return;
         changeCampaign({
             is_ready: isChecked
         })
@@ -108,6 +80,7 @@ const FinishControl = ()=>{
             <div style={style}>
                 <CheckboxControl 
                     checked={is_ready}
+                    disabled={isSaving}
                     label="I'm ready to start this campaign"
                     onChange={handleStartCheckbox}
                 />

@@ -1,11 +1,12 @@
 import { Button } from "@wordpress/components";
+import { useIsSavingPost } from "../hooks/use-post";
 import { useAudience, useIsRequesting, useRecentCampaign, useSegment, useSendTestEmails, useTestEmailAddresses } from "../hooks/use-store";
 import { campaignStateIsDraft, campaignStateIsNew, campaignStateIsReady, isCampaign } from "../utils/campaign";
 import { validateEmail } from "../utils/email";
 
 
 export const DeleteButton = ()=>{
-
+    const isSaving = useIsSavingPost();
     const isRequesting = useIsRequesting();
     const [campaign, setCampaign] = useRecentCampaign();
 
@@ -13,11 +14,12 @@ export const DeleteButton = ()=>{
         return null;
     }
 
-    return <Button disabled={isRequesting} isDestructive onClick={()=>setCampaign({delete:true})}>Delete</Button>
+    return <Button disabled={isRequesting || isSaving} isDestructive onClick={()=>setCampaign({delete:true})}>Delete</Button>
 }
 
 export const SendTestButton = ()=>{
 
+    const isSaving = useIsSavingPost();
     const isRequesting = useIsRequesting();
     const [campaign] = useRecentCampaign();
     const [emails] = useTestEmailAddresses();
@@ -31,7 +33,7 @@ export const SendTestButton = ()=>{
 
     const validEmails = emails.filter(validateEmail)
 
-    const disabled = isCampaignNew || isCampaignDraft || validEmails.length == 0;
+    const disabled = isCampaignNew || isCampaignDraft || validEmails.length == 0 || isRequesting || isSaving;
 
     return <Button 
         disabled={disabled} 
@@ -44,6 +46,7 @@ export const SendTestButton = ()=>{
 
 export const SendButton = ()=>{
 
+    const isSaving = useIsSavingPost();
     const isRequesting = useIsRequesting();
     const [campaign] = useRecentCampaign();
 
@@ -51,7 +54,7 @@ export const SendButton = ()=>{
         return null;
     }
 
-    const disabled = typeof campaign === typeof undefined || isRequesting;
+    const disabled = typeof campaign === typeof undefined || isRequesting || isSaving;
 
     return <Button disabled={disabled} isPrimary onClick={()=>console.log("send")}>Send!</Button>
 }

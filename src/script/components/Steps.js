@@ -24,13 +24,10 @@ export const Step2 = ()=>{
 
     const [campaign] = useRecentCampaign()
 
-    const isReady = campaignStateIsReady(campaign)
-
     if(!campaign.id) return null;
 
     return <PanelBody
         title="Step 2: Test"
-        
         initialOpen={false}
     >
         <PreviewUrl>HTML Preview</PreviewUrl>

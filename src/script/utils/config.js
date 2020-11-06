@@ -35,3 +35,4 @@ export const getDefaultScheduleNextDateTime = ()=>{
     date.setHours(hours, minutes);
     return date;
 }
+export const getDefaultScheduleNextTimestamp = ()=> getDefaultScheduleNextDateTime().getTime();

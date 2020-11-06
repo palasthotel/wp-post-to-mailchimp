@@ -1,9 +1,11 @@
 import { FormTokenField, PanelRow } from "@wordpress/components";
+import { useIsSavingPost } from "../hooks/use-post";
 import { useTestEmailAddresses } from "../hooks/use-store";
 import { validateEmail } from "../utils/email";
 
 const EMailAddressesControl = () => {
 
+    const isSaving = useIsSavingPost();
     const [emails, setEmails] = useTestEmailAddresses();
 
     const handleChange = (values) => {
@@ -15,6 +17,7 @@ const EMailAddressesControl = () => {
     return <PanelRow>
         <FormTokenField 
             label="Email addresses"
+            disabled={isSaving}
             value={emails.map(e=>{
                 if(validateEmail(e)){
                     return e;

@@ -1,16 +1,18 @@
 import {BaseControl, TextControl} from "@wordpress/components";
 import { useEffect } from "@wordpress/element";
 import { getIsEmptySegmentAllowed, getSegments, isSegment, isTag} from "../utils/config.js";
-import {useRecentCampaign} from "../hooks/use-store";
+import {useRecentCampaign} from "../hooks/use-store.js";
+import { useIsSavingPost } from "../hooks/use-post.js";
 
 const SegmentsControl = ()=> {
-
+    const isSaving = useIsSavingPost();
     const [campaign = {}, setCampaign ] = useRecentCampaign();
     const { audience_id:audience = "", segment_id:state = "" } = campaign;
     const segments = getSegments(audience);
     const isEmptySegmentAllowed = getIsEmptySegmentAllowed(audience);
 
     const setState = (_segment_id) => {
+        if(isSaving) return;
         setCampaign({
             ...campaign,
             segment_id: _segment_id,
@@ -31,9 +33,8 @@ const SegmentsControl = ()=> {
     }
 
     if(segments.length === 1 && !isEmptySegmentAllowed){
-        const isTag = isTag(segments[0]);
         return <TextControl 
-            label={isTag ? "Tag": "Segment"}
+            label={isTag(segments[0]) ? "Tag": "Segment"}
             value={segments[0].name}
             readOnly
         />
@@ -51,8 +52,9 @@ const SegmentsControl = ()=> {
             style={{width:'100%'}}
             value={state || ""}
             onChange={(e)=> setState(parseInt(e.target.value))}
+            disabled={isSaving}
         >
-            <option value=''>-</option>
+            { isEmptySegmentAllowed ? <option value=''>-</option> : null }
             <optgroup label="Segments">
                 {_segments.map(({id, name})=><option key={id} value={id}>{name}</option>)}
             </optgroup>
