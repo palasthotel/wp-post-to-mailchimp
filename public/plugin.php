@@ -198,3 +198,5 @@ class Plugin {
  * init and make it accessible
  */
 Plugin::instance();
+
+require_once dirname(__FILE__)."/public-function.php";

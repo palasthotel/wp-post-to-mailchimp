@@ -165,7 +165,7 @@ class API extends _Component {
 	public function addCampaign( MailchimpCampaignArgs $args ) {
 		return $this->getApi()->post(
 			"/campaigns",
-			apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args->toArray(), $this )
+			apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args->toArray(), $args )
 		);
 	}
 
@@ -181,7 +181,7 @@ class API extends _Component {
 
 		return $this->getApi()->patch(
 			"/campaigns/$args->campaign_id",
-			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args->toArray(), $this )
+			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args->toArray(), $args )
 		);
 
 	}

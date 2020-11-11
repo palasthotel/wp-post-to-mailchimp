@@ -7,6 +7,35 @@ import Plugin from "./components/Plugin";
 // validate post date selection
 // ---------------------------------------
 import './auto/post-date.js'
+import { TextControl } from "@wordpress/components";
+import { usePost } from "./hooks/use-post";
+
+PostToMailchimp.customConfig = [
+    {
+        key: "subject",
+        Element: ({value, onChange})=> {
+            const post = usePost();
+            return <TextControl
+                label="Betreffzeile (optional)"
+                value={value || ""}
+                onChange={onChange}
+                placeholder={post.title}
+            />
+        }
+    },
+
+    {
+        key: "issue_number",
+        Element: ({value, onChange})=> {
+            return <TextControl
+                label="Ausgabennummer"
+                value={value || ""}
+                onChange={onChange}
+            />
+        }
+    }
+
+];
 
 // ---------------------------------------
 // UI

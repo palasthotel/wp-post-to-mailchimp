@@ -47,8 +47,6 @@ subscribe(()=>{
 
     const date = getDate();
 
-    console.log(date);
-
     if(!date) return;
 
     if(last_date === date) return;
@@ -58,8 +56,6 @@ subscribe(()=>{
         self_action = false;
         return;
     }
-
-    console.log("buildValidDate")
 
     const timestamp = Date.parse(date);
     if(isValidDate(timestamp)) return;

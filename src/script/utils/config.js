@@ -36,3 +36,10 @@ export const getDefaultScheduleNextDateTime = ()=>{
     return date;
 }
 export const getDefaultScheduleNextTimestamp = ()=> getDefaultScheduleNextDateTime().getTime();
+
+//------------------------------------------------------------
+// custom config controls
+//------------------------------------------------------------
+export const getCustomConfig = ()=>{
+    return PostToMailchimp.customConfig || [];
+}

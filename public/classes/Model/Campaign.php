@@ -4,6 +4,8 @@
 namespace Palasthotel\PostToMailchimp\Model;
 
 
+use stdClass;
+
 /**
  * @property int $id
  * @property int $post_id
@@ -13,6 +15,7 @@ namespace Palasthotel\PostToMailchimp\Model;
  * @property null|array $attributes
  * @property string $state
  * @property null|int $schedule
+ * @property stdClass custom
  */
 class Campaign {
 
@@ -43,6 +46,8 @@ class Campaign {
 		$this->schedule = null;
 
 		$this->attributes = null;
+
+		$this->custom = new stdClass();
 
 	}
 
@@ -103,7 +108,7 @@ class Campaign {
 		) ?
 			$this->attributes["status"]
 			:
-			static::MC_STATUS_UNKNOWN;
+			static::STATE_NEW;
 
 		if(
 			is_array( $this->attributes )
@@ -138,7 +143,17 @@ class Campaign {
 		) ?
 			$this->attributes["status"]
 			:
-			static::MC_STATUS_UNKNOWN;
+			static::STATE_NEW;
+	}
+
+	/**
+	 * @param stdClass $obj
+	 *
+	 * @return $this
+	 */
+	public function setCustom($obj){
+		$this->custom = $obj;
+		return $this;
 	}
 
 

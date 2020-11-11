@@ -37,6 +37,21 @@ export const useRecentCampaign = ()=>{
     ]
 }
 
+export const useRecentCampaignCustomized = ()=>{
+    const [campaign, changeCampaign] = useRecentCampaign();
+    return [
+        campaign.custom || {},
+        (changeSet)=>{
+            changeCampaign({
+                custom:{
+                    ...campaign.custom,
+                    ...changeSet
+                }
+            })
+        },
+    ]
+}
+
 export const useAudience = ()=>{
     const [campaign, setValue] = useRecentCampaign();
     return [

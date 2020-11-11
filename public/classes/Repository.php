@@ -177,6 +177,13 @@ class Repository extends _Component {
 	}
 
 	/**
+	 * @param string $campaign_id mailchimp campaign id
+	 */
+	public function getCampaignById( string $campaign_id){
+		return $this->database->getCampaignById($campaign_id);
+	}
+
+	/**
 	 * @param $post_id
 	 *
 	 * @return Campaign|null
@@ -355,6 +362,29 @@ class Repository extends _Component {
 
 		return true;
 
+	}
+
+	/**
+	 * @param int|Campaign $id
+	 * @param array $customs_array
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function updateCampaignCustoms($id, array $customs_array){
+		$campaign = $this->getCampaignOrFalse($id);
+		if ( false === $campaign ) {
+			return new WP_Error(
+				404,
+				"Could not find campaign.",
+				[
+					"id" => $id,
+				]
+			);
+		}
+
+		$this->database->updateCampaignCustoms($campaign->id, $customs_array);
+
+		return true;
 	}
 
 	/**

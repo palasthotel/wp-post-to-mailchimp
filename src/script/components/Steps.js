@@ -3,6 +3,7 @@ import { useRecentCampaign } from "../hooks/use-store"
 import { campaignStateIsReady } from "../utils/campaign"
 import AudiencesControl from "./AudiencesControl"
 import { SendTestButton } from "./Buttons"
+import CustomConfigControl from "./CustomConfigControl"
 import EMailAddressesControl from "./EMailAddressesControl"
 import FinishControl from "./FinishControl"
 import PreviewUrl from "./PreviewUrl"
@@ -12,11 +13,12 @@ import SegmentsControl from "./SegmentsControl"
 export const Step1 = ()=>{
 
     return <PanelBody
-        title="Step 1: Configure"
+        title="Step 1: Configuration"
         initialOpen={true}
     >
         <AudiencesControl />
         <SegmentsControl />
+        <CustomConfigControl />
     </PanelBody>
 }
 

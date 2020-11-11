@@ -4,11 +4,13 @@
 namespace Palasthotel\PostToMailchimp;
 
 use Palasthotel\PostToMailchimp\Model\Campaign;
+use stdClass;
 use wpdb;
 
 /**
  * @property wpdb wpdb
  * @property string $table
+ * @property string table_customize
  */
 class Database extends _Component {
 
@@ -16,6 +18,7 @@ class Database extends _Component {
 		global $wpdb;
 		$this->wpdb  = $wpdb;
 		$this->table = $wpdb->prefix . "post_to_mailchimp_campaigns";
+		$this->table_customize = $wpdb->prefix . "post_to_mailchimp_campaigns_customize";
 	}
 
 	/**
@@ -79,6 +82,24 @@ class Database extends _Component {
 		return null;
 	}
 
+	/**
+	 * @param string $campaign_id mailchimp campaign id
+	 *
+	 * @return Campaign|null
+	 */
+	public function getCampaignById( string $campaign_id ) {
+		$row = $this->wpdb->get_row(
+			$this->wpdb->prepare(
+				"SELECT * FROM $this->table WHERE campaign_id = %s ORDER BY id LIMIT 1", $campaign_id
+			)
+		);
+		if ( $row ) {
+			return $this->campaignRowToModel( $row );
+		}
+
+		return null;
+	}
+
 
 	/**
 	 * @param int $post_id
@@ -119,10 +140,59 @@ class Database extends _Component {
 
 	/**
 	 * @param int $id
+	 * @param array $customs_array
+	 */
+	public function updateCampaignCustoms( int $id, array $customs_array ) {
+		$this->deleteCampaignCustoms($id);
+		foreach ($customs_array as $key => $value){
+			$this->wpdb->insert(
+				$this->table_customize,
+				[
+					"campaign_id" => $id,
+					"custom_key" => $key,
+					"custom_value" => $value
+				],
+				[ "%d", "%s", "%s"]
+			);
+		}
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return stdClass
+	 */
+	public function getCampaignCustoms(int $id){
+		$results = $this->wpdb->get_results(
+			$this->wpdb->prepare("SELECT custom_key, custom_value FROM $this->table_customize WHERE campaign_id = %d", $id)
+		);
+		$customs = new stdClass();
+		foreach ($results as $row){
+			$customs->{$row->custom_key} = $row->custom_value;
+		}
+		return $customs;
+	}
+
+	/**
+	 * @param int $id
+	 *
+	 * @return bool|int
+	 */
+	public function deleteCampaignCustoms( int $id ) {
+		return $this->wpdb->delete(
+			$this->table_customize,
+			["campaign_id" => $id],
+			["%d"]
+		);
+	}
+
+	/**
+	 * @param int $id
 	 *
 	 * @return bool|int
 	 */
 	public function deleteCampaign( int $id ) {
+		$this->deleteCampaignCustoms($id);
 		return $this->wpdb->delete( $this->table, [ "id" => $id, ], [ "%d" ] );
 	}
 
@@ -148,7 +218,8 @@ class Database extends _Component {
 
 		return Campaign::build( $row->id, $row->post_id )
 		               ->setCampaignId( $row->campaign_id )
-		               ->setAttributes( $attributes );
+		               ->setAttributes( $attributes )
+						->setCustom($this->getCampaignCustoms($row->id));
 	}
 
 	/**
@@ -166,9 +237,19 @@ class Database extends _Component {
 			 unique key unique_post_campaign (post_id, campaign_id),
 			 key (campaign_id),
 			 key (post_id)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+		\dbDelta( "CREATE TABLE IF NOT EXISTS $this->table_customize
+			(
+			 campaign_id bigint(20) unsigned,
+			 custom_key varchar(190) NOT NULL,
+			 custom_value TEXT default null,
+			 primary key (campaign_id, custom_key)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;" );
 
 	}
+
+
 
 
 }

@@ -39,6 +39,13 @@ class RecentCampaignField extends _Component {
 					// check for recent campaign to exist
 					$campaign = $this->plugin->repository->getRecentCampaign( $post->ID );
 
+					// custom values
+					$customs = [];
+					if(is_array($value["custom"])){
+						foreach ($value["custom"] as $custom_key => $custom_value){
+							$customs[sanitize_text_field($custom_key)] = sanitize_textarea_field($custom_value);
+						}
+					}
 
 					if ( isset( $value["delete"] ) && true === $value["delete"] ) {
 						// if delete flag is set, delete campaign
@@ -65,6 +72,8 @@ class RecentCampaignField extends _Component {
 						if($value["id"] !== $campaign->id){
 							return;
 						}
+
+						$this->plugin->repository->updateCampaignCustoms($campaign->id, $customs);
 
 						if ( ! empty( $value["audience_id"] ) ) {
 							// update campaign configuration
@@ -96,6 +105,7 @@ class RecentCampaignField extends _Component {
 							isset( $value["segment_id"] ) ? intval( $value["segment_id"] ) : null
 						);
 						$this->plugin->repository->updateCampaignContent( $campaign );
+						$this->plugin->repository->updateCampaignCustoms($campaign->id, $customs);
 					}
 
 				},
