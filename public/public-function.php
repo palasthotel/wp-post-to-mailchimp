@@ -8,6 +8,15 @@ function ptm_plugin(){
 }
 
 /**
+ * @param $post_id
+ *
+ * @return Campaign|null
+ */
+function ptm_get_recent_campaign($post_id){
+	return ptm_plugin()->repository->getRecentCampaign($post_id);
+}
+
+/**
  * @param string $campaign_id mailchimp campaign id
  *
  * @return Campaign|null
