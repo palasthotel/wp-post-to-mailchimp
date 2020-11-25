@@ -1,7 +1,7 @@
 import { subscribe, select, dispatch } from '@wordpress/data';
-import { ceil15Minutes, is15MinutesStep, round15Minutes } from '../utils/date';
+import { getDefaultScheduleNextDateTime } from '../utils/config';
+import { ceil15Minutes, dateFormat, is15MinutesStep, round15Minutes } from '../utils/date';
 import { showNotice } from '../utils/notice.js';
-
 
 const isValidDate = (timestamp)=> {
     const now = new Date();
@@ -37,6 +37,7 @@ const buildValidDate = (timestamp) => {
 // --------------------------------------------
 const getDate = ()=> select('core/editor').getEditedPostAttribute('date');
 const setDate = (dateISOString) => dispatch('core/editor').editPost({date:dateISOString})
+const getPostStatus = ()=> select('core/editor').getCurrentPost().status;
 
 // ----------------------------------------
 // start watching
@@ -49,6 +50,16 @@ subscribe(()=>{
 
     if(!date) return;
 
+    // default date
+    if(getPostStatus() === "auto-draft" && null === last_date) {
+        
+        const date = getDefaultScheduleNextDateTime();
+        const iso = date.toISOString();
+        last_date = iso;
+        setDate(iso);
+        return;
+    }
+
     if(last_date === date) return;
     last_date = date;
 
@@ -60,10 +71,10 @@ subscribe(()=>{
     const timestamp = Date.parse(date);
     if(isValidDate(timestamp)) return;
 
-    showNotice("Date was changed to 15 minutes step.")
-    
-
     const validDateObj = buildValidDate(timestamp);
+
+    const format = dateFormat(validDateObj.getTime())
+    showNotice(`Date was changed to ${format}  because Mailchimp only supports 15 minutes exact time planning.`)
 
     self_action = true;
     setDate(validDateObj.toISOString());

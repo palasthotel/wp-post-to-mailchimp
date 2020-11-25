@@ -1,7 +1,7 @@
 import { Button, DateTimePicker, Dropdown, PanelRow } from "@wordpress/components";
-import ReadableTimestamp, { is12HourTime } from "./ReadableTimestamp";
+import ReadableTimestamp from "./ReadableTimestamp";
 import { useIsSavingPost } from "../hooks/use-post";
-import { isFutureDate, isPastDay } from "../utils/date";
+import { isFutureDate, isPastDay, is12HourTime } from "../utils/date";
 import { useSchedule } from "../hooks/use-schedule";
 
 const ScheduleControl = ()=>{
