@@ -9,11 +9,23 @@ class Option {
 	// ------------------------------------------------
 	// mailchimp api
 	// ------------------------------------------------
+	public static function isApiKeyInBlogConstant() {
+		$blogId = get_current_blog_id();
+
+		return defined( 'POST_TO_MAILCHIMP_API_KEY_BLOG_' . $blogId )
+		       &&
+		       is_string(constant( 'POST_TO_MAILCHIMP_API_KEY_BLOG_' . $blogId ));
+	}
 
 	public static function isApiKeyInConstant(){
-		return false !== POST_TO_MAILCHIMP_API_KEY;
+		return is_string(POST_TO_MAILCHIMP_API_KEY) || static::isApiKeyInBlogConstant();
 	}
+
 	public static function getApiKey(){
+		if(static::isApiKeyInBlogConstant()){
+			$blogId = get_current_blog_id();
+			return constant( 'POST_TO_MAILCHIMP_API_KEY_BLOG_' . $blogId );
+		}
 		return static::isApiKeyInConstant() ? POST_TO_MAILCHIMP_API_KEY: get_option(Plugin::OPTION_MAILCHIMP_API_KEY, '');
 	}
 

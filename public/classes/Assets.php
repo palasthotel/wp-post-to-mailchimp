@@ -43,6 +43,7 @@ class Assets extends _Component {
 				"segments" => $segments,
 				"audienceIdsWithEmptySegmentsAllowed" => Option::getAudienceIdsWithEmptySegmentAllowed(),
 				"groups" => $groups,
+				"settingsUrl" => $this->plugin->settings->getUrl(),
 			]
 		);
 

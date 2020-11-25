@@ -87,7 +87,7 @@ class Settings extends _Component {
 		);
 
 		add_settings_field(
-			'ph_mailchimp_api_key',
+			Plugin::OPTION_MAILCHIMP_API_KEY,
 			__( 'API key', Plugin::DOMAIN ),
 			array( $this, 'render_api_key' ),
 			'ph_mailchimp_settings',
@@ -96,7 +96,7 @@ class Settings extends _Component {
 		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_MAILCHIMP_API_KEY );
 
 		add_settings_field(
-			'ph_mailchimp_ga',
+			Plugin::OPTION_GA_API_KEY,
 			__( 'Google Analytics ID', Plugin::DOMAIN ),
 			array( $this, 'render_ga' ),
 			'ph_mailchimp_settings',
@@ -124,6 +124,10 @@ class Settings extends _Component {
 
 	}
 
+	public function getUrl(){
+	    return admin_url( 'options-general.php?page=ph_mailchimp_settings' );
+    }
+
 
 	/**
 	 * action link to settings on plugins list page
@@ -134,7 +138,7 @@ class Settings extends _Component {
 	 */
 	public function add_action_links( $links ) {
 		return array_merge( $links, array(
-			'<a href="' . admin_url( 'options-general.php?page=ph_mailchimp_settings' ) . '">' . __( "Settings", Plugin::DOMAIN ) . '</a>'
+			'<a href="' . $this->getUrl() . '">' . __( "Settings", Plugin::DOMAIN ) . '</a>'
 		) );
 	}
 
@@ -166,11 +170,15 @@ class Settings extends _Component {
 	}
 
 	public function render_api_key() {
-		$isConstantOption = Option::isApiKeyInConstant();
-		$apiKey           = Option::getApiKey();
-		$this->renderInput( "ph_mailchimp_api_key", $apiKey, $isConstantOption );
+
+		$this->renderInput(
+            Plugin::OPTION_MAILCHIMP_API_KEY,
+			Option::getApiKey(),
+			Option::isApiKeyInConstant()
+        );
+
 		echo "<br/>";
-		if ( $isConstantOption ) {
+		if ( Option::isApiKeyInConstant() ) {
 			echo "<span class='description'>";
 			_e( 'Included in wp-config.php.', Plugin::DOMAIN );
 			echo "</span> ";
@@ -337,8 +345,9 @@ class Settings extends _Component {
 
 	}
 
-	public function before_update() {
+	public function before_update($value) {
 		$this->plugin->repository->cacheClear();
+		return $value;
 	}
 
 

@@ -1,5 +1,5 @@
 import { PanelBody} from "@wordpress/components";
-import { getAudiencesLists } from "../utils/config.js";
+import { getAudiencesLists, getSettingsUrl } from "../utils/config.js";
 import { useRecentCampaign } from "../hooks/use-store.js";
 import { campaignIsLocked, campaignStateIsDone, isCampaign } from "../utils/campaign.js";
 import CampaignEditor from "./CampaignEditor.js";
@@ -13,7 +13,7 @@ const Plugin = ()=>{
     const hasRecentCampaign = isCampaign(campaign);
 
     if(audiences.length < 1){
-        return <PanelBody>Please make sure there is at least one Mailchimp.com audience available.</PanelBody>
+        return <PanelBody>Please make sure there is at least one Mailchimp.com audience available. <a href={getSettingsUrl()}>Goto Settings</a></PanelBody>
     }
 
     if( hasRecentCampaign && campaignIsLocked(campaign) ){

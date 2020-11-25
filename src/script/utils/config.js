@@ -1,4 +1,6 @@
 
+export const getSettingsUrl = ()=> PostToMailchimp.settingsUrl;
+
 //------------------------------------------------------------
 // audience and segments
 //------------------------------------------------------------

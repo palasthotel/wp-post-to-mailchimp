@@ -77,6 +77,9 @@ class API extends _Component {
 	 * @return Audience[]
 	 */
 	public function getAudiences( array $args = array() ) {
+
+		if($this->getApi() == false) return [];
+
 		$result = $this->getApi()->get( '/lists', apply_filters( Plugin::FILTER_GET_LISTS_ARGS, $args ) );
 		if ( ! is_array( $result ) || ! is_array( $result["lists"] ) ) {
 			return [];
@@ -93,6 +96,9 @@ class API extends _Component {
 	 * @return Audience|false
 	 */
 	public function getAudience( string $id ) {
+
+		if($this->getApi() == false) return false;
+
 		$result = $this->getApi()->get( "/lists/$id" );
 		return Audience::parse( $result );
 	}
@@ -103,6 +109,9 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function getSegments( string $audienceId ) {
+
+		if($this->getApi() == false) return false;
+
 		$result = $this->getApi()->get( "/lists/$audienceId/segments" );
 		if ( is_array( $result ) && is_array( $result["segments"] ) ) {
 			return array_map( function ( $item ) {
@@ -116,9 +125,12 @@ class API extends _Component {
 	/**
 	 * @param string $audienceId
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function getGroups( string $audienceId ) {
+
+		if($this->getApi() == false) return [];
+
 		$baseUrl = "/lists/$audienceId/interest-categories";
 		$result  = $this->getApi()->get( $baseUrl );
 		if ( ! is_array( $result ) || ! is_array( $result["categories"] ) ) {
@@ -142,6 +154,9 @@ class API extends _Component {
 	 * @return array|false
 	 */
 	public function getCampaigns( array $args = array() ) {
+
+		if($this->getApi() == false) return false;
+
 		$items = $this->getApi()->get( "/campaigns", $args );
 
 		return ( $items !== false ) ? $items["campaigns"] : false;
@@ -151,9 +166,12 @@ class API extends _Component {
 	 * @param string $campaignID
 	 * @param array $args
 	 *
-	 * @return array|bool|false
+	 * @return array|false
 	 */
 	public function getCampaign( string $campaignID, array $args = array() ) {
+
+		if($this->getApi() == false) return false;
+
 		return $this->getApi()->get( "/campaigns/$campaignID", $args );
 	}
 
@@ -163,6 +181,9 @@ class API extends _Component {
 	 * @return array|false
 	 */
 	public function addCampaign( MailchimpCampaignArgs $args ) {
+
+		if($this->getApi() == false) return false;
+
 		return $this->getApi()->post(
 			"/campaigns",
 			apply_filters( Plugin::FILTER_ADD_CAMPAIGN_ARGS, $args->toArray(), $args )
@@ -179,6 +200,8 @@ class API extends _Component {
 			return false;
 		}
 
+		if($this->getApi() == false) return false;
+
 		return $this->getApi()->patch(
 			"/campaigns/$args->campaign_id",
 			apply_filters( Plugin::FILTER_UPDATE_CAMPAIGN_ARGS, $args->toArray(), $args )
@@ -192,6 +215,9 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function deleteCampaign( string $campaignId ) {
+
+		if($this->getApi() == false) return false;
+
 		return $this->getApi()->delete( "/campaigns/$campaignId" );
 	}
 
@@ -205,6 +231,8 @@ class API extends _Component {
 	 * @return bool|array
 	 */
 	public function addContent( $campaignId, $html, $plain_text, $url = "" ) {
+
+		if($this->getApi() == false) return false;
 
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
@@ -224,6 +252,9 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function sendTestMail( string $campaignId, MailchimpTestMail $test ) {
+
+		if($this->getApi() == false) return false;
+
 		$mails = [];
 		if ( $test->type === MailchimpTestMail::TYPE_HTML || $test->type === MailchimpTestMail::TYPE_BOTH ) {
 			$mails[] = [
@@ -250,6 +281,8 @@ class API extends _Component {
 	 */
 	public function send( string $campaignId ) {
 
+		if($this->getApi() == false) return false;
+
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
@@ -263,6 +296,8 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function cancel( string $campaignId ) {
+
+		if($this->getApi() == false) return false;
 
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
@@ -279,6 +314,8 @@ class API extends _Component {
 	 * @return array|bool|false
 	 */
 	public function schedule( string $campaignId, DateTime $utc_datetime ) {
+
+		if($this->getApi() == false) return false;
 
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
@@ -303,6 +340,9 @@ class API extends _Component {
 	 * @return array|bool
 	 */
 	public function unschedule( string $campaignId ) {
+
+		if($this->getApi() == false) return false;
+
 		if ( WP_DEBUG && ! POST_TO_MAILCHIMP_DEBUG_OFF ) {
 			return false;
 		}
@@ -321,6 +361,9 @@ class API extends _Component {
 	 * @deprecated use getAudience
 	 */
 	public function getListById( $id ) {
+
+		if($this->getApi() == false) return false;
+
 		$lists = $this->getAudiences();
 		if ( ! is_array( $lists ) ) {
 			return false;

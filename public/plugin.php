@@ -22,6 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// you can use blog scope constants with POST_TO_MAILCHIMP_API_KEY_BLOG_$id
 if ( ! defined( 'POST_TO_MAILCHIMP_API_KEY' ) ) {
 	define( 'POST_TO_MAILCHIMP_API_KEY', false );
 }
@@ -31,6 +32,7 @@ if ( ! defined( 'POST_TO_MAILCHIMP_GOOGLE_ANALYTICS_API_KEY' ) ) {
 if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
 	define( 'POST_TO_MAILCHIMP_DEBUG_OFF', false );
 }
+
 
 /**
  * Class Plugin
