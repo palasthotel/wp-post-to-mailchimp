@@ -1,4 +1,5 @@
 "use strict";
+
 import {registerPlugin} from "@wordpress/plugins";
 import { PluginSidebarMoreMenuItem, PluginSidebar } from "@wordpress/edit-post";
 import Plugin from "./components/Plugin";
@@ -6,36 +7,16 @@ import Plugin from "./components/Plugin";
 // ---------------------------------------
 // validate post date selection
 // ---------------------------------------
-import './auto/post-date.js'
-import { TextControl } from "@wordpress/components";
-import { usePost } from "./hooks/use-post";
+import './auto/post-date.js';
 
-PostToMailchimp.customConfig = [
-    {
-        key: "subject",
-        Element: ({value, onChange})=> {
-            const post = usePost();
-            return <TextControl
-                label="Betreffzeile (optional)"
-                value={value || ""}
-                onChange={onChange}
-                placeholder={post.title}
-            />
-        }
-    },
-
-    {
-        key: "issue_number",
-        Element: ({value, onChange})=> {
-            return <TextControl
-                label="Ausgabennummer"
-                value={value || ""}
-                onChange={onChange}
-            />
-        }
-    }
-
-];
+if(typeof window.PostToMailchimp === typeof undefined){
+    window.PostToMailchimp = {
+        customConfig: [],
+    };
+}
+if(typeof window.PostToMailchimp.customConfig === typeof undefined){
+    window.PostToMailchimp.customConfig = [];
+}
 
 // ---------------------------------------
 // UI
