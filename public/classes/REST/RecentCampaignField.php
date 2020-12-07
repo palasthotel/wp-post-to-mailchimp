@@ -87,10 +87,14 @@ class RecentCampaignField extends _Component {
 							$campaign = $this->plugin->repository->getCampaign( $campaign->id );
 						}
 
-						if ( isset( $value["is_ready"] ) && true === $value["is_ready"] ) {
+						// update content of campaign
+						$this->plugin->repository->updateCampaignContent( $campaign );
 
-							// update content of campaign
-							$this->plugin->repository->updateCampaignContent( $campaign );
+						if (
+							isset( $value["is_ready"] ) && true === $value["is_ready"]
+							&&
+							in_array(get_post_status($post->ID), ["future", "publish"])
+						) {
 							$this->plugin->repository->startCampaign($campaign);
 						}
 
