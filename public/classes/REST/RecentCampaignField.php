@@ -89,6 +89,7 @@ class RecentCampaignField extends _Component {
 
 						// update content of campaign
 						$this->plugin->repository->updateCampaignContent( $campaign );
+						$this->plugin->repository->unscheduleCampaignUpdate($campaign->id);
 
 						if (
 							isset( $value["is_ready"] ) && true === $value["is_ready"]
@@ -109,6 +110,7 @@ class RecentCampaignField extends _Component {
 							isset( $value["segment_id"] ) ? intval( $value["segment_id"] ) : null
 						);
 						$this->plugin->repository->updateCampaignContent( $campaign );
+						$this->plugin->repository->unscheduleCampaignUpdate($campaign->id);
 						$this->plugin->repository->updateCampaignCustoms($campaign->id, $customs);
 					}
 

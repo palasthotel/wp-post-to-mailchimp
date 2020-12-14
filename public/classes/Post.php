@@ -25,7 +25,10 @@ class Post extends _Component {
 		if( get_post_status($post_id) == "trash" ) return;
 
 		$campaign = $this->plugin->repository->getRecentCampaign($post_id);
-		if($campaign instanceof Campaign) $this->plugin->repository->updateCampaignContent($campaign->id);
+		if($campaign instanceof Campaign){
+			$this->plugin->repository->updateCampaignContent($campaign->id);
+			$this->plugin->repository->unscheduleCampaignUpdate($campaign->id);
+		}
 	}
 
 	public function on_delete( $post_id ) {

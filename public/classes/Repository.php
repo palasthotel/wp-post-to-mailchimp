@@ -178,6 +178,8 @@ class Repository extends _Component {
 
 	/**
 	 * @param string $campaign_id mailchimp campaign id
+	 *
+	 * @return Campaign|null
 	 */
 	public function getCampaignById( string $campaign_id){
 		return $this->database->getCampaignById($campaign_id);
@@ -365,6 +367,23 @@ class Repository extends _Component {
 	}
 
 	/**
+	 * @param $campaign_id
+	 *
+	 * @return bool|int
+	 */
+	public function scheduleCampaignUpdate($campaign_id){
+		return $this->database->scheduleCampaignUpdate($campaign_id);
+	}
+
+	public function getScheduledCampaignUpdates(){
+		return $this->database->getScheduledCampaignUpdates();
+	}
+
+	public function unscheduleCampaignUpdate($campaign_id){
+		return $this->database->unscheduleCampaignUpdate($campaign_id);
+	}
+
+	/**
 	 * @param int|Campaign $id
 	 * @param array $customs_array
 	 *
@@ -539,6 +558,18 @@ class Repository extends _Component {
 	}
 
 	/**
+	 * @return int[]
+	 */
+	public function getFutureNewsletterPostIds(){
+		return get_posts([
+			"post_type" => "any",
+			"post_status" => "future",
+			"fields" => "ids",
+			Plugin::WP_QUERY_ARG_HAS_CAMPAIGN => true,
+		]);
+	}
+
+	/**
 	 * @param int|Campaign $id
 	 *
 	 * @return false
@@ -587,6 +618,5 @@ class Repository extends _Component {
 
 		return $campaign;
 	}
-
 
 }

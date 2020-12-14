@@ -11,6 +11,7 @@ use wpdb;
  * @property wpdb wpdb
  * @property string $table
  * @property string table_customize
+ * @property string table_pending_updates
  */
 class Database extends _Component {
 
@@ -19,6 +20,7 @@ class Database extends _Component {
 		$this->wpdb  = $wpdb;
 		$this->table = $wpdb->prefix . "post_to_mailchimp_campaigns";
 		$this->table_customize = $wpdb->prefix . "post_to_mailchimp_campaigns_customize";
+		$this->table_pending_updates = $wpdb->prefix . "post_to_mailchimp_pending_updates";
 	}
 
 	/**
@@ -205,6 +207,26 @@ class Database extends _Component {
 		return $this->wpdb->delete( $this->table, [ "post_id" => $post_id ], [ '%d' ] );
 	}
 
+	public function scheduleCampaignUpdate(int $campaign_id){
+		return $this->wpdb->replace(
+			$this->table_pending_updates,
+			["campaign_id" => $campaign_id]
+		);
+	}
+
+	public function getScheduledCampaignUpdates(){
+		return $this->wpdb->get_col(
+			"SELECT campaign_id FROM $this->table_pending_updates"
+		);
+	}
+
+	public function unscheduleCampaignUpdate(int $campaign_id){
+		return $this->wpdb->delete(
+			$this->table_pending_updates,
+			["campaign_id" => $campaign_id]
+		);
+	}
+
 	// ------------------------------------------------------------------------
 	// util functions
 	// ------------------------------------------------------------------------
@@ -247,9 +269,13 @@ class Database extends _Component {
 			 primary key (campaign_id, custom_key)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;" );
 
+		\dbDelta( "CREATE TABLE IF NOT EXISTS $this->table_pending_updates
+			(
+			 campaign_id bigint(20) unsigned,
+			 update_date datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			 primary key (campaign_id)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;" );
+
 	}
-
-
-
 
 }

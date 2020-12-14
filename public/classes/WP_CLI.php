@@ -3,11 +3,29 @@
 
 namespace Palasthotel\PostToMailchimp;
 
-
 class WP_CLI {
 
-	public function __construct() {
-		// TODO: custom cli cron to publish contents on time
+	/**
+	 * @return Plugin
+	 */
+	private function plugin(): Plugin {
+		return Plugin::instance();
+	}
+
+	/**
+	 * update all pending newsletter contents to mailchimp
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp ptm updatePendingContents
+	 *
+	 * @when after_wp_load
+	 */
+
+	public function updatePendingContents($args, $assoc_args){
+		$this->plugin()->schedule->updateCampaignContents(function($error){
+			CLI::error($error);
+		});
 	}
 
 }

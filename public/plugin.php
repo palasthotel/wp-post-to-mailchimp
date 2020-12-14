@@ -50,6 +50,9 @@ if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
  * @property Post post
  * @property Preview preview
  * @property PostsTable postsTable
+ * @property WP_Query_Extension wpQueryExtension
+ * @property BlockX blockX
+ * @property Schedule schedule
  */
 class Plugin {
 
@@ -80,6 +83,11 @@ class Plugin {
 	const REST_FIELD_RECENT_CAMPAIGN = "recent_campaign";
 
 	/**
+	 * wp query args
+	 */
+	const WP_QUERY_ARG_HAS_CAMPAIGN = "has_campaign";
+
+	/**
 	 * actions
 	 */
 	const ACTION_NEWSLETTER_THE_CONTENT = "post_to_mailchimp_the_content";
@@ -107,6 +115,11 @@ class Plugin {
 	const OPTION_SEGMENT_WHITELIST = "ph_mailchimp_segment_%s_whitelist";
 	const OPTION_TAG_WHITELIST = "ph_mailchimp_tag_%s_whitelist";
 	const OPTION_EMPTY_SEGMENT_ALLOWED_AUDIENCES_LIST = "ph_mailchimp_empty_segment_allowed_audiences_list";
+
+	/**
+	 * schedules
+	 */
+	const SCHEDULE_UPDATE_CAMPAIGNS = "post_to_mailchimp_update_campaigns";
 
 	/**
 	 * transients
@@ -152,6 +165,14 @@ class Plugin {
 		$this->post       = new Post( $this );
 		$this->postsTable = new PostsTable( $this );
 
+		$this->blockX = new BlockX($this);
+		$this->wpQueryExtension = new WP_Query_Extension($this);
+		$this->schedule = new Schedule($this);
+
+		if(class_exists("\WP_CLI")){
+			\WP_CLI::add_command('ptm', new WP_CLI());
+		}
+
 		require_once dirname( __FILE__ ) . "/inc/utils.php";
 
 		/**
@@ -160,8 +181,9 @@ class Plugin {
 		register_activation_hook( __FILE__, array( $this, "activation" ) );
 		register_deactivation_hook( __FILE__, array( $this, "deactivation" ) );
 
-		$this->database->createTables();
-
+		add_action('admin_init', function(){
+			$this->database->createTables();
+		});
 	}
 
 	/**
