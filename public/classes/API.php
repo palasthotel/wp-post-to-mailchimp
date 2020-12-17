@@ -276,7 +276,7 @@ class API extends _Component {
 			if($result !== true){
 				$error->add(
 					"test_mail_not_send",
-					sprintf( __("Could not send '%s' test mail", Plugin::DOMAIN), $mail["send_type"]),
+					sprintf( __("Could not send '%s' test mail.", Plugin::DOMAIN), $mail["send_type"]),
 					$result
 				);
 			}

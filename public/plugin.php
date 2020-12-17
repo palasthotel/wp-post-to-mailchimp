@@ -5,7 +5,7 @@
  * Description: Use your contents with Mailchimp.com API
  * Version: 2.0.0
  * Author: Palasthotel ( Edward Bock <eb@palasthotel.de> )
- * Author URI: http://www.palasthotel.de
+ * Author URI: https://www.palasthotel.de
  * Text Domain: post_to_mailchimp
  * Domain Path: /languages
  * Requires at least: 5.x
