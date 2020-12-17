@@ -1,0 +1,23 @@
+.ptm-error{
+    border-left: 5px solid #cc1818;
+    background: #f4a2a2;
+    padding: 10px 5px 5px 5px;
+    & + & {
+        margin-top: 4px;
+        border-top:1px solid #e3e3e3;
+    }
+}
+.ptm-error__message{
+    
+}
+.ptm-error__message + .ptm-error__detail{
+    margin-top: 4px;
+}
+.ptm-error__detail{
+    padding: 2px;
+    background: #efefef;
+    border:1px solid #e3e3e3;
+    & + & {
+        margin-top: 4px;
+    }
+}

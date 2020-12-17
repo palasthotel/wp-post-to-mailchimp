@@ -11,6 +11,8 @@ import { useEffect } from "@wordpress/element"
 import './auto/post-date.js';
 import { useErrors } from "./hooks/use-store";
 import { showError } from "./utils/notice";
+import ErrorMessage from "./components/ErrorMessage";
+import { Notice } from "@wordpress/components";
 ;
 
 if(typeof window.PostToMailchimp === typeof undefined){
@@ -32,18 +34,10 @@ registerPlugin(PLUGIN_NAME, {
         useEffect(()=>{
             if(errors.length > 0){
                 const error = errors[errors.length-1];
-                let data = "";
-                if(error.data !== null && typeof error.data === typeof {}){
-                    data = " "+JSON.stringify(error.data);
-                }
-                showError(error.message+data);
+                showError(error.message);
                 if(typeof error.additional_errors === typeof []){
                     for(const e of error.additional_errors){
-                        let innerData = "";
-                        if(error.data !== null && typeof error.data === typeof {}){
-                            innerData = " "+JSON.stringify(error.data);
-                        }
-                        showError(e.message+innerData);
+                        showError(e.message);
                     }
                 }
             }
