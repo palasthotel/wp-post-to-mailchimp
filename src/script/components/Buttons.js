@@ -31,7 +31,7 @@ export const SendTestButton = ()=>{
         return null;
     }
 
-    const validEmails = emails.filter(validateEmail)
+    const validEmails = emails.filter(validateEmail);
 
     const disabled = isCampaignNew || isCampaignDraft || validEmails.length == 0 || isRequesting || isSaving;
 

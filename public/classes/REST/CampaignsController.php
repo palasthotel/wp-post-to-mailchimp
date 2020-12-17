@@ -6,6 +6,7 @@ namespace Palasthotel\PostToMailchimp\REST;
 use Palasthotel\PostToMailchimp\Model\Campaign;
 use Palasthotel\PostToMailchimp\Model\MailchimpTestMail;
 use Palasthotel\PostToMailchimp\Option;
+use Palasthotel\PostToMailchimp\Plugin;
 use Palasthotel\PostToMailchimp\WP_REST;
 use WP_REST_Request;
 use WP_REST_Server;
@@ -155,8 +156,8 @@ class CampaignsController extends _BaseController {
 		$type            = $request->get_param( WP_REST::ARG_EMAIL_TYPE );
 
 		$campaign = $this->plugin->repository->getCampaign( $id );
-		if ( ! ( $campaign instanceof Campaign ) ) {
-			return false;
+		if ( !( $campaign instanceof Campaign ) ) {
+			return new \WP_Error("campaign_not_found", sprintf( __("Could not find any campaign with id: %s.", Plugin::DOMAIN), $id) );
 		}
 
 		return $this->plugin->api->sendTestMail( $campaign->campaign_id, new MailchimpTestMail(

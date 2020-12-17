@@ -118,3 +118,5 @@ export const useSendTestEmails = ()=>{
         }
     }
 }
+
+export const useErrors = ()=> useSelect(select => select(STORE_NAME).getErrors());

@@ -106,6 +106,11 @@ class Plugin {
 	const FILTER_ADD_TEMPLATE_PATHS = "post_to_mailchimp_add_template_paths";
 
 	/**
+	 * Post metas
+	 */
+	const POST_META_CAMPAIGN_SYNC_TIMESTAMP = "_ptm_campaign_sync_timestamp";
+
+	/**
 	 * options
 	 */
 	const OPTION_MAILCHIMP_API_KEY = "ph_mailchimp_api_key";

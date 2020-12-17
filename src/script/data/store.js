@@ -5,12 +5,12 @@ import { validateEmail } from "../utils/email";
 // ---------------------------------------------
 // default store state
 // ---------------------------------------------
-// TODO: collect default from settings?
 const testEmailAddressesCache = localStorage.getItem("gutenberg-post-to-mailchimp__test_email_addresses") || "[]"
 const DEFAULT_STATE = {
     isRequesting: false,
     campaigns: [],
     testEmailAddresses: JSON.parse(testEmailAddressesCache).filter(validateEmail), 
+    errors: [],
 };
 
 // ---------------------------------------------
@@ -30,16 +30,14 @@ const CAMPAIGN_TEST = (campaign, email_addresses)=>({
 const CAMPAIGN_SEND = (post_id, campaign_id)=>({
     type: 'CAMPAIGN_UPDATE',
     path: `/post-to-mailchimp/v1/campaigns/${post_id}/campaign/${campaign_id}/send`,
-    data: {
-        email_addresses: email_addresses,
-    }
 });
 
 // ---------------------------------------------
 // action generators
 // ---------------------------------------------
 const actionNone = ()=> ({type:'none'})
-const actionIsRequesting = (isRequesting) => ({type: 'SET_IS_REQUESTING', isRequesting})
+const actionIsRequesting = (isRequesting) => ({type: 'SET_IS_REQUESTING', isRequesting});
+const actionAddError = (error) => ({type: 'ADD_ERROR', error});
 
 // ---------------------------------------------
 // public actions that can be used with dispatch
@@ -66,7 +64,22 @@ const actions = {
     },
     * sendTestMail(campaign, emailAddresses){
         yield actionIsRequesting(true);
-        const result = yield CAMPAIGN_TEST(campaign, emailAddresses)
+        let result = null;
+        try{
+            result = yield CAMPAIGN_TEST(campaign, emailAddresses);
+        } catch(e){
+            result = e;
+        }
+        
+        if(typeof result === typeof {} && typeof result.code === typeof ""){
+            yield actionAddError(result);
+        } else if(typeof result === typeof [] && result.length > 0){
+            for(const item of result){
+                if(typeof item === typeof {} && typeof item.code === typeof ""){
+                    yield actionAddError(item);
+                }
+            }
+        }
         return actionIsRequesting(false);
     },
     * sendCampaign(campaign){
@@ -102,6 +115,14 @@ registerStore( STORE_NAME, {
                     ...state,
                     testEmailAddresses: action.testEmailAddresses
                 }
+            case 'ADD_ERROR':
+                return {
+                    ...state,
+                    errors:[
+                        ...state.errors,
+                        action.error,
+                    ]
+                }
         }
         return state;
     },
@@ -123,6 +144,9 @@ registerStore( STORE_NAME, {
         getTestEmailAddresses(state){
             return state.testEmailAddresses;
         },
+        getErrors(state){
+            return state.errors;
+        },
     },
      // ----------------------------------------------------------------
     //  helps resolving the equivalent selector function
@@ -130,9 +154,9 @@ registerStore( STORE_NAME, {
     resolvers: {
         * getCampaigns(post_id){
             if(typeof post_id === typeof undefined) return actionNone();
-            yield actionIsRequesting(true)
+            yield actionIsRequesting(true);
             const campaigns = yield CAMPAIGNS_FETCH(post_id);
-            yield actionIsRequesting(false)
+            yield actionIsRequesting(false);
             return actions.setCampaigns(campaigns);
         },
     },

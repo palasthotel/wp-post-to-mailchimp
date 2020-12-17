@@ -249,7 +249,7 @@ class API extends _Component {
 	 * @param string $campaignId
 	 * @param MailchimpTestMail $test
 	 *
-	 * @return array|bool
+	 * @return bool|\WP_Error
 	 */
 	public function sendTestMail( string $campaignId, MailchimpTestMail $test ) {
 
@@ -269,9 +269,20 @@ class API extends _Component {
 			];
 		}
 
-		return array_map( function ( $mail ) use ( $campaignId ) {
-			return $this->getApi()->post( "/campaigns/$campaignId/actions/test", $mail );
-		}, $mails );
+		$error = new \WP_Error();
+		foreach ($mails as $mail){
+
+			$result = $this->getApi()->post( "/campaigns/$campaignId/actions/test", $mail );
+			if($result !== true){
+				$error->add(
+					"test_mail_not_send",
+					sprintf( __("Could not send '%s' test mail", Plugin::DOMAIN), $mail["send_type"]),
+					$result
+				);
+			}
+		}
+
+		return $error->has_errors() ? $error : true;
 	}
 
 	/**

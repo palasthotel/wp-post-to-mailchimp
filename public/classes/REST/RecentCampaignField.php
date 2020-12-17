@@ -28,6 +28,20 @@ class RecentCampaignField extends _Component {
 					$postId   = $post["id"];
 					$campaign = $this->plugin->repository->getRecentCampaign( $postId );
 
+					if($campaign instanceof Campaign){
+						if($campaign->state === Campaign::MC_STATUS_SCHEDULED || $campaign->state === Campaign::MC_STATUS_SENDING){
+							$time = intval(get_post_meta($postId, Plugin::POST_META_CAMPAIGN_SYNC_TIMESTAMP, true));
+							$now = time();
+							if( $time < $now - 8 ){
+								update_post_meta($postId, Plugin::POST_META_CAMPAIGN_SYNC_TIMESTAMP, time());
+								$campaign = $this->plugin->repository->fetchCampaign($campaign);
+							}
+						}
+						if($campaign->state === Campaign::MC_STATUS_SENT){
+							delete_post_meta($postId, Plugin::POST_META_CAMPAIGN_SYNC_TIMESTAMP);
+						}
+					}
+
 					return null === $campaign ? new \stdClass() : $campaign;
 				},
 				'update_callback'     => function ( $value, $post ) {
