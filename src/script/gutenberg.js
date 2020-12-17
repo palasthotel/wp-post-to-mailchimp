@@ -32,10 +32,18 @@ registerPlugin(PLUGIN_NAME, {
         useEffect(()=>{
             if(errors.length > 0){
                 const error = errors[errors.length-1];
-                showError(error.message);
+                let data = "";
+                if(error.data !== null && typeof error.data === typeof {}){
+                    data = " "+JSON.stringify(error.data);
+                }
+                showError(error.message+data);
                 if(typeof error.additional_errors === typeof []){
                     for(const e of error.additional_errors){
-                        showError(e.message);
+                        let innerData = "";
+                        if(error.data !== null && typeof error.data === typeof {}){
+                            innerData = " "+JSON.stringify(error.data);
+                        }
+                        showError(e.message+innerData);
                     }
                 }
             }
