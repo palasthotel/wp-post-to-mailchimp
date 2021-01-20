@@ -235,7 +235,7 @@ class Database extends _Component {
 	 *
 	 * @return Campaign
 	 */
-	private function campaignRowToModel( object $row ) {
+	private function campaignRowToModel( $row ) {
 		$attributes = ! empty( $row->attributes ) ? json_decode( $row->attributes, true ) : null;
 
 		return Campaign::build( $row->id, $row->post_id )
