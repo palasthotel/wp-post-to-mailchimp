@@ -1,5 +1,5 @@
 import apiFetch from "@wordpress/api-fetch";
-import { registerStore } from "@wordpress/data";
+import { createReduxStore, register } from "@wordpress/data";
 import { validateEmail } from "../utils/email";
 
 // ---------------------------------------------
@@ -69,6 +69,7 @@ const actions = {
             result = yield CAMPAIGN_TEST(campaign, emailAddresses);
         } catch(e){
             result = e;
+            console.error(e);
         }
         
         if(typeof result === typeof {} && typeof result.code === typeof ""){
@@ -93,7 +94,7 @@ const actions = {
 // register our custom store
 // ------------------------------------------------------
 export const STORE_NAME = 'post-to-mailchimp';
-registerStore( STORE_NAME, {
+const store = createReduxStore( STORE_NAME, {
     // ------------------------------------------------------
     // reduce actions to new state
     // ------------------------------------------------------
@@ -178,3 +179,5 @@ registerStore( STORE_NAME, {
         }
     },
 })
+
+register(store);
