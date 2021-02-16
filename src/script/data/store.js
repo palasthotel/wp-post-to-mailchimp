@@ -1,5 +1,5 @@
 import apiFetch from "@wordpress/api-fetch";
-import { createReduxStore, register } from "@wordpress/data";
+import { registerStore } from "@wordpress/data";
 import { validateEmail } from "../utils/email";
 
 // ---------------------------------------------
@@ -94,7 +94,7 @@ const actions = {
 // register our custom store
 // ------------------------------------------------------
 export const STORE_NAME = 'post-to-mailchimp';
-const store = createReduxStore( STORE_NAME, {
+registerStore( STORE_NAME, {
     // ------------------------------------------------------
     // reduce actions to new state
     // ------------------------------------------------------
@@ -179,5 +179,3 @@ const store = createReduxStore( STORE_NAME, {
         }
     },
 })
-
-register(store);
