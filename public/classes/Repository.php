@@ -225,7 +225,7 @@ class Repository extends _Component {
 
 		// create campaign at mailchimp
 		$args = MailchimpCampaignArgs::build()
-		                             ->setTitle( get_the_title( $post_id ) )
+		                             ->setTitle( html_entity_decode(get_the_title( $post_id )) )
 		                             ->setAudience( $audience )
 		                             ->setSegmentId( $segmentId );
 
@@ -274,7 +274,7 @@ class Repository extends _Component {
 
 		$args = MailchimpCampaignArgs::build()
 		                             ->setCampaignId( $campaign->campaign_id )
-		                             ->setTitle( get_the_title( $campaign->post_id ) )
+		                             ->setTitle( html_entity_decode(get_the_title( $campaign->post_id )) )
 		                             ->setAudience( $audience )
 		                             ->setSegmentId( $segmentId );
 
