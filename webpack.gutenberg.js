@@ -9,7 +9,5 @@ module.exports = {
 	},
 	output: {
 		path: path.resolve(__dirname, './public/js/gutenberg/.'),
-		filename: '[name].js',
-		sourceMapFilename: '[name].map',
 	},
 }

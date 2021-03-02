@@ -2,6 +2,7 @@
 import { useDispatch, useSelect } from "@wordpress/data";
 
 export const usePost = ()=> useSelect( select => select('core/editor').getCurrentPost() );
+export const usePostEdits = ()=> useSelect( select => select('core/editor').getPostEdits() );
 export const useIsSavingPost = ()=> useSelect( select => select('core/editor').isSavingPost() );
 
 export const usePostDate = ()=> {

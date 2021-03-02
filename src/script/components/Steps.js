@@ -9,6 +9,8 @@ import FinishControl from "./FinishControl"
 import PreviewUrl from "./PreviewUrl"
 import ScheduleControl from "./ScheduleControl"
 import SegmentsControl from "./SegmentsControl"
+import {usePost, usePostEdits} from "../hooks/use-post";
+import ErrorMessage from "./ErrorMessage";
 
 export const Step1 = ()=>{
 
@@ -43,14 +45,20 @@ export const Step2 = ()=>{
 
 export const Step3 = ()=>{
 
-    const [campaign] = useRecentCampaign()
+    const post = usePost();
+    const postEdits = usePostEdits();
+    const [campaign] = useRecentCampaign();
     if(!campaign.id) return null;
+
+    const isReadyResponse = window.PostToMailchimp.isReadyToSendOrSchedule(post, postEdits, campaign);
+    const isReady =  typeof isReadyResponse === typeof true;
 
     return <PanelBody
         title="Step 3: Deliver"
         initialOpen={false}
     >
-        <ScheduleControl />
-        <FinishControl />
+        {!isReady && <p>{isReadyResponse}</p>}
+        {isReady && <ScheduleControl />}
+        {isReady && <FinishControl />}
     </PanelBody>
 }

@@ -24,6 +24,18 @@ if(typeof window.PostToMailchimp.customConfig === typeof undefined){
     window.PostToMailchimp.customConfig = [];
 }
 
+if(typeof window.PostToMailchimp.isReadyToSendOrSchedule === typeof undefined){
+    window.PostToMailchimp.isReadyToSendOrSchedule = (post, postEdits, campaign) => {
+        if( post.title.length > 0 && typeof postEdits.title === typeof undefined){
+            return true;
+        }
+        if(typeof postEdits.title === typeof "" && postEdits.title.length > 0){
+            return true;
+        }
+        return "Add a post title which will be used as the email subject and save the post.";
+    }
+}
+
 // ---------------------------------------
 // UI
 // ---------------------------------------

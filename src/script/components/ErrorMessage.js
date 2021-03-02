@@ -5,8 +5,6 @@ const dataKeys = ["title", "detail"];
 
 const ErrorMessage = ({message, code, data = null })=>{
 
-    if(!data || Object.keys(data).length === 0) return null;
-
     let additional = null;
     if(data && Object.keys(data).length){
         if(
