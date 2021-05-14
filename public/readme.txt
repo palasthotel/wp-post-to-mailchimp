@@ -34,6 +34,9 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 == Changelog ==
 
+= 2.0.1 =
+* Added QuickLink to Posts admin table
+
 = 2.0.0 =
 * Gutenberg support!
 * dropped classic editor support
