@@ -1,8 +1,7 @@
 {
+    "name": "palasthotel/post-to-mailchimp",
+    "description": "Mailchimp integration",
     "autoload": {
-        "classmap": [
-            "classes"
-        ],
         "psr-4": {
             "Palasthotel\\PostToMailchimp\\": "classes"
         }

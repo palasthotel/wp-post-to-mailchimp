@@ -29,33 +29,7 @@ class ComposerStaticInitfe98777d43565134f1643d8f5712d151
     );
 
     public static $classMap = array (
-        'Palasthotel\\PostToMailchimp\\API' => __DIR__ . '/../..' . '/classes/API.php',
-        'Palasthotel\\PostToMailchimp\\Assets' => __DIR__ . '/../..' . '/classes/Assets.php',
-        'Palasthotel\\PostToMailchimp\\BlockX' => __DIR__ . '/../..' . '/classes/BlockX.php',
-        'Palasthotel\\PostToMailchimp\\Database' => __DIR__ . '/../..' . '/classes/Database.php',
-        'Palasthotel\\PostToMailchimp\\Gutenberg' => __DIR__ . '/../..' . '/classes/Gutenberg.php',
-        'Palasthotel\\PostToMailchimp\\Model\\Audience' => __DIR__ . '/../..' . '/classes/Model/Audience.php',
-        'Palasthotel\\PostToMailchimp\\Model\\Campaign' => __DIR__ . '/../..' . '/classes/Model/Campaign.php',
-        'Palasthotel\\PostToMailchimp\\Model\\GroupCategory' => __DIR__ . '/../..' . '/classes/Model/GroupCategory.php',
-        'Palasthotel\\PostToMailchimp\\Model\\GroupInterest' => __DIR__ . '/../..' . '/classes/Model/GroupInterest.php',
-        'Palasthotel\\PostToMailchimp\\Model\\MailchimpCampaignArgs' => __DIR__ . '/../..' . '/classes/Model/MailchimpCampaignArgs.php',
-        'Palasthotel\\PostToMailchimp\\Model\\MailchimpTestMail' => __DIR__ . '/../..' . '/classes/Model/MailchimpTestMail.php',
-        'Palasthotel\\PostToMailchimp\\Model\\Segment' => __DIR__ . '/../..' . '/classes/Model/Segment.php',
-        'Palasthotel\\PostToMailchimp\\Option' => __DIR__ . '/../..' . '/classes/Option.php',
-        'Palasthotel\\PostToMailchimp\\Post' => __DIR__ . '/../..' . '/classes/Post.php',
-        'Palasthotel\\PostToMailchimp\\PostsTable' => __DIR__ . '/../..' . '/classes/PostsTable.php',
-        'Palasthotel\\PostToMailchimp\\Preview' => __DIR__ . '/../..' . '/classes/Preview.php',
-        'Palasthotel\\PostToMailchimp\\REST\\CampaignsController' => __DIR__ . '/../..' . '/classes/REST/CampaignsController.php',
-        'Palasthotel\\PostToMailchimp\\REST\\RecentCampaignField' => __DIR__ . '/../..' . '/classes/REST/RecentCampaignField.php',
-        'Palasthotel\\PostToMailchimp\\REST\\_BaseController' => __DIR__ . '/../..' . '/classes/REST/_BaseController.php',
-        'Palasthotel\\PostToMailchimp\\Repository' => __DIR__ . '/../..' . '/classes/Repository.php',
-        'Palasthotel\\PostToMailchimp\\Schedule' => __DIR__ . '/../..' . '/classes/Schedule.php',
-        'Palasthotel\\PostToMailchimp\\Settings' => __DIR__ . '/../..' . '/classes/Settings.php',
-        'Palasthotel\\PostToMailchimp\\Templates' => __DIR__ . '/../..' . '/classes/Templates.php',
-        'Palasthotel\\PostToMailchimp\\WP_CLI' => __DIR__ . '/../..' . '/classes/WP_CLI.php',
-        'Palasthotel\\PostToMailchimp\\WP_Query_Extension' => __DIR__ . '/../..' . '/classes/WP_Query_Extension.php',
-        'Palasthotel\\PostToMailchimp\\WP_REST' => __DIR__ . '/../..' . '/classes/WP_REST.php',
-        'Palasthotel\\PostToMailchimp\\_Component' => __DIR__ . '/../..' . '/classes/_Component.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

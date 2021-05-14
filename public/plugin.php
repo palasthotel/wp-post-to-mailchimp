@@ -53,6 +53,7 @@ if ( ! defined( 'POST_TO_MAILCHIMP_DEBUG_OFF' ) ) {
  * @property WP_Query_Extension wpQueryExtension
  * @property BlockX blockX
  * @property Schedule schedule
+ * @property NewsletterTypes $types
  */
 class Plugin {
 
@@ -104,6 +105,8 @@ class Plugin {
 	const FILTER_SCHEDULE_CAMPAIGN_ARGS = "post_to_mailchimp_schedule_campaign_args";
 	const FILTER_POST_TYPES = "post_to_mailchimp_post_types";
 	const FILTER_ADD_TEMPLATE_PATHS = "post_to_mailchimp_add_template_paths";
+	const FILTER_NEWSLETTER_TYPES = "post_to_mailchimp_newsletter_types";
+	const FILTER_NEWSLETTER_TYPE_ID = "post_to_mailchimp_newsletter_type_id";
 
 	/**
 	 * Post metas
@@ -158,6 +161,7 @@ class Plugin {
 		$this->database   = new Database( $this );
 		$this->api        = new API( $this );
 		$this->repository = new Repository( $this );
+		$this->types      = new NewsletterTypes();
 
 		$this->settings = new Settings( $this );
 
