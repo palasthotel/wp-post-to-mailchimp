@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'ac146d0465208661b21c2616543ca4374229864f',
+    'reference' => '09b93ce979c24544ad1b26558856ba9288255bf2',
     'name' => 'palasthotel/post-to-mailchimp',
   ),
   'versions' => 
@@ -27,7 +27,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'ac146d0465208661b21c2616543ca4374229864f',
+      'reference' => '09b93ce979c24544ad1b26558856ba9288255bf2',
     ),
   ),
 );
