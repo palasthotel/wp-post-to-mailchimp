@@ -38,7 +38,7 @@ class Schedule extends _Component {
 					continue;
 				}
 			}
-			$this->plugin->repository->unscheduleCampaignUpdate($campaign->id);
+			$this->plugin->repository->unscheduleCampaignUpdate($campaign_id);
 		}
 	}
 
