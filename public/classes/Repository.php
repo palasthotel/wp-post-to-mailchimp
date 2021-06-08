@@ -181,8 +181,8 @@ class Repository extends _Component {
 	 *
 	 * @return Campaign|null
 	 */
-	public function getCampaignById( string $campaign_id){
-		return $this->database->getCampaignById($campaign_id);
+	public function getCampaignById( string $campaign_id ) {
+		return $this->database->getCampaignById( $campaign_id );
 	}
 
 	/**
@@ -225,7 +225,7 @@ class Repository extends _Component {
 
 		// create campaign at mailchimp
 		$args = MailchimpCampaignArgs::build()
-		                             ->setTitle( html_entity_decode(get_the_title( $post_id )) )
+		                             ->setTitle( html_entity_decode( get_the_title( $post_id ) ) )
 		                             ->setAudience( $audience )
 		                             ->setSegmentId( $segmentId );
 
@@ -274,7 +274,7 @@ class Repository extends _Component {
 
 		$args = MailchimpCampaignArgs::build()
 		                             ->setCampaignId( $campaign->campaign_id )
-		                             ->setTitle( html_entity_decode(get_the_title( $campaign->post_id )) )
+		                             ->setTitle( html_entity_decode( get_the_title( $campaign->post_id ) ) )
 		                             ->setAudience( $audience )
 		                             ->setSegmentId( $segmentId );
 
@@ -371,16 +371,16 @@ class Repository extends _Component {
 	 *
 	 * @return bool|int
 	 */
-	public function scheduleCampaignUpdate($campaign_id){
-		return $this->database->scheduleCampaignUpdate($campaign_id);
+	public function scheduleCampaignUpdate( $campaign_id ) {
+		return $this->database->scheduleCampaignUpdate( $campaign_id );
 	}
 
-	public function getScheduledCampaignUpdates(){
+	public function getScheduledCampaignUpdates() {
 		return $this->database->getScheduledCampaignUpdates();
 	}
 
-	public function unscheduleCampaignUpdate($campaign_id){
-		return $this->database->unscheduleCampaignUpdate($campaign_id);
+	public function unscheduleCampaignUpdate( $campaign_id ) {
+		return $this->database->unscheduleCampaignUpdate( $campaign_id );
 	}
 
 	/**
@@ -389,8 +389,8 @@ class Repository extends _Component {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function updateCampaignCustoms($id, array $customs_array){
-		$campaign = $this->getCampaignOrFalse($id);
+	public function updateCampaignCustoms( $id, array $customs_array ) {
+		$campaign = $this->getCampaignOrFalse( $id );
 		if ( false === $campaign ) {
 			return new WP_Error(
 				404,
@@ -401,7 +401,7 @@ class Repository extends _Component {
 			);
 		}
 
-		$this->database->updateCampaignCustoms($campaign->id, $customs_array);
+		$this->database->updateCampaignCustoms( $campaign->id, $customs_array );
 
 		return true;
 	}
@@ -554,7 +554,7 @@ class Repository extends _Component {
 
 		$campaign = $this->fetchCampaign( $campaign );
 
-		do_action(Plugin::ACTION_CAMPAIGN_WAS_SCHEDULED, $campaign);
+		do_action( Plugin::ACTION_CAMPAIGN_WAS_SCHEDULED, $campaign );
 
 		return $result;
 	}
@@ -562,13 +562,13 @@ class Repository extends _Component {
 	/**
 	 * @return int[]
 	 */
-	public function getFutureNewsletterPostIds(){
-		return get_posts([
-			"post_type" => "any",
-			"post_status" => "future",
-			"fields" => "ids",
+	public function getFutureNewsletterPostIds() {
+		return get_posts( [
+			"post_type"                       => "any",
+			"post_status"                     => "future",
+			"fields"                          => "ids",
 			Plugin::WP_QUERY_ARG_HAS_CAMPAIGN => true,
-		]);
+		] );
 	}
 
 	/**
