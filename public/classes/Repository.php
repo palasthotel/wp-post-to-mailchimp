@@ -552,7 +552,9 @@ class Repository extends _Component {
 			);
 		}
 
-		$this->fetchCampaign( $campaign );
+		$campaign = $this->fetchCampaign( $campaign );
+
+		do_action(Plugin::ACTION_CAMPAIGN_WAS_SCHEDULED, $campaign);
 
 		return $result;
 	}

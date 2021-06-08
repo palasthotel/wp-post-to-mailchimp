@@ -93,6 +93,7 @@ class Plugin {
 	 */
 	const ACTION_NEWSLETTER_THE_CONTENT = "post_to_mailchimp_the_content";
 	const ACTION_NEWSLETTER_THE_CONTENT_PLAINTEXT = "post_to_mailchimp_the_content_plaintext";
+	const ACTION_CAMPAIGN_WAS_SCHEDULED = "post_to_mailchimp_campaign_was_scheduled";
 
 	/**
 	 * filters

@@ -3,8 +3,8 @@ Contributors: palasthotel, edwardbock
 Donate link: http://palasthotel.de/
 Tags: mailchimp, newsletter
 Requires at least: 5.0
-Tested up to: 5.5.1
-Stable tag: 2.0.0
+Tested up to: 5.7.2
+Stable tag: 2.0.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl
 
@@ -33,6 +33,9 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 
 == Changelog ==
+
+= 2.0.2 =
+* Added action when campaign was scheduled
 
 = 2.0.1 =
 * Added QuickLink to Posts admin table
