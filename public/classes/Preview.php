@@ -13,11 +13,21 @@ class Preview extends _Component {
 	}
 
 	public function getHTMLUrl($post_id){
-		return admin_url('admin-ajax.php?action='.static::ACTION."&post_id=$post_id");
+		$additional = "";
+		if(function_exists("wpml_get_current_language")) {
+			$lang = wpml_get_current_language();
+			$additional.="&lang=$lang";
+		}
+		return admin_url('admin-ajax.php?action='.static::ACTION."&post_id={$post_id}{$additional}");
 	}
 
 	public function getPlaintextUrl($post_id){
-		return admin_url('admin-ajax.php?action='.static::ACTION."&post_id=$post_id&version=plaintext");
+		$additional = "";
+		if(function_exists("wpml_get_current_language")) {
+			$lang = wpml_get_current_language();
+			$additional.="&lang=$lang";
+		}
+		return admin_url('admin-ajax.php?action='.static::ACTION."&post_id={$post_id}&version=plaintext{$additional}");
 	}
 
 	public function preview(){
