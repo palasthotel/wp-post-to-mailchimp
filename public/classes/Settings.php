@@ -88,7 +88,7 @@ class Settings extends _Component {
 					}
 				}
 
-				if ( is_array( $_POST["ptm_allow_no_segment_selection_${typeId}"] ) ) {
+				if ( isset( $_POST["ptm_allow_no_segment_selection_${typeId}"] ) && is_array( $_POST["ptm_allow_no_segment_selection_${typeId}"] ) ) {
 					Option::setEmptySegmentsAllowed(
 						array_values(
 							array_map(
