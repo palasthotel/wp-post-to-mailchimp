@@ -4,7 +4,7 @@ Donate link: http://palasthotel.de/
 Tags: mailchimp, newsletter
 Requires at least: 5.0
 Tested up to: 5.7.2
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl
 
@@ -33,6 +33,10 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 
 == Changelog ==
+
+
+= 2.0.4 =
+* Added action when campaign was sent
 
 = 2.0.3 =
 * Added support for process-log plugin

@@ -3,7 +3,7 @@
  * Plugin Name: Post to Mailchimp
  * Plugin URI: https://github.com/Palasthotel
  * Description: Use your contents with Mailchimp.com API
- * Version: 2.0.3
+ * Version: 2.0.4
  * Author: Palasthotel ( Edward Bock <eb@palasthotel.de> )
  * Author URI: https://www.palasthotel.de
  * Text Domain: post_to_mailchimp
@@ -93,6 +93,7 @@ class Plugin {
 	 */
 	const ACTION_NEWSLETTER_THE_CONTENT = "post_to_mailchimp_the_content";
 	const ACTION_NEWSLETTER_THE_CONTENT_PLAINTEXT = "post_to_mailchimp_the_content_plaintext";
+	const ACTION_CAMPAIGN_WAS_SENT = "post_to_mailchimp_campaign_was_sent";
 	const ACTION_CAMPAIGN_WAS_SCHEDULED = "post_to_mailchimp_campaign_was_scheduled";
 
 	/**

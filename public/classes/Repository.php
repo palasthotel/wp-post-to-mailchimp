@@ -598,7 +598,9 @@ class Repository extends _Component {
 			return $log;
 		});
 
-		$this->fetchCampaign( $campaign );
+		$campaign = $this->fetchCampaign( $campaign );
+
+		do_action( Plugin::ACTION_CAMPAIGN_WAS_SENT, $campaign );
 
 		return true;
 	}
