@@ -10,6 +10,7 @@ use Palasthotel\PostToMailchimp\Model\Campaign;
 use Palasthotel\PostToMailchimp\Model\GroupCategory;
 use Palasthotel\PostToMailchimp\Model\MailchimpCampaignArgs;
 use Palasthotel\PostToMailchimp\Model\Segment;
+use Palasthotel\ProcessLog\Model\ProcessLog;
 use WP_Error;
 
 /**
@@ -62,6 +63,14 @@ class Repository extends _Component {
 		}
 
 		$this->audiences = $this->api->getAudiences();
+		Log::write(function(ProcessLog $log){
+			$log
+				->setMessage("Fetch audiences")
+				->setChangedDataField("audiences")
+				->setChangedDataValueNew($this->audiences)
+			    ->setEventType("mailchimp_api_fetch");
+			return $log;
+		});
 		set_transient( Plugin::TRANSIENT_LISTS, $this->audiences, 60 * 10 );
 
 		return $this->audiences;
@@ -85,6 +94,14 @@ class Repository extends _Component {
 			}
 		}
 		$audience                             = $this->api->getAudience( $audienceListId );
+		Log::write(function(ProcessLog $log) use ($audience, $audienceListId){
+			$log
+				->setMessage("Fetch single audience")
+				->setChangedDataField("audience")
+				->setChangedDataValueNew($audience)
+				->setEventType("mailchimp_api_fetch");
+			return $log;
+		});
 		$this->audienceMap[ $audienceListId ] = $audience;
 
 		return $audience;
@@ -111,6 +128,16 @@ class Repository extends _Component {
 		}
 
 		$this->segments[ $id ] = $this->api->getSegments( $id );
+
+		Log::write(function(ProcessLog $log) use ($id){
+			$log
+				->setMessage("Fetch segments for audience $id")
+				->setChangedDataField("segments")
+				->setChangedDataValueNew($this->segments[$id])
+				->setEventType("mailchimp_api_fetch");
+			return $log;
+		});
+
 		set_transient( $transientKey, $this->segments[ $id ], 60 * 10 );
 
 		return $this->segments[ $id ];
@@ -139,6 +166,14 @@ class Repository extends _Component {
 
 		$groups              = $this->api->getGroups( $id );
 		$this->groups[ $id ] = $groups;
+		Log::write(function(ProcessLog $log) use ($id){
+			$log
+				->setMessage("Fetch groups for audience $id")
+				->setChangedDataField("groups")
+				->setChangedDataValueNew($this->groups[$id])
+				->setEventType("mailchimp_api_fetch");
+			return $log;
+		});
 		set_transient( $transientKey, $this->groups[ $id ], 60 * 10 );
 
 		return $this->groups[ $id ];
@@ -156,6 +191,12 @@ class Repository extends _Component {
 		global $wpdb;
 		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '" . Plugin::TRANSIENT_DELETE_SEGMENTS_LIKE . "'" );
 		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '" . Plugin::TRANSIENT_DELETE_GROUPS_LIKE . "'" );
+		Log::write(function(ProcessLog $log){
+			$log
+				->setMessage("Cleared cache for audiences, segments and groups")
+				->setEventType(process_log_get_plugin()::EVENT_TYPE_DELETE);
+			return $log;
+		});
 	}
 
 	/**
@@ -208,6 +249,12 @@ class Repository extends _Component {
 		$audience = $this->getAudience( $audienceListId );
 
 		if ( ! ( $audience instanceof Audience ) ) {
+			Log::write(function(ProcessLog $log) use ($audienceListId){
+				$log
+					->setMessage("addCampaign -> Could not add campaign because audience is missing: $audienceListId")
+					->setEventType(process_log_get_plugin()::EVENT_TYPE_ERROR);
+				return $log;
+			});
 			return new WP_Error( 404, "Could not find audience list id.", [
 				"audience" => $audienceListId,
 				"campaign" => $campaign,
@@ -220,6 +267,13 @@ class Repository extends _Component {
 			$campaign->attributes  = [];
 			$this->database->updateCampaign( $campaign );
 
+			Log::write(function(ProcessLog $log) use ($campaign){
+				$log
+					->setMessage("addCampaign -> Add campaign DEBUG stop for campaign $campaign->id")
+					->setEventType(process_log_get_plugin()::EVENT_TYPE_CREATE);
+				return $log;
+			});
+
 			return $campaign;
 		}
 
@@ -231,6 +285,18 @@ class Repository extends _Component {
 
 		$response = $this->api->addCampaign( $args );
 		if ( ! is_array( $response ) ) {
+			Log::write(function(ProcessLog $log) use ($campaign, $args, $response){
+				$log
+					->setChangedDataField("campaign")
+					->setChangedDataValueNew([
+						"args" => $args,
+						"campaign" => $campaign,
+						"response" => $response,
+					])
+					->setMessage("addCampaign -> Could not add campaign via Mailchimp api")
+					->setEventType(process_log_get_plugin()::EVENT_TYPE_ERROR);
+				return $log;
+			});
 			return new WP_Error(
 				500,
 				"Bad response from mailchimp controller.",
@@ -242,6 +308,19 @@ class Repository extends _Component {
 		}
 
 		$this->database->updateCampaign( $campaign->setAttributes( $response ) );
+
+		Log::write(function(ProcessLog $log) use ($campaign, $args, $response){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"args" => $args,
+					"campaign" => $campaign,
+					"response" => $response,
+				])
+				->setMessage("addCampaign -> Campaign was created via mailchimp api")
+				->setEventType("mailchimp_api_add_campaign");
+			return $log;
+		});
 
 		return $campaign;
 	}
@@ -258,6 +337,17 @@ class Repository extends _Component {
 		$campaign = $id instanceof Campaign ? $id : $this->database->getCampaign( $id );
 
 		if ( ! ( $campaign instanceof Campaign ) ) {
+			Log::write(function(ProcessLog $log) use ($id, $campaign){
+				$log
+					->setChangedDataField("campaign")
+					->setChangedDataValueNew([
+						"campaign_id" => $id,
+						"campaign" => $campaign,
+					])
+					->setMessage("updateCampaign -> Could not find campaign")
+					->setEventType(process_log_get_plugin()::EVENT_TYPE_ERROR);
+				return $log;
+			});
 			return new WP_Error(
 				404,
 				"Could not find campaign.",
@@ -279,6 +369,19 @@ class Repository extends _Component {
 		                             ->setSegmentId( $segmentId );
 
 		$response = $this->api->updateCampaign( $args );
+
+		Log::write(function(ProcessLog $log) use ($id, $args, $campaign, $response){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"args" => $args,
+					"campaign" => $campaign,
+					"response" => $response,
+				])
+				->setMessage("updateCampaign -> Campaign was updated via mailchimp api")
+				->setEventType("mailchimp_api_update_campaign");
+			return $log;
+		});
 
 		$campaign->setAttributes( $response );
 
@@ -334,6 +437,16 @@ class Repository extends _Component {
 	public function updateCampaignContent( $id ) {
 		$campaign = $this->getCampaignOrFalse( $id );
 		if ( false === $campaign ) {
+			Log::write(function(ProcessLog $log) use ($id){
+				$log
+					->setChangedDataField("campaign")
+					->setChangedDataValueNew([
+						"campaign_id" => $id,
+					])
+					->setMessage("updateCampaignContent -> No campaign was found in local database")
+					->setEventType(process_log_get_plugin()::EVENT_TYPE_ERROR);
+				return $log;
+			});
 			return new WP_Error(
 				404,
 				"Could not find campaign.",
@@ -359,6 +472,18 @@ class Repository extends _Component {
 			apply_filters( Plugin::FILTER_NEWSLETTER_CHANGE_CONTENT_PLAINTEXT, $content_plaintext, $campaign->post_id ),
 			get_permalink( $campaign->post_id )
 		);
+
+		Log::write(function(ProcessLog $log) use ($id, $response){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"campaign_id" => $id,
+					"response" => $response,
+				])
+				->setMessage("updateCampaignContent -> Updated campaign content via mailchimp api")
+				->setEventType("mailchimp_api_add_content");
+			return $log;
+		});
 
 		$this->fetchCampaign( $campaign );
 
@@ -461,6 +586,18 @@ class Repository extends _Component {
 			return false;
 		}
 
+		Log::write(function(ProcessLog $log) use ($id, $result){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"campaign_id" => $id,
+					"response" => $result,
+				])
+				->setMessage("send -> Campaign was sent via mailchimp api")
+				->setEventType("mailchimp_api_send");
+			return $log;
+		});
+
 		$this->fetchCampaign( $campaign );
 
 		return true;
@@ -554,6 +691,19 @@ class Repository extends _Component {
 
 		$campaign = $this->fetchCampaign( $campaign );
 
+		Log::write(function(ProcessLog $log) use ($id, $result, $datetime){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"campaign_id" => $id,
+					"datetime" => $datetime,
+					"response" => $result,
+				])
+				->setMessage("schedule -> Campaign was scheduled  via mailchimp api")
+				->setEventType("mailchimp_api_schedule");
+			return $log;
+		});
+
 		do_action( Plugin::ACTION_CAMPAIGN_WAS_SCHEDULED, $campaign );
 
 		return $result;
@@ -582,8 +732,20 @@ class Repository extends _Component {
 			return false;
 		}
 
-		$this->api->unschedule( $campaign->campaign_id );
+		$response = $this->api->unschedule( $campaign->campaign_id );
 		$this->fetchCampaign( $campaign );
+
+		Log::write(function(ProcessLog $log) use ($id, $response){
+			$log
+				->setChangedDataField("campaign")
+				->setChangedDataValueNew([
+					"campaign_id" => $id,
+					"response" => $response,
+				])
+				->setMessage("unschedule -> Campaign was unscheduled via mailchimp api")
+				->setEventType("mailchimp_api_unschedule");
+			return $log;
+		});
 
 		return true;
 	}
