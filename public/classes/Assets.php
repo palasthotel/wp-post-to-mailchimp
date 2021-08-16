@@ -18,19 +18,20 @@ class Assets extends _Component {
 
 		$typeId = $this->plugin->types->getType( get_the_ID() );
 
-		$lists = $this->plugin->repository->getAudiences();
-		$lists = array_values( array_filter( $lists, function ( $list ) use ( $typeId ) {
+		$audiences          = $this->plugin->repository->getAudiences();
+		$audiencesWhitelist = array_values( array_filter( $audiences, function ( $list ) use ( $typeId ) {
 			return Option::isAudienceWhitelisted( $list->listId, $typeId );
 		} ) );
 
 		$segments = [];
 		$groups   = [];
-		foreach ( $lists as $list ) {
+		foreach ( $audiencesWhitelist as $list ) {
 			$segments[ $list->listId ] = array_values(
 				array_filter(
 					$this->plugin->repository->getSegments( $list ),
 					function ( $segment ) use ( $typeId, $list ) {
-						return Option::isSegmentWhitelisted( $list->listId, $segment->id, $typeId ) || Option::isTagWhitelisted( $list->listId, $segment->id, $typeId );
+						return Option::isSegmentWhitelisted( $list->listId, $segment->id, $typeId )
+						       || Option::isTagWhitelisted( $list->listId, $segment->id, $typeId );
 					} )
 			);
 			$groups[ $list->listId ]   = $this->plugin->repository->getGroups( $list );
@@ -45,9 +46,21 @@ class Assets extends _Component {
 					"html"      => $this->plugin->preview->getHTMLUrl( get_the_ID() ),
 					"plaintext" => $this->plugin->preview->getPlaintextUrl( get_the_ID() ),
 				],
-				"defaultScheduleTime"                 => Option::getScheduleTime(),
-				"lists"                               => $lists,
-				"segments"                            => $segments,
+				"defaultScheduleTime"                 => apply_filters(
+					Plugin::FILTER_EDITOR_DEFAULT_SCHEDULE_TIME,
+					Option::getScheduleTime(),
+					$typeId,
+				),
+				"lists"                               => apply_filters(
+					Plugin::FILTER_EDITOR_AUDIENCES,
+					$audiencesWhitelist,
+					$typeId
+				),
+				"segments"                            => apply_filters(
+					Plugin::FILTER_EDITOR_SEGMENTS,
+					$segments,
+					$typeId
+				),
 				"audienceIdsWithEmptySegmentsAllowed" => Option::getAudienceIdsWithEmptySegmentAllowed( $typeId ),
 				"groups"                              => $groups,
 				"settingsUrl"                         => $this->plugin->settings->getUrl(),
