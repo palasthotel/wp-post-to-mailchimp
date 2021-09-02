@@ -95,6 +95,7 @@ class Plugin {
 	const ACTION_NEWSLETTER_THE_CONTENT_PLAINTEXT = "post_to_mailchimp_the_content_plaintext";
 	const ACTION_CAMPAIGN_WAS_SENT = "post_to_mailchimp_campaign_was_sent";
 	const ACTION_CAMPAIGN_WAS_SCHEDULED = "post_to_mailchimp_campaign_was_scheduled";
+    const ACTION_CAMPAIGN_WAS_UPDATED = "post_to_mailchimp_campaign_was_updated";
 
 	/**
 	 * filters

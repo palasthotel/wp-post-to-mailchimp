@@ -382,6 +382,7 @@ class Repository extends _Component {
 				->setEventType("mailchimp_api_update_campaign");
 			return $log;
 		});
+        do_action(Plugin::ACTION_CAMPAIGN_WAS_UPDATED, $response, $args, $campaign);
 
 		$campaign->setAttributes( $response );
 
