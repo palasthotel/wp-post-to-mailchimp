@@ -3,13 +3,13 @@
  * Plugin Name: Post to Mailchimp
  * Plugin URI: https://github.com/Palasthotel
  * Description: Use your contents with Mailchimp.com API
- * Version: 2.0.5
+ * Version: 2.0.6
  * Author: Palasthotel ( Edward Bock <eb@palasthotel.de> )
  * Author URI: https://www.palasthotel.de
  * Text Domain: post_to_mailchimp
  * Domain Path: /languages
  * Requires at least: 5.x
- * Tested up to: 5.8
+ * Tested up to: 5.8.1
  * License: http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @copyright Copyright (c) 2020, Palasthotel
  * @package Palasthotel\PostToMailchimp

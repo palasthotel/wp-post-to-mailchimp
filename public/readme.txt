@@ -3,8 +3,8 @@ Contributors: palasthotel, edwardbock
 Donate link: http://palasthotel.de/
 Tags: mailchimp, newsletter
 Requires at least: 5.0
-Tested up to: 5.8
-Stable tag: 2.0.5
+Tested up to: 5.8.1
+Stable tag: 2.0.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl
 
@@ -33,6 +33,10 @@ You can copy one or both templates out of the `wp-content/plugins/post-to-mailch
 
 
 == Changelog ==
+
+= 2.0.6 =
+* Added new action when audience was updated
+* Bugfix dirty campaignstate error campaign_id == null
 
 = 2.0.5 =
 * Added filter for editor audiences list
