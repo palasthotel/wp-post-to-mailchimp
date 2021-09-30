@@ -28,7 +28,7 @@ class RecentCampaignField extends _Component {
 					$postId   = $post["id"];
 					$campaign = $this->plugin->repository->getRecentCampaign( $postId );
 
-					if($campaign instanceof Campaign){
+					if($campaign instanceof Campaign && $campaign->isValid()){
 						if($campaign->state === Campaign::MC_STATUS_SCHEDULED || $campaign->state === Campaign::MC_STATUS_SENDING){
 							$time = intval(get_post_meta($postId, Plugin::POST_META_CAMPAIGN_SYNC_TIMESTAMP, true));
 							$now = time();
@@ -42,7 +42,7 @@ class RecentCampaignField extends _Component {
 						}
 					}
 
-					return null === $campaign ? new \stdClass() : $campaign;
+					return null === $campaign || !$campaign->isValid() ? new \stdClass() : $campaign;
 				},
 				'update_callback'     => function ( $value, $post ) {
 
@@ -55,7 +55,7 @@ class RecentCampaignField extends _Component {
 
 					// custom values
 					$customs = [];
-					if(is_array($value["custom"])){
+					if(isset($value["custom"]) && is_array($value["custom"])){
 						foreach ($value["custom"] as $custom_key => $custom_value){
 							$customs[sanitize_text_field($custom_key)] = sanitize_textarea_field($custom_value);
 						}

@@ -1,3 +1,27 @@
-.ptm-error{border-left:5px solid #cc1818;background:#f4a2a2;padding:10px 5px 5px 5px}.ptm-error+.ptm-error{margin-top:4px;border-top:1px solid #e3e3e3}.ptm-error__message+.ptm-error__detail{margin-top:4px}.ptm-error__detail{padding:2px;background:#efefef;border:1px solid #e3e3e3}.ptm-error__detail+.ptm-error__detail{margin-top:4px}
+/*!****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/script/components/ErrorMessage.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************/
+.ptm-error {
+  border-left: 5px solid #cc1818;
+  background: #f4a2a2;
+  padding: 10px 5px 5px 5px;
+}
+.ptm-error + .ptm-error {
+  margin-top: 4px;
+  border-top: 1px solid #e3e3e3;
+}
+
+.ptm-error__message + .ptm-error__detail {
+  margin-top: 4px;
+}
+
+.ptm-error__detail {
+  padding: 2px;
+  background: #efefef;
+  border: 1px solid #e3e3e3;
+}
+.ptm-error__detail + .ptm-error__detail {
+  margin-top: 4px;
+}
 
 /*# sourceMappingURL=post-to-mailchimp.css.map*/

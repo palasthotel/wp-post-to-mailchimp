@@ -61,6 +61,10 @@ class Campaign {
 		return new static( $id, $post_id );
 	}
 
+	public function isValid(): bool{
+		return $this->campaign_id !== null && $this->attributes !== null;
+	}
+
 	/**
 	 * @param string|null $campaignId
 	 *

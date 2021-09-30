@@ -759,7 +759,7 @@ class Repository extends _Component {
 	 */
 	public function fetchCampaign( $id ) {
 		$campaign = $this->getCampaignOrFalse( $id );
-		if ( false === $campaign ) {
+		if ( !($campaign instanceof Campaign) || !$campaign->isValid() ) {
 			return false;
 		}
 

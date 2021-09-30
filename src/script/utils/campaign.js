@@ -5,7 +5,7 @@ const getAttributes = campaign => isCampaign(campaign) ? campaign.attributes : {
 
 export const campaignGetState = (campaign)=>{
     const attributes = getAttributes(campaign);
-    return attributes.status || "";
+    return attributes?.status || "";
 }
 
 // mailchimp campaign status
