@@ -765,6 +765,21 @@ class Repository extends _Component {
 		}
 
 		$response = $this->api->getCampaign( $campaign->campaign_id );
+		if($response !== null && !is_array($response)){
+			Log::write(function(ProcessLog $log) use ($id, $response){
+				$log
+					->setChangedDataField("campaign")
+					->setChangedDataValueNew([
+						"campaign_id" => $id,
+						"response" => $response,
+					])
+					->setMessage("fetchCampaign -> try to fetch Campaign from mailchimp api")
+					->setEventType("mailchimp_api");
+				return $log;
+			});
+			return false;
+		}
+		
 		$campaign->setAttributes( $response );
 		$this->database->updateCampaign( $campaign );
 
