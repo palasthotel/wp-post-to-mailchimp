@@ -1,5 +1,6 @@
 {
   "name": "post-to-mailchimp",
+  "license": "GPL-3.0-or-later",
   "version": "2.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
