@@ -1,5 +1,6 @@
 {
     "name": "palasthotel/post-to-mailchimp",
+    "license": "GPL-3.0-or-later",
     "description": "Mailchimp integration",
     "autoload": {
         "psr-4": {
