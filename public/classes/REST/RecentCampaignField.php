@@ -26,6 +26,15 @@ class RecentCampaignField extends _Component {
 			[
 				'get_callback'        => function ( $post ) {
 					$postId   = $post["id"];
+
+					// The field is on every response for the post, also the public
+					// one. The campaign - audience, segment, sender, Mailchimp ids -
+					// is only for those who may edit the post, and an anonymous
+					// request must not start a Mailchimp API call either.
+					if ( ! current_user_can( 'edit_post', $postId ) ) {
+						return new \stdClass();
+					}
+
 					$campaign = $this->plugin->repository->getRecentCampaign( $postId );
 
 					if($campaign instanceof Campaign && $campaign->isValid()){
