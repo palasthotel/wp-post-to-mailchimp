@@ -111,11 +111,25 @@ class CampaignsController extends _BaseController {
 
 	}
 
+	/**
+	 * The user has to be allowed to edit the post, and a campaign named in the route
+	 * has to belong to that post - otherwise the right to edit one post would reach
+	 * every campaign of the Mailchimp account.
+	 */
 	public function permission(WP_REST_Request $request){
-		$post_id = $request->get_param( WP_REST::ARG_POST_ID );
+		$post_id = intval( $request->get_param( WP_REST::ARG_POST_ID ) );
 		$post_type = get_post_type($post_id);
-		$isActive =  Option::isActiveFor($post_type);
-		return $isActive && (current_user_can( 'edit_post', $post_id ) || WP_DEBUG);
+		if ( ! $post_type || ! Option::isActiveFor( $post_type ) || ! current_user_can( 'edit_post', $post_id ) ) {
+			return false;
+		}
+
+		$campaign_id = $request->get_param( WP_REST::ARG_CAMPAIGN_ID );
+		if ( null === $campaign_id ) {
+			return true;
+		}
+		$campaign = $this->plugin->repository->getCampaign( intval( $campaign_id ) );
+
+		return $campaign instanceof Campaign && intval( $campaign->post_id ) === $post_id;
 	}
 
 	public function get_items( $request ) {
