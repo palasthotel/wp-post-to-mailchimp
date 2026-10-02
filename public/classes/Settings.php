@@ -51,6 +51,79 @@ class Settings extends _Component {
 	 */
 	function admin_init() {
 
+		// The cache button and the whitelists are not registered settings, so
+		// options.php does not save them - this does, on the same request. admin_init
+		// also runs for admin-ajax.php and admin-post.php, for any visitor, so the
+		// request has to be the settings form, sent by someone who may manage options.
+		if ( $this->isSettingsFormSubmission() ) {
+			$this->saveSettingsForm();
+		}
+
+		add_settings_section(
+			'ph_mailchimp_settings_section',
+			__( 'API', Plugin::DOMAIN ),
+			array( $this, 'render_section' ),
+			'ph_mailchimp_settings'
+		);
+
+		add_settings_field(
+			Plugin::OPTION_MAILCHIMP_API_KEY,
+			__( 'API key', Plugin::DOMAIN ),
+			array( $this, 'render_api_key' ),
+			'ph_mailchimp_settings',
+			'ph_mailchimp_settings_section'
+		);
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_MAILCHIMP_API_KEY );
+
+		add_settings_field(
+			Plugin::OPTION_GA_API_KEY,
+			__( 'Google Analytics ID', Plugin::DOMAIN ),
+			array( $this, 'render_ga' ),
+			'ph_mailchimp_settings',
+			'ph_mailchimp_settings_section'
+		);
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_GA_API_KEY );
+
+		add_settings_field(
+			'ph_mailchimp_schedule_time',
+			__( 'Default schedule time', Plugin::DOMAIN ),
+			array( $this, 'render_schedule_time' ),
+			'ph_mailchimp_settings',
+			'ph_mailchimp_settings_section'
+		);
+		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_SCHEDULE_TIME );
+
+		add_settings_field(
+			'ph_mailchimp_lists',
+			__( 'Available lists', Plugin::DOMAIN ),
+			array( $this, 'render_lists' ),
+			'ph_mailchimp_settings',
+			'ph_mailchimp_settings_section'
+		);
+
+	}
+
+	/**
+	 * Is this request the settings form, with its nonce, from a user who may change
+	 * the settings?
+	 */
+	private function isSettingsFormSubmission(): bool {
+		if ( ! isset( $_POST["option_page"] ) || "ph_mailchimp_settings" !== $_POST["option_page"] ) {
+			return false;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+		$nonce = isset( $_POST["_wpnonce"] ) ? sanitize_text_field( wp_unslash( $_POST["_wpnonce"] ) ) : "";
+
+		return false !== wp_verify_nonce( $nonce, "ph_mailchimp_settings-options" );
+	}
+
+	/**
+	 * Saves what the settings form sends besides the registered settings.
+	 */
+	private function saveSettingsForm() {
+
 		if (
 			is_array( $_POST ) && isset( $_POST["post-to-mailchimp-settings-form"] ) && $_POST["post-to-mailchimp-settings-form"] === "it-is"
 			&&
@@ -104,50 +177,6 @@ class Settings extends _Component {
 
 			}
 		}
-
-
-		add_settings_section(
-			'ph_mailchimp_settings_section',
-			__( 'API', Plugin::DOMAIN ),
-			array( $this, 'render_section' ),
-			'ph_mailchimp_settings'
-		);
-
-		add_settings_field(
-			Plugin::OPTION_MAILCHIMP_API_KEY,
-			__( 'API key', Plugin::DOMAIN ),
-			array( $this, 'render_api_key' ),
-			'ph_mailchimp_settings',
-			'ph_mailchimp_settings_section'
-		);
-		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_MAILCHIMP_API_KEY );
-
-		add_settings_field(
-			Plugin::OPTION_GA_API_KEY,
-			__( 'Google Analytics ID', Plugin::DOMAIN ),
-			array( $this, 'render_ga' ),
-			'ph_mailchimp_settings',
-			'ph_mailchimp_settings_section'
-		);
-		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_GA_API_KEY );
-
-		add_settings_field(
-			'ph_mailchimp_schedule_time',
-			__( 'Default schedule time', Plugin::DOMAIN ),
-			array( $this, 'render_schedule_time' ),
-			'ph_mailchimp_settings',
-			'ph_mailchimp_settings_section'
-		);
-		register_setting( 'ph_mailchimp_settings', Plugin::OPTION_SCHEDULE_TIME );
-
-		add_settings_field(
-			'ph_mailchimp_lists',
-			__( 'Available lists', Plugin::DOMAIN ),
-			array( $this, 'render_lists' ),
-			'ph_mailchimp_settings',
-			'ph_mailchimp_settings_section'
-		);
-
 	}
 
 	public function getUrl() {
