@@ -31,7 +31,11 @@ class Database extends _Component {
 	 * @return false|Campaign
 	 */
 	public function addCampaign( int $post_id ) {
-		$row = $this->wpdb->get_row( "SELECT * FROM $this->table WHERE campaign_id IS NULL LIMIT 1" );
+		// Reuse a row that never got a Mailchimp campaign - but only one of this post,
+		// or the new campaign would be filed under, and filled with, another post.
+		$row = $this->wpdb->get_row(
+			$this->wpdb->prepare( "SELECT * FROM $this->table WHERE campaign_id IS NULL AND post_id = %d LIMIT 1", $post_id )
+		);
 		if ( $row ) {
 			return $this->campaignRowToModel( $row );
 		}
